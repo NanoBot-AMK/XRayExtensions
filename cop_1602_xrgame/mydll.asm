@@ -26,11 +26,11 @@ LOCAL a_msg
 	jmp     lab1_
 a_msg db msg_txt, 0
 lab1_:
-	pusha
+	pushad
 	push    offset a_msg
 	call    Msg
 	add     esp, 04h
-	popa
+	popad
 ENDM
 
 PRINT_UINT MACRO fmt_txt:REQ, val:REQ
@@ -39,12 +39,12 @@ LOCAL a_msg
 	jmp     lab1_
 a_msg db fmt_txt, 0
 lab1_:
-	pusha
+	pushad
 	push    val
 	push    offset a_msg
 	call    Msg
 	add     esp, 08h
-	popa
+	popad
 ENDM
 
 PRINT_FLOAT MACRO fmt_txt:REQ, val:REQ
@@ -55,7 +55,7 @@ LOCAL value1
 a_msg db fmt_txt, 0
 value1 dd ?
 lab1_:
-	pusha
+	pushad
 	mov     [value1], val
 	sub     esp, 8
 	fld     [value1]
@@ -64,12 +64,14 @@ lab1_:
 	call    Msg
 	add     esp, 0Ch
 	
-	popa
+	popad
 ENDM
 
 ; позиция в том месте, где в целевой DLL начинается наша секция
 org sec1_sec2_dist
 
+include macros_smart_cast.asm
+include macros_call.asm
 include types.asm
 include global_ns_fix.asm
 include level_ns_fix.asm

@@ -30,12 +30,10 @@ cuilistbox_fix2 endp
 CUIListBox__GetMainInputReceiver proc near
 stub = dword ptr  4
 	call    CurrentGameUI
-	test    eax, eax
-	jz      exit
-	mov     ecx, eax
-	add     ecx, 10h
-	call    CDialogHolder__TopInputReceiver
-exit:
+	.if		eax != 0
+		lea     ecx, [eax+10h]
+		call    CDialogHolder__TopInputReceiver
+	.endif
 	retn    4
 CUIListBox__GetMainInputReceiver endp
 

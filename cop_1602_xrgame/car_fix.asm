@@ -14,10 +14,8 @@ pCar           = dword ptr  8
 	cmp     edi, ebx
 	mov     esi, ecx
 	jz      m_end
-	
 	;call    CActor__PickupModeOff
 	mov     [esi+4C4h], edi
-	
 	mov     ecx, [esi+4C4h]
 	mov     eax, [ecx]
 	push    esi
@@ -27,7 +25,6 @@ pCar           = dword ptr  8
 	jnz     m_1
 	mov     [esi+4C4h], ebx
 	jmp     m_end
-
 m_1:
 	mov     eax, [esi+4C4h]
 	cmp     eax, ebx
@@ -55,7 +52,7 @@ loc_101C19BE:
 	push    1
 	push    eax
 	mov     ecx, esi
-	call CActor__SetWeaponHideState
+	call 	CActor__SetWeaponHideState
 	
 m_end:
 	pop     edi

@@ -1,3 +1,8 @@
+
+TRUE				equ 1
+FALSE				equ 0
+NULL				equ 0
+
 ;	---===RayPick===---
 collide__rq_result struc
 O					dd ? ; CObject *O;
@@ -12,3 +17,41 @@ y					dd ? ;
 z					dd ? ;
 Fvector ends
 
+Fvector4 struc
+x					dd ? ; 
+y					dd ? ;
+z					dd ? ;
+_					dd ?
+Fvector4 ends
+
+CCartridge struct 4		; sizeof 60 bytes 
+	m_ammoSect			dd ?
+	kDist				dd ?
+	kDisp				dd ?
+	kHit				dd ?
+	kImpulse			dd ?
+	kAP					dd ?
+	kAirRes				dd ?
+	buckShot			dd ?
+	impair				dd ?
+	fWallmarkSize		dd ?
+	u8ColorID			db ?
+	align 4
+	m_LocalAmmoType		db ?
+	align 4
+	bullet_material_idx	dw ?
+	align 4
+	m_flags				db ?
+	align 4
+	m_InvShortName		dd ?
+	align 4
+CCartridge ends
+
+; for m_flags
+cfTracer				= byte ptr 1
+cfRicochet				= byte ptr 2
+cfCanBeUnlimited		= byte ptr 4
+cfExplosive				= byte ptr 8
+cfMagneticBeam			= byte ptr 16
+;-----------
+	

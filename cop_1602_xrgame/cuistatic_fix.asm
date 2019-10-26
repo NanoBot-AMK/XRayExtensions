@@ -49,26 +49,30 @@ arg_0			= dword ptr	 4
 	retn	4
 CUIStatic__SetHeading endp
 
-CUIStatic__SetColor proc
+CUIStatic__SetColor proc color:dword
 m_UIStaticItem	= dword ptr	 08Ch
 dwColor			= dword ptr	 038h
-arg_0			= dword ptr	 4
+;arg_0			= dword ptr	 4
+A				= dword ptr	 0
+R				= dword ptr	 4
+G				= dword ptr	 8
+B				= dword ptr	 12
 	push	ebx
 ;----------------------------------
-; u32 color = clamp_0_255((int)(_c.x1)) | (clamp_0_255((int)(_c.x2)) << 8) | (clamp_0_255((int)(_c.y1)) << 16) | (clamp_0_255((int)(_c.y1)) << 24)
-	mov		eax, [esp+4+arg_0]
-	cvttss2si	edx, dword ptr [eax]
+; u32 color = clamp_0_255((int)(_c.x1)) | (clamp_0_255((int)(_c.x2)) << 8) | (clamp_0_255((int)(_c.y1)) << 16) | (clamp_0_255((int)(_c.y2)) << 24)
+	mov		eax, color
+	cvttss2si	edx, dword ptr [eax+A]
 	call	clamp_0_255
 	mov		ebx, edx
-	cvttss2si	edx, dword ptr [eax+4]
+	cvttss2si	edx, dword ptr [eax+R]
 	call	clamp_0_255
 	shl		edx, 8
 	or		ebx, edx
-	cvttss2si	edx, dword ptr [eax+8]
+	cvttss2si	edx, dword ptr [eax+G]
 	call	clamp_0_255
 	shl		edx, 16
 	or		ebx, edx
-	cvttss2si	edx, dword ptr [eax+12]
+	cvttss2si	edx, dword ptr [eax+B]
 	call	clamp_0_255
 	shl		edx, 24
 	or		ebx, edx							; u32	ebx = color
@@ -76,20 +80,10 @@ arg_0			= dword ptr	 4
 ;	PRINT_UINT "color - %x", ebx
 ;----------------------------------
 	pop		ebx
-	retn	4
+	ret		4
 ;==========================
-	; clamp(param, 0, 255)
 clamp_0_255:
-	cmp		edx, 0
-	jge		lab1
-	xor		edx, edx
-	jmp		lab2
-lab1:
-	cmp		edx, 0FFh
-	jbe		lab2
-	mov		edx, 0FFh
-lab2:
-;	PRINT_UINT "param - %d", edx
+	clamp	edx, 0, 255
 	retn
 CUIStatic__SetColor endp
 	

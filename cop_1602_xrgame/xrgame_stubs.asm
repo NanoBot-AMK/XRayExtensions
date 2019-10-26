@@ -372,13 +372,11 @@ push	1
 ;==============================================================================
 ; ищется по ссылке на строку "li_pause_key"
 ;.text:10237540 CLevel__IR_OnKeyboardPress proc near	; DATA XREF: .rdata:1054857Co
-;.text:10237540					mov		eax, ds:?Device@@3VCRenderDevice@@A ; CRenderDevice Device
-org 10237545h - shift
-	jmp level_input_fix
-;.text:10237545					sub		esp, 410h
-org 1023754Bh - shift
-back_from_level_input_fix:
-;.text:1023754B					cmp		dword ptr [eax+0Ch], 0
+; колбек на нажатие клавиш
+org 10237545h - shift	; 6 bytes
+	jmp		level_input_CallbackKeyPress
+	nop
+back_from_level_input_CallbackKeyPress:
 
 
 org 103065C0h - shift
@@ -737,7 +735,10 @@ CWeaponMagazined__OnAnimationEnd:
 ;================================================================
 iMagazineSize			= dword ptr 1684
 iMagazineSize2			= dword ptr 2024
-m_bGrenadeMode			= dword ptr 7F8h
+m_bGrenadeMode			= byte	ptr 2040
+m_bLockType				= byte	ptr 1972
+m_bBlockRocket			= byte	ptr 1974
+m_bCanRocketReload		= byte	ptr 1975
 ; Подствольный гранатомёт: перезарядка параметров: подствол. - основной ствол.
 org 102D3A52h - shift	; 5 bytes
 	jmp		switshGL_params
@@ -748,18 +749,17 @@ org 102D1FE9h - shift	; 7 bytes
 	nop
 	nop
 back_from_reload_GL:
-; Подствольный гранатомёт: блокируем перезарядку, если есть ещё патроны.
-org 102D15A0h - shift	; 2 bytes
-jnz     short loc_102D15D4
-org 102D15B7h - shift	; 51 bytes
-	cmp		byte ptr [esi+m_bGrenadeMode-2E0h], 0
-	jz		loc_102D15D4 			; if (m_bGrenadeMode)
-	cmp		byte ptr [esi+iAmmoElapsed-2E0h], 0
-	jnz		loc_102D15D4			; if (iAmmoElapsed==0)
-	mov		eax, [esi-2E0h]
-	mov		edx, [eax+188h]
-	lea		ecx, [esi-2E0h]
-	call	edx				; CWeaponMagazined::Reload
+; Подствольный гранатомёт: убираем перезарядку.
+; CWeaponMagazinedWGrenade::OnAnimationEnd
+org 102D1596h - shift	; 75 bytes
+	mov		esi, ecx
+	mov		[esi+m_bCanRocketReload-2E0h], true
+	cmp		edi, 10
+	jnz		short loc_102D15D4
+	mov		eax, [esi]
+	mov		edx, [eax]
+	push	0
+	call	edx				; SwitchState(eIdle);
 loc_102D15D4:
 	push	edi
 	mov		ecx, esi
@@ -767,8 +767,18 @@ loc_102D15D4:
 	pop		edi
 	pop		esi
 	retn	4
-	
+	db		40 dup (0CCh)
+
 ; Подствольный гранатомёт: задаём размер магазина.
+; CWeaponMagazinedWGrenade::Load
+org 102D3FA7h - shift	; 12 bytes
+	mov		ecx, edi
+	call	load_param_GL
+	nop
+	nop
+	nop
+	nop
+	nop
 org 102D4063h - shift	; 12 bytes
 	mov		ecx, edi
 	call	load_param_GL
@@ -785,10 +795,11 @@ org 102D407Ch - shift	; 12 bytes
 	nop
 	nop
 	nop
+;--------------------
 ; Подствольный гранатомёт: размер магазана.
 org 102D3748h - shift	; 38 bytes
 ;	m_bGrenadeMode = !m_bGrenadeMode;
-	xor		byte ptr [esi+m_bGrenadeMode], 1
+	xor		[esi+m_bGrenadeMode], 1
 	push	edi
 	nop
 	nop
@@ -801,7 +812,13 @@ org 102D3748h - shift	; 38 bytes
 	mov		eax, [esi+iMagazineSize2]
 	mov		[esi+iMagazineSize2], ecx
 	mov		[esi+iMagazineSize], eax
-
+; При отсоединении ПГ в основном режиме, разряжаем ПГ.
+org 102D3BAAh - shift	; 8 bytes
+	jmp		CWeaponMagazinedWGrenade__Detach_fix
+	nop
+	nop
+	nop
+back_from_CWeaponMagazinedWGrenade__Detach_fix:
 
 ; колбек на удар ножа, вызывается в объекте ножа
 org 102D73D2h - shift	; 7 bytes
@@ -814,7 +831,7 @@ back_from_CWeaponKnife__CallbackOnShoot:
 ; (c) NanoBot
 org 102C8268h - shift	; 17 bytes		//	void CMissile::UpdateCL()
 	; if (m_actived_grn_udz)	CMissile__UDZ();
-	mov		cl, byte ptr [esi+m_actived_grn_udz]
+	mov		cl, [esi+m_actived_grn_udz]
 	test	cl, cl
 	jnz		CMissile__UDZ
 	nop
@@ -826,25 +843,27 @@ org 102C80E1h - shift	; 12 bytes		//	void CMissile::OnEvent(NET_Packet& P, u16 t
 	jmp		InitFakeMissile
 back_from_InitFakeMissile:
 
+; CMissile
 ; переопределяем адрес bool m_constpower с 3A8h на 33Dh, а на её место назначаем u32 m_dwSafetyLockTime
-m_throw					= dword ptr 828
-m_constpower			= dword ptr 829
-m_actived_grn_udz		= dword ptr 830		; bool граната УДЗ активирована (без чеки)
-m_bFlying				= dword ptr 831		; граната полетела
+m_throw					= byte	ptr 828
+m_constpower			= byte	ptr 829
+m_actived_grn_udz		= byte	ptr 830		; bool граната УДЗ активирована (без чеки)
+m_bFlying				= byte	ptr 831		; граната полетела
 m_dwSafetyLockTime		= dword ptr 3A8h	; u32 время взвода ударного взрывателя, мс
 m_fAccThreshold			= dword ptr 960
 m_dwDelta				= dword ptr 964
+m_bHasDifferentFireModes = byte ptr 1950
 
 org 102C6A10h - shift	; 6 bytes
-	mov		byte ptr [esi+m_constpower], al
+	mov		[esi+m_constpower], al
 org 102C8D44h - shift	; 7 bytes
 	cmp		byte ptr [ebx+m_constpower], 0
 org 102C707Ch - shift	; 6 bytes
-	mov		byte ptr [esi+m_constpower], cl
+	mov		[esi+m_constpower], cl
 org 102C70D9h - shift	; 7 bytes
 	mov		byte ptr [esi+m_constpower], 1
 org 102C73EFh - shift	; 12 bytes
-	mov		[esi+m_throw], eax		; обнуляем разом 4 булевы	m_throw = m_constpower = m_actived_grn_udz = m_bFlying = false;
+	mov		dword ptr [esi+m_throw], eax	; обнуляем разом 4 булевы	m_throw = m_constpower = m_actived_grn_udz = m_bFlying = false;
 	mov		eax, eax
 	mov		eax, eax
 	mov		eax, eax
@@ -874,7 +893,7 @@ back_from_stabilized_rocket:
 org 102CA7F0h - shift
 CCustomRocket__Contact:
 
-org 102C7130h - shift	; 0 bytes
+org 102C7130h - shift	; 
 CMissile__ExitContactCallback:
 ;	mov		byte ptr [eax], 1
 org 102CBCDEh - shift	; 5 bytes
@@ -899,8 +918,9 @@ org 102CBF90h - shift
 CExplosiveRocket__Contact:
 
 ; блокировка автоперезарядки
-m_iPrefferedFireMode	= dword ptr 1968
-m_bAutoReload			= dword ptr 1973
+m_iPrefferedFireMode				= dword ptr 1968
+m_bAutoReload						= byte	ptr 1973
+m_iBaseDispersionedBulletsCount		= dword ptr 1912
 ; if (m_pInventory && !iAmmoElapsed && actor && GetState()!=eReload && m_bAutoReload) 
 org 102CFFBEh - shift	; 60 bytes
 	cmp		dword ptr [esi-2ACh], 0
@@ -911,8 +931,8 @@ org 102CFFBEh - shift	; 60 bytes
 	jz		short FireEnd_exit
 	cmp		dword ptr [esi-54h], 7
 	jz		short FireEnd_exit
-	cmp		byte ptr [esi-824+m_bAutoReload], 1
-	jnz		short FireEnd_exit
+	cmp		[esi-824+m_bAutoReload], 0
+	jz		short FireEnd_exit
 	mov		eax, [esi-338h]
 	mov		edx, [eax+188h]
 	lea		ecx, [esi-338h]
@@ -921,11 +941,32 @@ org 102CFFBEh - shift	; 60 bytes
 FireEnd_exit:
 	pop		esi
 	retn
-org 102CFE17h - shift	; 8 bytes
+org 102CFBF5h - shift	; 6 bytes
 	jmp		LoadBoolAutoload
 	nop
 back_from_LoadBoolAutoload:
-	test	edi, edi
+	
+;CWeaponMagazined__switch2_Empty
+org 102D07B3h - shift	; 55 bytes
+	cmp		[esi+m_bAutoReload], 0
+	jz		short switch2_Empty_exit
+	mov		eax, [esi]
+	mov		edx, [eax+168h]
+	call	edx
+	mov		ecx, esi
+	call	CWeaponMagazined__TryReload
+	test	al, al
+	jnz		short switch2_Empty_exit
+	mov		eax, [esi]
+	mov		edx, [eax+1F4h]
+	mov		ecx, esi
+	pop		esi
+	jmp		edx
+switch2_Empty_exit:
+	lea		ecx, [esi+338h]
+	pop		esi
+	jmp		CWeapon__FireEnd
+
 
 org 1055AD10h - shift
 aFake_grenade_n		dd ?
@@ -957,21 +998,7 @@ org 102CF67Eh - shift	; 6 bytes
 	jmp		unload_delete_rockets
 	nop
 back_from_unload_delete_rockets:
-; Стрельба картечью из РГ-6
-org 102DF6DDh - shift	; 39 bytes
-	mov		ecx, ebp
-	call	CWeaponMagazined__FireStart
-	cmp		dword ptr [ebp-54h], 0
-	jnz		loc_102DFBE5
-	lea		ecx, [ebp-358h]
-	call	CRocketLauncher__getRocketCount
-	test	eax, eax
-	jz		loc_102DFBE5
-	push	ebx
-	push	esi
-	push	edi
-org 102DFBE5h - shift
-loc_102DFBE5:
+
 org 102CFE50h - shift
 CWeaponMagazined__FireStart:
 
@@ -988,10 +1015,12 @@ org 101D5EB0h - shift
 register__bool__go:
 org 101D4E00h - shift
 register__void__go_str_pvector_float:
+org 101E9E30h - shift
+register__void__float_float:
 
 ; Блокировка пуска ракет для класса CWeaponRPG7
-org 102D9948h - shift	; 5 bytes
-	call	BlockedRPG7
+;org 102D9948h - shift	; 5 bytes
+;	call	BlockedRPG7
 
 ; Callback	CWeaponRPG7__UpdateMissileVisibility
 org 102D9658h - shift	; 6 bytes
@@ -1013,6 +1042,10 @@ org 10512810h - shift
 str_container__dock		dd ?
 org 1056C2B4h - shift
 aElite		dd ?
+org 102FE620h - shift
+attachable_hud_item__set_bone_visible:
+org 1055F7B4h - shift
+aRocket_class:   	; 'rocket_class'
 
 ; Скриптовый детектор
 org 102EC7F1h - shift	; 6 bytes
@@ -1025,3 +1058,175 @@ org 102F0BC8h - shift	; 6 bytes
 back_from__CEliteDetectorUpdateAfScriptExt:
 org 102EF315h - shift	; 5 bytes
 	jmp		CEliteDetector__ui_xml_tag_ext
+
+; колбек на удержание клавиш
+org 102378C3h - shift	; 7 bytes
+	jmp		level_input_CallbackKeyRelease
+	nop
+	nop
+back_from__level_input_CallbackKeyRelease:
+; колбек на опускание клавиш
+org 102379E1h - shift	; 5 bytes
+	jmp		level_input_CallbackKeyHold
+back_from__level_input_CallbackKeyHold:
+
+; Осветительная ракета (не взрывается)
+m_bFlareRocket		= byte	ptr 649
+org 102CA840h - shift
+CCustomRocket__PlayContact:
+org 102CBFAFh - shift	; 8 bytes
+	jmp		CExplosiveRocket__EndFlareRocket
+	nop
+back_from_CExplosiveRocket__EndFlareRocket:
+	push	edi
+	push	ebx
+org 102C9EF4h - shift	; 8 bytes
+	jmp		CCustomRocket__reloadFlareRocket
+	nop
+back_from_CCustomRocket__reloadFlareRocket:
+	test	al, al
+org 102CBCD0h - shift	; 6 bytes
+	jmp		CCustomRocket__notcontact_FlareRocket
+	nop
+back_from__notcontact_FlareRocket:
+org 102CBCE5h - shift
+back_from__notcontact_FlareRocket2:
+org 102CB030h - shift	; 15 bytes
+;	jz		exit_UpdateParticles
+	lea		edx, [esp+14h]
+	push	edx
+	nop
+	lea		eax, [esi+50h]
+	push	eax
+	call	CParticlesObject__UpdateParent
+;exit_UpdateParticles:
+;	pop		esi
+;	add		esp, 92
+;	retn
+;	db		0CCh
+;org 102CAE27h - shift	; 6 bytes
+;	jz		exit_UpdateParticles
+;---------------------------------------
+; Фикс вылета если не указан в классе CWeaponMagazined параметр fire_modes.
+m_aFireModes		= dword ptr 1952	; sizeof 12 bytes
+m_iCurFireMode		= dword ptr 1964
+;virtual	int		GetCurrentFireMode	() { return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1; };
+org 102CEB30h - shift	; 17+12 = 29 bytes
+CWeaponMagazined__GetCurrentFireMode:
+	xor		eax, eax
+	inc		eax			; eax = 1;
+	.if		[ecx+m_bHasDifferentFireModes]		; 9 bytes
+		mov		eax, [ecx+m_iCurFireMode]
+		mov		ecx, [ecx+m_aFireModes]
+		movsx	eax, byte ptr [eax+ecx]
+	.endif
+	retn
+;---------------------------------------
+org 102D0720h - shift
+CWeaponMagazined__switch2_Fire:
+org 102CFF90h - shift
+CWeaponMagazined__FireEnd:
+;org 102D9910h - shift
+;CWeaponRPG7__RocketLaunch:
+;org 102DF6D0h - shift
+;CWeaponRG6__FireStart:
+org 10509E10h - shift
+__alloca_probe:
+org 10331EA0h - shift
+CParticlesObject__play_at_pos:
+org 10331DE0h - shift
+CParticlesObject__UpdateParent:
+org 102BC130h - shift
+CWeapon__Reload:
+org 102D0000h - shift
+CWeaponMagazined__TryReload:
+org 102C2D30h - shift
+CWeapon__FireEnd:
+org 102D3740h - shift
+CWeaponMagazinedWGrenade__PerformSwitchGL:
+
+
+; возможность стрелять из CWeaponRPG7 очередями.
+; переопределяем наследника с CWeaponCustomPistol на CWeaponMagazined
+org 1055F714h - shift	; 4 bytes
+	dd		CWeaponMagazined__GetCurrentFireMode	; в место CWeaponCustomPistol::GetCurrentFireMode { return 1 }
+org 102D9910h - shift	; 16+34=50 bytes	; убираем лишние команды
+	db		16 dup (0CCh)
+CWeaponRPG7__RocketLaunch:
+	movss	xmm0, xmm0
+	movss	xmm1, xmm1
+	mov		eax, 40A0h
+	call	__alloca_probe
+	push	esi
+	mov		esi, ecx
+	cmp		[esi+m_bBlockRocket], 0		; Блокировка пуска ракет для класса CWeaponRPG7
+	jnz		loc_102D9D99
+;	cmp		dword ptr [esi+740], 5
+;	mov		dword ptr [esi+1908], 0
+;	mov		byte ptr [esi+1949], 1
+;	mov		byte ptr [esi+858], 0
+;	jnz		loc_102D9D99
+org 102D9D99h - shift
+loc_102D9D99:
+org 1055F748h - shift	; 4 bytes
+	dd		CWeaponMagazined__switch2_Fire			; в место CWeaponRPG7::switch2_Fire
+org 1055F158h - shift	; 4 bytes
+	dd		CWeaponMagazined__FireEnd				; в место CWeaponCustomPistol::FireEnd
+org 1055F1E4h - shift	; 4 bytes
+	dd		CWeaponRPG7__OnAnimationEnd				; в место CWeaponMagazined::OnAnimationEnd
+org 102D98DFh - shift	; 5 bytes
+	jmp		CWeaponRPG7__FireRocket
+back_from__CWeaponRPG7__FireRocket:
+
+; возможность стрелять из CWeaponRG6 очередями.
+; переопределяем наследника с CWeaponCustomPistol на CWeaponMagazined
+; переопределяем метод CWeaponRG6::FireStart на функцию CWeaponRG6__RocketLaunch
+org 1056420Ch - shift	; 4 bytes
+	dd		CWeaponMagazined__GetCurrentFireMode	; в место CWeaponCustomPistol::GetCurrentFireMode { return 1 }
+org 10563C50h - shift	; 4 bytes
+	dd		CWeaponMagazined__FireEnd				; в место CWeaponCustomPistol::FireEnd
+org 10564240h - shift	; 4 bytes
+	dd		CWeaponMagazined__switch2_Fire			; в место CWeaponShotgun::switch2_Fire
+org 10563C4Ch - shift	; 4 bytes
+	dd		CWeaponMagazined__FireStart				; в место CWeaponRG6::FireStart()
+org 105641E4h - shift	; 4 bytes
+	dd		CWeaponRG6__FireTrace					; в место CWeapon::FireTrace(const Fvector& P, const Fvector& D)
+org 102DF6D0h - shift	; 52 bytes					; в место CWeaponRG6::FireStart()
+	db		16 dup (0CCh)
+CWeaponRG6__RocketLaunch:
+	mov		eax, 40A0h
+	call	__alloca_probe
+	push	ebp
+	mov		ebp, ecx
+;	cmp		dword ptr [ebp-54h], 0
+;	jnz		loc_102DFBE5
+	lea		ecx, [ebp-358h]
+	call	CRocketLauncher__getRocketCount
+	test	eax, eax
+	jz		loc_102DFBE5
+	push	ebx
+	push	esi
+	push	edi
+	nop
+;	mov		ecx, ebp
+;	call	CWeaponMagazined__FireStart
+org 102DFBE5h - shift
+loc_102DFBE5:
+;--------------------------------------------------------
+; CWeaponRG6: целимся в объекты.
+org 102DF9DCh - shift	; 2 bytes
+	push	3			; collide::rqtBoth
+; CWeaponMagazinedWGrenade: целимся в объекты.
+org 102D3004h - shift	; 2 bytes
+	push	3			; collide::rqtBoth
+; Фикс изменение размера магазина у CWeaponMagazinedWGrenade после апгрейда.
+org 102D40FFh - shift	; 6 bytes
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+org 102D40C0h - shift	; 6 bytes
+	lea		esi, [ebp+iMagazineSize]
+

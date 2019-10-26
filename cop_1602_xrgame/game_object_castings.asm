@@ -46,7 +46,7 @@ casting_fun_name proc near
 	test	eax, eax
 	jnz		short lab1
 	;
-	call print_error_msg
+	call 	print_error_msg
 	;
 	jmp		short exit
 lab1:

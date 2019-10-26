@@ -174,11 +174,11 @@ level_ns_extension_1:
 ;--------------------------------------
 	jmp back_to_level_ns_ext_1
 	
-aGet_target_dist db "get_target_dist", 0
-aGet_target_obj	 db "get_target_obj", 0
-aGet_actor_body_state db "get_actor_body_state", 0
-aSet_fov db "set_fov", 0
-aGet_fov db "get_fov", 0
+aGet_target_dist 		db "get_target_dist", 0
+aGet_target_obj			db "get_target_obj", 0
+aGet_actor_body_state 	db "get_actor_body_state", 0
+aSet_fov 				db "set_fov", 0
+aGet_fov 				db "get_fov", 0
 ;	---===RayPick===---
 aRayPickSetParams1				db "raypick_set_flags_dir_dist", 0
 aRayPickSetParams2				db "raypick_set_ignore_pos", 0
@@ -275,34 +275,33 @@ level_ns_extension_2: ; здесь надо добавлять столько раз   "mov ecx, eax" + "cal
 	jmp back_to_level_ns_ext_2
 
 
-GetTargetDistance:
+GetTargetDistance proc
 	mov		eax, [g_hud] ; CCustomHUD * g_hud
 	mov		ecx, [eax]
 	call	CCustomHUD__GetRQ ; eax = RQ
 	fld		dword ptr [eax+4] ; return EQ.range
 	retn
-	
-GetTargetObject:
+GetTargetDistance endp
+
+GetTargetObject proc
 	mov		eax, [g_hud] ; CCustomHUD * g_hud
 	mov		ecx, [eax]
 	call	CCustomHUD__GetRQ ; eax = RQ
 	push	dword ptr [eax] ; RQ.O
 	call	smart_cast_CGameObject ; eax = smart_cast<CGameObject*>
 	pop		ecx
-	test	eax, eax ; если ничего не нашли
-	jnz		return_value
-	xor		eax, eax ; то возвращаем nil
-	retn
-return_value: ; иначе - конвертируем в game_object
+	.if		eax == null ; если ничего не нашли, то возвращаем nil
+		retn
+	.endif ; иначе - конвертируем в game_object
 	mov		ecx, eax ; this = <найденный CGameObject>
 	jmp		CGameObject__lua_game_object
+GetTargetObject endp
 
 GetActorBodyState proc
 	mov		eax, [g_Actor]
-	test	eax, eax
-	jz		short exit_fail
-	mov		eax, [eax+1428] ; mstate_real (0x594 = 1428)
-exit_fail:
+	.if		eax != 0
+		mov		eax, [eax+1428] ; mstate_real (0x594 = 1428)
+	.endif
 	retn
 GetActorBodyState endp
 
@@ -329,83 +328,51 @@ normal			Fvector {0.0, 0.0, 0.0}
 vector_0		Fvector {0.0, 0.0, 0.0}
 end_point		Fvector {0.0, 0.0, 0.0}
 
-RayPickSetParams1 proc
-arg1			= dword ptr	8
-arg2x			= dword ptr	12
-arg2y			= dword ptr	16
-arg2z			= dword ptr	20
-arg3			= dword ptr 24
-
-	push	ebp
-	mov		ebp, esp
-;	push	ebx
-;	push	esi
-;	push	edi
+RayPickSetParams1 proc	flags:dword, direction_x:dword, direction_y:dword, direction_z:dword, distance:dword
 ;---------------------------------------------
-	mov		eax, [ebp+arg1]
+	mov		eax, flags
 	mov		[RP_flags], eax
-;	PRINT_UINT	"RP_flags - %d", eax
-	mov		eax, [ebp+arg2x]
+	mov		eax, direction_x
 	mov		[RP_direction.x], eax
-;	PRINT_FLOAT	"RP_direction.x - %f", eax
-	mov		eax, [ebp+arg2y]
+	mov		eax, direction_y
 	mov		[RP_direction.y], eax
-;	PRINT_FLOAT	"RP_direction.y - %f", eax
-	mov		eax, [ebp+arg2z]
+	mov		eax, direction_z
 	mov		[RP_direction.z], eax
-;	PRINT_FLOAT	"RP_direction.z - %f", eax
-	mov		eax, [ebp+arg3]
+	mov		eax, distance
 	mov		[RP_distance], eax
-;	PRINT_FLOAT	"RP_distance - %f", eax
 ;---------------------------------------------
-;	pop		edi
-;	pop		esi
-;	pop		ebx
-	mov		esp, ebp
-	pop		ebp
-	retn
+	ret
 RayPickSetParams1 endp
 
-RayPickSetParams2 proc
-arg1			= dword ptr	8
-arg2			= dword ptr	12
+RayPickSetParams2 proc ignore_id:word, position:dword
 x				= dword ptr	0
 y				= dword ptr	4
 z				= dword ptr	8
 
-	push	ebp
-	mov		ebp, esp
 	push	ecx
 ;---------------------------------------------
-	movzx	eax, word ptr [ebp+arg1]
+	movzx	eax, ignore_id
 	mov		[RP_ignore_id], eax
-;	PRINT_UINT	"RP_ignore_id - %d", eax
-	mov		ecx, [ebp+arg2]
+	mov		ecx, position
 	mov		eax, [ecx+x]
 	mov		[RP_position.x], eax
-;	PRINT_FLOAT	"RP_position.x - %f", eax
 	mov		eax, [ecx+y]
 	mov		[RP_position.y], eax
-;	PRINT_FLOAT	"RP_position.y - %f", eax
 	mov		eax, [ecx+z]
 	mov		[RP_position.z], eax
-;	PRINT_FLOAT	"RP_position.z - %f", eax
 ;---------------------------------------------
 	pop		ecx
-	mov		esp, ebp
-	pop		ebp
-	retn
+	ret
 RayPickSetParams2 endp
 
 RayPickQuery proc
 	mov		eax, dword ptr [RP_ignore_id]	; ID GameObject
 	; CObject *O = Level().Objects.net_Find(RP_ignore_id)
-	cmp		ax, 0FFFFh
-	jz		object_null
+	.if		ax != 0FFFFh
 		mov		ecx, ds:g_pGameLevel		; IGame_Level * g_pGameLevel
 		mov		ecx, [ecx]
 		mov		eax, [ecx+eax*4+4Ch]		; CObject eax = *O
-object_null:
+	.endif
 ;	PRINT_UINT	"CObject *O - %d", eax
 	push	eax								; CObject *O
 	push	offset rq_res					; collide::rq_result &
@@ -438,11 +405,10 @@ RayPickQuery endp
 
 RayPickGetObject proc
 	mov		eax, [rq_res.O]
-	test	eax, eax
-	jz		exit
+	.if		eax != 0
 		mov		ecx, eax
 		jmp		CGameObject__lua_game_object
-exit:
+	.endif
 	retn
 RayPickGetObject endp
 
@@ -460,11 +426,9 @@ RayPickGetNameBone proc
 	push	ecx
 	push	edx
 	mov		eax, [rq_res.O]		; CObject	Obj = rq_res.O
-	test	eax, eax
-	jz		exit
+	.if		eax != 0
 		mov		eax, [eax+90h]		; IRenderVisual vis* = Obj->Visual()
-		test	eax, eax
-		jz		exit
+		.if		eax != 0
 			mov		ecx, [eax]
 			mov		edx, [ecx+0Ch]
 			push	eax
@@ -474,7 +438,8 @@ RayPickGetNameBone proc
 			push	[rq_res.element]	; u16 BoneID
 			push	eax
 			call	edx					; LPCSTR eax = namebone = IK->LL_BoneName_dbg(BoneID)
-exit:	
+		.endif
+	.endif
 	pop		edx
 	pop		ecx
 	retn
@@ -619,108 +584,55 @@ RayPickGetEndPoint proc
 RayPickGetEndPoint endp
 
 RayPickGetShootFactor proc
-	mov		eax, [rq_res.O]
-	test	eax, eax
-	jz		static
-		mov		eax, [eax+90h]		; IRenderVisual vis* = Obj->Visual()
-		test	eax, eax
-		jz		zero
-			mov		ecx, [eax]
-			mov		edx, [ecx+0Ch]
-			push	eax
-			call	edx					; IKinematics *IK = smart_cast<IKinematics*>(vis)
-			mov		ecx, [eax]
-			mov		edx, [ecx+28h]
-			push	[rq_res.element]	; u16 BoneID
-			push	eax
-			call	edx					; CBoneData eax = bone_data = IK->LL_GetData(BoneID)
-			movzx	eax, word ptr [eax+13Ch]	; bone_data.game_mtl_idx
-		jmp		end_if
-static:
-	test	[rq_res.element], -1
-	jz		zero
-		mov		ecx, ds:g_pGameLevel		; IGame_Level * g_pGameLevel
-		mov		eax, [ecx]
-		lea		ecx, [eax+40094h]
-		call	ds:GetStaticTris			; CObjectSpace::GetStaticTris(void)
-		mov		edx, [rq_res.element]
-		shl		edx, 4
-		add		eax, edx
-		movzx	eax, word ptr [eax+0Ch]
-		and		eax, 0FFFF3FFFh				; u16 eax = tgt_material
-end_if:
-	mov		ecx, ds:GMLib				; CGameMtlLibrary GMLib
-	push	eax							; tgt_material
-	call	ds:GetMaterialByIdx			; CGameMtlLibrary::GetMaterialByIdx(ushort)
-	fld		dword ptr [eax+28h]
-	retn
-zero:
-	fldz
+	call	GetMaterial
+	.if		eax != 0
+		fld		dword ptr [eax+28h]
+	.else
+		fldz
+	.endif
 	retn
 RayPickGetShootFactor endp
 
 RayPickGetFlags proc
-	mov		eax, [rq_res.O]
-	test	eax, eax
-	jz		static
-		mov		eax, [eax+90h]		; IRenderVisual vis* = Obj->Visual()
-		test	eax, eax
-		jz		zero
-			mov		ecx, [eax]
-			mov		edx, [ecx+0Ch]
-			push	eax
-			call	edx					; IKinematics *IK = smart_cast<IKinematics*>(vis)
-			mov		ecx, [eax]
-			mov		edx, [ecx+28h]
-			push	[rq_res.element]	; u16 BoneID
-			push	eax
-			call	edx					; CBoneData eax = bone_data = IK->LL_GetData(BoneID)
-			movzx	eax, word ptr [eax+13Ch]	; bone_data.game_mtl_idx
-			jmp		end_if
-static:
-	test	[rq_res.element], -1
-	jz		zero
-		mov		ecx, ds:g_pGameLevel		; IGame_Level * g_pGameLevel
-		mov		eax, [ecx]
-		lea		ecx, [eax+40094h]
-		call	ds:GetStaticTris			; CObjectSpace::GetStaticTris(void)
-		mov		edx, [rq_res.element]
-		shl		edx, 4
-		add		eax, edx
-		movzx	eax, word ptr [eax+0Ch]
-		and		eax, 0FFFF3FFFh				; u16 eax = tgt_material
-end_if:
-	mov		ecx, ds:GMLib				; CGameMtlLibrary GMLib
-	push	eax							; tgt_material
-	call	ds:GetMaterialByIdx			; CGameMtlLibrary::GetMaterialByIdx(ushort)
-	mov		eax, dword ptr [eax+0Ch]
-	retn
-zero:
-	xor		eax, eax
+	call	GetMaterial
+	.if		eax != 0
+		mov		eax, dword ptr [eax+0Ch]
+	.endif
 	retn
 RayPickGetFlags endp
 
 RayPickGetTransparencyFactor proc
+	call	GetMaterial
+	.if		eax != 0
+		fld		dword ptr [eax+38h]
+	.else
+		fld1
+	.endif
+	retn
+RayPickGetTransparencyFactor endp
+
+GetMaterial proc
 	mov		eax, [rq_res.O]
-	test	eax, eax
-	jz		static
+	.if		eax != 0
 		mov		eax, [eax+90h]		; IRenderVisual vis* = Obj->Visual()
-		test	eax, eax
-		jz		zero
-			mov		ecx, [eax]
-			mov		edx, [ecx+0Ch]
-			push	eax
-			call	edx					; IKinematics *IK = smart_cast<IKinematics*>(vis)
-			mov		ecx, [eax]
-			mov		edx, [ecx+28h]
-			push	[rq_res.element]	; u16 BoneID
-			push	eax
-			call	edx					; CBoneData eax = bone_data = IK->LL_GetData(BoneID)
-			movzx	eax, word ptr [eax+13Ch]	; bone_data.game_mtl_idx
-		jmp		end_if
-static:
-	test	[rq_res.element], -1
-	jz		zero
+		.if		eax == 0
+			retn
+		.endif
+		mov		ecx, [eax]
+		mov		edx, [ecx+0Ch]
+		push	eax
+		call	edx					; IKinematics *IK = smart_cast<IKinematics*>(vis)
+		mov		ecx, [eax]
+		mov		edx, [ecx+28h]
+		push	[rq_res.element]	; u16 BoneID
+		push	eax
+		call	edx					; CBoneData eax = bone_data = IK->LL_GetData(BoneID)
+		movzx	eax, word ptr [eax+13Ch]	; bone_data.game_mtl_idx
+	.else
+		.if		[rq_res.element] == -1
+			xor		eax, eax
+			retn
+		.endif
 		mov		ecx, ds:g_pGameLevel		; IGame_Level * g_pGameLevel
 		mov		eax, [ecx]
 		lea		ecx, [eax+40094h]
@@ -730,27 +642,22 @@ static:
 		add		eax, edx
 		movzx	eax, word ptr [eax+0Ch]
 		and		eax, 0FFFF3FFFh				; u16 eax = tgt_material
-end_if:
+	.endif
 	mov		ecx, ds:GMLib				; CGameMtlLibrary GMLib
 	push	eax							; tgt_material
 	call	ds:GetMaterialByIdx			; CGameMtlLibrary::GetMaterialByIdx(ushort)
-	fld		dword ptr [eax+38h]
 	retn
-zero:
-	fld1
-	retn
-RayPickGetTransparencyFactor endp
+GetMaterial endp
 ;	---===RayPick===---
 
 Level__CurrentEntity proc
 	mov     edx, ds:g_pGameLevel		 		; IGame_Level * g_pGameLevel
 	mov     ecx, [edx]
 	call    ds:IGame_Level__CurrentEntity 		; IGame_Level::CurrentEntity(void)
-	test    eax, eax
-	jz      exit_fail
+	.if		eax != 0
 		mov		ecx, eax
 		jmp		CGameObject__lua_game_object
-exit_fail:
+	.endif
 	retn
 Level__CurrentEntity endp
 
