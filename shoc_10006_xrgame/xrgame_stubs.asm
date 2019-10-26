@@ -3921,10 +3921,12 @@ org 103917F1h - shift
 collide_label:
 
 ; принудительное убирание оружи€ в машине
-org 101CF1DFh - shift
-	jmp no_weapons_fix	
-org 101CF1E7h - shift
-back_from_no_weapons_fix:
+;org 101CF1DFh - shift
+;	jmp no_weapons_fix	
+;org 101CF1E7h - shift
+;back_from_no_weapons_fix:
+org 101CF1E4h - shift	; 2 bytes
+	push	0FFFFFFFFh	; используетс€ коротка€ форма
 org 1053E810h - shift
 	dd 0FFFFFFFFh
 
@@ -5440,7 +5442,7 @@ org 104586E0h - shift
 psHUD_Flags			dd ?
 ;выдел€ем больше места дл€ структуры CCarWeapon
 org 10267806h - shift	; 5 bytes
-	push	564+12
+	push	sizeof CCarWeapon
 ;
 org 10278BA8h - shift	; 7 bytes
 	db		7 dup (90h)
@@ -5506,3 +5508,24 @@ org 10209A65h - shift	; 16 bytes
 	jmp		CInventoryItem__Load_chank
 	db		11 dup (0CCh)
 ;====================================================================================================
+; ¬озможность назначать лучшие оружие скриптом.
+org 101198C0h - shift
+CAI_Stalker__update_best_item_info:
+;CAI_Stalker::CAI_Stalker()
+org 100F8CACh - shift	; 19 bytes
+	ASSUME	ebp:ptr CAI_Stalker
+	;m_script_best_weapon = nullptr;	// иницилизируем m_script_best_weapon
+	mov		[ebp].m_script_best_weapon, ebx			
+	;m_sell_info_actuality = m_script_not_check_can_kill = m_not_drop_wpn_death = false;
+	mov		dword ptr [ebp].m_sell_info_actuality, ebx	
+	ASSUME	ebp:nothing
+	mov		eax, ebp
+	pop		ebp
+	pop		ebx
+	retn	4
+; CAI_Stalker::update_best_item_info()
+org 101198F6h - shift	; 6 bytes
+	jmp		CAI_Stalker__update_best_item_info_fix
+	nop
+return_CAI_Stalker__update_best_item_info_fix:
+;============================================================

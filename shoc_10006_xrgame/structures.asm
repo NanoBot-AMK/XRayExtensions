@@ -110,11 +110,11 @@ SHit struct ; (sizeof=72, align=4)
 SHit ends									; 72
 
 xr_vector struct ; (sizeof=16, align=4)
-	_Alval				dword ?	; allocator object for values			; объект{цель} программы распределения для значений
-	_Myfirst			dword ?	; pointer to beginning of array			; указатель на начало массива
-	_Mylast				dword ?	; pointer to current end of sequence	; указатель на текущий конец последовательности
-	_Myend				dword ?	; pointer to end of array				; указатель на конец массива
-xr_vector ends
+	_Alval				dword ?				; 0 	allocator object for values			; объект{цель} программы распределения для значений
+	_Myfirst			dword ?				; 4		pointer to beginning of array		; указатель на начало массива
+	_Mylast				dword ?				; 8		pointer to current end of sequence	; указатель на текущий конец последовательности
+	_Myend				dword ?				; 12	pointer to end of array				; указатель на конец массива
+xr_vector ends								; 16
 
 xr_vector2 struct ; (sizeof=20, align=4)
 	xr_vector <>
@@ -171,6 +171,10 @@ collide@@rq_results struct
 	rq_results					xr_vector <>		; 0		collide::rq_result
 collide@@rq_results ends							; 16
 
+string16 struct
+								byte 16 dup(?)
+string16 ends
+
 CHolderCustom struct	; 12 sizeof
 	CHolderCustom@vfptr			dword ?				; 0
 	m_owner						dword ?				; 4		CGameObject*
@@ -179,46 +183,46 @@ CHolderCustom ends									; 12
 
 ; объектные переменные класса CShootingObject
 CShootingObject struct		; sizeof 200 bytes 
-	CShootingObject@vfptr		dword ?		; 0
-	m_vCurrentShootDir			Fvector <>	; 4		Fvector	
-	m_vCurrentShootPos			Fvector <>	; 16	Fvector	
-	m_iCurrentParentID			word  ?		; 28	u16		; ID персонажа который иницировал действие
-	bWorking					byte  ?		; 30	bool	; Weapon fires now
+	CShootingObject@vfptr			dword ?		; 0
+	m_vCurrentShootDir				Fvector <>	; 4		Fvector	
+	m_vCurrentShootPos				Fvector <>	; 16	Fvector	
+	m_iCurrentParentID				word  ?		; 28	u16		; ID персонажа который иницировал действие
+	bWorking						byte  ?		; 30	bool	; Weapon fires now
 	align 4
-	fTimeToFire					dword ?		; 32	float	
-	fvHitPower					Fvector4 <>	; 36	Fvector4
-	fHitImpulse					dword ?		; 52	float	
-	m_fStartBulletSpeed			dword ?		; 56	float	; скорость вылета пули из ствола
-	fireDistance				dword ?		; 60	float	; максимальное расстояние стрельбы
-	fireDispersionBase			dword ?		; 64	float	; рассеивание во время стрельбы
-	fTime						dword ?		; 68	float	; счетчик времени, затрачиваемого на выстрел
+	fTimeToFire						dword ?		; 32	float	
+	fvHitPower						Fvector4 <>	; 36	Fvector4
+	fHitImpulse						dword ?		; 52	float	
+	m_fStartBulletSpeed				dword ?		; 56	float	; скорость вылета пули из ствола
+	fireDistance					dword ?		; 60	float	; максимальное расстояние стрельбы
+	fireDispersionBase				dword ?		; 64	float	; рассеивание во время стрельбы
+	fTime							dword ?		; 68	float	; счетчик времени, затрачиваемого на выстрел
 	; для сталкеров, чтоб они знали эффективные границы использования оружия
-	m_fMinRadius				dword ?		; 72	float	
-	m_fMaxRadius				dword ?		; 76	float	
+	CShootingObject@m_fMinRadius	dword ?		; 72	float	
+	CShootingObject@m_fMaxRadius	dword ?		; 76	float	
 	; Lights
-	light_base_color			Fcolor <>	; 80	Fcolor		
-	light_base_range			dword ?		; 96	float		
-	light_build_color			Fcolor <>	; 100	Fcolor		
-	light_build_range			dword ?		; 116	float		
-	light_render				dword ?		; 120	ref_light	
-	light_var_color				dword ?		; 124	float		
-	light_var_range				dword ?		; 128	float		
-	light_lifetime				dword ?		; 132	float		
-	light_frame					dword ?		; 136	u32			
-	light_time					dword ?		; 140	float		
-	m_bLightShotEnabled			byte  ?		; 144	bool				; включение подсветки во время выстрела
+	light_base_color				Fcolor <>	; 80	Fcolor		
+	light_base_range				dword ?		; 96	float		
+	light_build_color				Fcolor <>	; 100	Fcolor		
+	light_build_range				dword ?		; 116	float		
+	light_render					dword ?		; 120	ref_light	
+	light_var_color					dword ?		; 124	float		
+	light_var_range					dword ?		; 128	float		
+	light_lifetime					dword ?		; 132	float		
+	light_frame						dword ?		; 136	u32			
+	light_time						dword ?		; 140	float		
+	m_bLightShotEnabled				byte  ?		; 144	bool				; включение подсветки во время выстрела
 	align 4
-	m_sShellParticles			dword ?		; 148	shared_str			; имя пратиклов для гильз
-	vLoadedShellPoint			Fvector <>	; 152	Fvector					
-	m_fPredBulletTime			dword ?		; 164	float					
-	m_fTimeToAim				dword ?		; 168	float					
-	m_bUseAimBullet				dword ?		; 172	BOOL					
-	m_sFlameParticlesCurrent	dword ?		; 176	shared_str			; имя пратиклов для огня
-	m_sFlameParticles			dword ?		; 180	shared_str			; для выстрела 1м и 2м видом стрельбы
-	m_pFlameParticles			dword ?		; 184	CParticlesObject*	; объект партиклов огня
-	m_sSmokeParticlesCurrent	dword ?		; 188	shared_str			; имя пратиклов для дыма
-	m_sSmokeParticles			dword ?		; 192	shared_str			
-	m_sShotParticles			dword ?		; 196	shared_str			; имя партиклов следа от пули
+	m_sShellParticles				dword ?		; 148	shared_str			; имя пратиклов для гильз
+	vLoadedShellPoint				Fvector <>	; 152	Fvector					
+	m_fPredBulletTime				dword ?		; 164	float					
+	m_fTimeToAim					dword ?		; 168	float					
+	m_bUseAimBullet					dword ?		; 172	BOOL					
+	m_sFlameParticlesCurrent		dword ?		; 176	shared_str			; имя пратиклов для огня
+	m_sFlameParticles				dword ?		; 180	shared_str			; для выстрела 1м и 2м видом стрельбы
+	m_pFlameParticles				dword ?		; 184	CParticlesObject*	; объект партиклов огня
+	m_sSmokeParticlesCurrent		dword ?		; 188	shared_str			; имя пратиклов для дыма
+	m_sSmokeParticles				dword ?		; 192	shared_str			
+	m_sShotParticles				dword ?		; 196	shared_str			; имя партиклов следа от пули
 CShootingObject ends
 
 ; class CCarWeapon :public CShootingObject
@@ -958,14 +962,14 @@ CPHCollisionDamageReceiver struct ; (sizeof=20, align=4)
 	m_controled_bones			xr_vector<>				; 4		xr_vector<std::pair<unsigned short,float>,xalloc<std::pair<unsigned short,float> > > ?
 CPHCollisionDamageReceiver ends							; 20
 
-HitImmunity__HitTypeSVec struct ; (sizeof=48, align=4)
+svector@float_11@ struct ; (sizeof=48, align=4)
 	array						dword 11 dup(?)			; 0
 	count						dword ?					; 44
-HitImmunity__HitTypeSVec ends							; 48
+svector@float_11@ ends							; 48
 
 CHitImmunity struct ; (sizeof=52, align=4)
 	CHitImmunity@vfptr			dword ?					; 0 offset
-	m_HitTypeK				HitImmunity__HitTypeSVec <>	; 4		HitImmunity::HitTypeSVec
+	m_HitTypeK					svector@float_11@ <>	; 4		HitImmunity::HitTypeSVec
 CHitImmunity ends										; 52
 
 CDelayedActionFuse struct ; (sizeof=16, align=4)
@@ -1098,78 +1102,75 @@ CCar ends												; 1616	new sizeof
 
 MotionID struct; (sizeof=2, align=2)
 	union
-    	;struct
-    	idx						word ?					; 0		:14
+		;struct
+		idx						word ?					; 0		:14
 		slot					word ?					; 0		:2
-        ;ends
-        val						word ?					; 0	u16
-    ends
+		;ends
+		val						word ?					; 0	u16
+	ends
 MotionID ends
 
-CCustomMonster@@net_update struc ; (sizeof=36, align=4)
-	dwTimeStamp     			dword ?              	; 0
-	o_model         			dword ?           		; 4
-	o_torso         			SRotation <>           	; 8
-	p_pos           			Fvector <>       		; 20
-	fHealth         			dword ?                	; 32
+CCustomMonster@@net_update struct ; (sizeof=36, align=4)
+	dwTimeStamp					dword ?					; 0
+	o_model						dword ?					; 4
+	o_torso						SRotation <>			; 8
+	p_pos						Fvector <>				; 20
+	fHealth						dword ?					; 32
 CCustomMonster@@net_update ends							; 36
 
-CCustomMonster	struct ; (sizeof=0x470, align=8)
+CCustomMonster	struct ; (sizeof=1112, align=8)
 ;----------------------------Classes----------------------------------
 	CEntityAlive <>													; 0
 	CScriptEntity <>												; 568
-	Feel@@Vision <>													; 680
-	Feel@@Sound <>													; 00000300
-	Feel@@Touch <>													; 00000304
+	Feel@@Vision <>													; 644
+	Feel@@Sound <>													; 748
+	Feel@@Touch <>													; 752
 ;---------------------------Properties--------------------------------
-	m_memory_manager						dword ?					; 0000033C	offset
-	m_movement_manager						dword ?					; 00000340	offset
-	m_sound_player							dword ?					; 00000344	offset
-	m_client_update_delta					dword ?					; 00000348
-	m_last_client_update_time				dword ?					; 0000034C
-	m_killer_clsids							xr_vector <>			; 00000350 xr_vector<unsigned __int64,xalloc<unsigned __int64> > ?
-	eye_matrix								Fmatrix <>				; 00000360
-	eye_bone								dword ?					; 000003A0
-	eye_fov									dword ?					; 000003A4
-	eye_range								dword ?					; 000003A8
-	m_fCurSpeed								dword ?					; 000003AC
-	eye_pp_stage							dword ?					; 000003B0
-	eye_pp_timestamp						dword ?					; 000003B4
-	m_tEyeShift								Fvector <>				; 000003B8
-	m_fEyeShiftYaw							dword ?					; 000003C4
-	NET_WasExtrapolating					dword ?					; 000003C8
-	tWatchDirection							Fvector <>				; 000003CC
-	m_fTimeUpdateDelta						dword ?					; 000003D8
-	m_dwLastUpdateTime						dword ?					; 000003DC
-	m_current_update						dword ?					; 000003E0
-	m_dwCurrentTime							dword ?					; 000003E4
-	NET										xr_deque <>				; 000003E8	xr_deque<CCustomMonster::net_update,xalloc<CCustomMonster::net_update> > ?
-	NET_Last								CCustomMonster@@net_update <>; 00000400
-	NET_WasInterpolating					dword ?					; 00000424
-	NET_Time								dword ?					; 00000428
-	m_panic_threshold						dword ?					; 0000042C
-	m_sound_user_data_visitor				dword ?					  ; 00000430offset
-	m_far_plane_factor						dword ?					; 00000434
-	m_fog_density_factor					dword ?					; 00000438
-	m_already_dead							byte ?					; 0000043C
+	m_memory_manager						dword ?					; 808	offset
+	CCustomMonster@m_movement_manager		dword ?					; 812	offset
+	m_sound_player							dword ?					; 816	offset
+	m_client_update_delta					dword ?					; 820
+	m_last_client_update_time				dword ?					; 824
+	m_killer_clsids							xr_vector <>			; 828 xr_vector<unsigned __int64,xalloc<unsigned __int64> > ?
+	eye_matrix								Fmatrix <>				; 844
+	eye_bone								dword ?					; 908
+	eye_fov									dword ?					; 912
+	eye_range								dword ?					; 916
+	m_fCurSpeed								dword ?					; 920
+	eye_pp_stage							dword ?					; 924
+	eye_pp_timestamp						dword ?					; 928
+	m_tEyeShift								Fvector <>				; 932
+	m_fEyeShiftYaw							dword ?					; 944
+	NET_WasExtrapolating					dword ?					; 948
+	tWatchDirection							Fvector <>				; 952
+	m_fTimeUpdateDelta						dword ?					; 964
+	m_dwLastUpdateTime						dword ?					; 968
+	m_current_update						dword ?					; 972
+	m_dwCurrentTime							dword ?					; 976
+	NET										xr_deque <>				; 980	xr_deque<CCustomMonster::net_update,xalloc<CCustomMonster::net_update> > ?
+	NET_Last								CCustomMonster@@net_update <>; 1000
+	NET_WasInterpolating					dword ?					; 1036
+	NET_Time								dword ?					; 1040
+	m_panic_threshold						dword ?					; 1044
+	CCustomMonster@m_sound_user_data_visitor dword ?				; 1048	offset
+	m_far_plane_factor						dword ?					; 1052
+	m_fog_density_factor					dword ?					; 1056
+	m_already_dead							byte ?					; 1060
 											byte ? ; undefined
 											byte ? ; undefined
 											byte ? ; undefined
-	m_last_hit_time							dword ?					; 00000440
-	m_critical_wound_threshold				dword ?					; 00000444
-	m_critical_wound_decrease_quant			dword ?					; 00000448
-	m_critical_wound_accumulator			dword ?					; 0000044C
-	m_critical_wound_type					dword ?					; 00000450
-	m_bones_body_parts						associative_vector <>	; 00000454	associative_vector<unsigned short,unsigned int,std::less<unsigned short> > ?
-	m_invulnerable							byte ?					; 00000468
-	m_update_rotation_on_frame				byte ?					; 00000469
-	m_movement_enabled_before_animation_controller byte ?			; 0000046A
+	m_last_hit_time							dword ?					; 1064
+	m_critical_wound_threshold				dword ?					; 1068
+	m_critical_wound_decrease_quant			dword ?					; 1072
+	m_critical_wound_accumulator			dword ?					; 1076
+	m_critical_wound_type					dword ?					; 1080
+	m_bones_body_parts						associative_vector <>	; 1084	associative_vector<unsigned short,unsigned int,std::less<unsigned short> > ?
+	m_invulnerable							byte ?					; 1104
+	m_update_rotation_on_frame				byte ?					; 1105
+	m_movement_enabled_before_animation_controller byte ?			; 1106
 											byte ? ; undefined
-											byte ? ; undefined
-											byte ? ; undefined
-											byte ? ; undefined
-											byte ? ; undefined
-CCustomMonster	ends	;00000470
+											dword ?					; 1108	undefined
+CCustomMonster	ends												; 1112
 
 ACTOR_DEFS@@InterpData struct ; (sizeof=40, align=4)
 Pos								Fvector <>				; 0
@@ -1398,4 +1399,395 @@ CActor struct ; (sizeof=2456, align=8)
 											byte ? ; undefined
 											dword ? ; undefined
 CActor ends															; 2456
+
+CAI_PhraseDialogManager struct ; (sizeof=76, align=4)
+	CPhraseDialogManager <>									; 0
+	m_sStartDialog						shared_str <>		; 52
+	m_sDefaultStartDialog				shared_str <>		; 56
+	m_PendingDialogs					xr_vector <>		; 60	xr_vector<intrusive_ptr<CPhraseDialog,intrusive_base>,xalloc<intrusive_ptr<CPhraseDialog,intrusive_base> > > ?
+CAI_PhraseDialogManager ends								; 76
+
+CObjectHandler	struct ; (sizeof=152, align=4)
+	CInventoryOwner <>										; 0
+	m_r_hand							dword ?				; 120
+	m_l_finger1							dword ?				; 124
+	m_r_finger2							dword ?				; 128
+	m_strap_bone0						dword ?				; 132
+	m_strap_bone1						dword ?				; 136
+	m_strap_object_id					word ?				; 140
+	m_hammer_is_clutched				byte ?				; 142
+	m_infinite_ammo						byte ?				; 143
+	m_planner							dword ?				; 144	offset
+	m_inventory_actual					byte ?				; 148
+	m_clutched_hammer_enabled			byte ?				; 149
+										byte ? ; undefined
+										byte ? ; undefined
+CObjectHandler	ends										; 152
+
+CAI_Stalker struct ; (sizeof=1816, align=8)
+;------------------------------Classes-----------------------------------
+	CCustomMonster <>												; 0
+	CObjectHandler <>												; 1112
+	CAI_PhraseDialogManager <>										; 1264
+	CStepManager <>													; 1340
+;-----------------------------Properties---------------------------------
+	m_animation_manager						dword ?					; 1436	offset
+	m_brain									dword ?					; 1440	offset
+	m_sight_manager							dword ?					; 1444	offset
+	CAI_Stalker@m_movement_manager			dword ?					; 1448	offset
+	m_boneHitProtection						dword ?					; 1452	offset
+	m_disp_walk_stand						dword ?					; 1456
+	m_disp_walk_crouch						dword ?					; 1460
+	m_disp_run_stand						dword ?					; 1464
+	m_disp_run_crouch						dword ?					; 1468
+	m_disp_stand_stand						dword ?					; 1472
+	m_disp_stand_crouch						dword ?					; 1476
+	m_disp_stand_stand_zoom					dword ?					; 1480
+	m_disp_stand_crouch_zoom				dword ?					; 1484
+	m_power_fx_factor						dword ?					; 1488
+	m_fRankDisperison						dword ?					; 1492
+	m_fRankVisibility						dword ?					; 1496
+	m_fRankImmunity							dword ?					; 1500
+	m_item_actuality						byte ?					; 1504
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_best_item_to_kill						dword ?					; 1508	offset
+	m_best_item_value						dword ?					; 1512
+	m_best_ammo								dword ?					; 1516	offset
+	m_best_found_item_to_kill				dword ?					; 1520	offset
+	m_best_found_ammo						dword ?					; 1524	offset
+	m_ce_close								dword ?					; 1528	offset
+	m_ce_far								dword ?					; 1532	offset
+	m_ce_best								dword ?					; 1536	offset
+	m_ce_angle								dword ?					; 1540	offset
+	m_ce_safe								dword ?					; 1544	offset
+	m_ce_random_game						dword ?					; 1548	offset
+	m_ce_ambush								dword ?					; 1552	offset
+	m_ce_best_by_time						dword ?					; 1556	offset
+	m_pPhysics_support						dword ?					; 1560	offset
+	m_wounded								byte ?					; 1564
+	m_can_kill_member						byte ?					; 1565
+	m_can_kill_enemy						byte ?					; 1566
+											byte ? ; undefined
+	m_pick_distance							dword ?					; 1568
+	m_pick_frame_id							dword ?					; 1572
+	rq_storage								collide@@rq_results <>	; 1576
+	m_actor_relation_flags					dword ?					; 1592	flags32
+	m_trader_game_object					dword ?					; 1596	offset
+	m_current_trader						dword ?					; 1600	offset
+	m_temp_items							xr_vector <>			; 1604	xr_vector<CAI_Stalker::CTradeItem,xalloc<CAI_Stalker::CTradeItem> > ?
+	m_total_money							dword ?					; 1620
+	m_sell_info_actuality					byte ?					; 1624
+	m_script_not_check_can_kill				byte ?					; 1625	bool NEW Не сменять оружие если кончились патроны.(надо для роботов с интергрированным оружием)
+	m_not_drop_wpn_death					byte ?					; 1626	bool NEW Не сбрасывать оружие при смерти сталкера, остаёться в руках.
+											byte ? ; undefined
+	CAI_Stalker@m_sound_user_data_visitor	dword ?					; 1628	offset
+	m_group_behaviour						byte ?					; 1632
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_weapon_shot_effector					dword ?					; 1636	offset
+	m_weapon_shot_random_seed				dword ?					; 1640
+	m_min_queue_size_far					dword ?					; 1644
+	m_max_queue_size_far					dword ?					; 1648
+	m_min_queue_interval_far				dword ?					; 1652
+	m_max_queue_interval_far				dword ?					; 1656
+	m_min_queue_size_medium					dword ?					; 1660
+	m_max_queue_size_medium					dword ?					; 1664
+	m_min_queue_interval_medium				dword ?					; 1668
+	m_max_queue_interval_medium				dword ?					; 1672
+	m_min_queue_size_close					dword ?					; 1676
+	m_max_queue_size_close					dword ?					; 1680
+	m_min_queue_interval_close				dword ?					; 1684
+	m_max_queue_interval_close				dword ?					; 1688
+	m_cover_delegates						xr_vector <>			; 1692	xr_vector<fastdelegate::FastDelegate<void __cdecl(CCoverPoint const *,CCoverPoint const *)>,xalloc<fastdelegate::FastDelegate<void __cdecl(CCoverPoint const *,CCoverPoint const *)> > > ?					; 
+	m_best_cover							dword ?					; 1708	offset
+	m_best_cover_value						dword ?					; 1712
+	m_best_cover_actual						byte ?					; 1716
+	m_best_cover_can_try_advance			byte ?					; 1717
+											byte ? ; undefined
+											byte ? ; undefined
+	m_best_cover_advance_cover				dword ?					; 1720	offset
+	m_throw_actual							byte ?					; 1724
+	m_computed_object_position				Fvector <>				; 1725
+	m_computed_object_direction				Fvector <>				; 1737
+	m_throw_target							Fvector <>				; 1749
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_throw_force							dword ?					; 1764
+	m_throw_position						Fvector <>				; 1768
+	m_throw_direction						Fvector <>				; 1780
+	m_critical_wound_weights				xr_vector <>			; 1792	xr_vector<float,xalloc<float> > ?
+	m_registered_in_combat_on_migration		byte ?					; 1808
+	m_sight_enabled_before_animation_controller	 byte ?				; 1809
+	m_can_select_items						byte ?					; 1810
+											byte ? ; undefined
+	m_script_best_weapon					dword ?					; 1812	CWeapon*	NEW Лучшие оружие заданное скриптовым методом.
+CAI_Stalker ends													; 1816
+
+IPhysicShellCreator struct ; (sizeof=4, align=4)
+	IPhysicShellCreator@vfptr				dword ?				; offset
+IPhysicShellCreator ends
+
+CPHShellSimpleCreator struct ; (sizeof=4, align=4)
+	IPhysicShellCreator <>		
+CPHShellSimpleCreator ends
+
+CPhysicItem	struct ; (sizeof=432, align=8)
+	CPhysicsShellHolder <>										; 0
+	CPHShellSimpleCreator <>									; 424
+	m_ready_to_destroy						byte ?				; 428
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+CPhysicItem	ends												; 432
+
+CAttachableItem struct ; (sizeof=80, align=4)
+	CAttachableItem@vfptr					dword ?				; 0		offset
+	CAttachableItem@m_item					dword ?				; 4		offset
+	m_bone_name								shared_str <>		; 8		
+	CAttachableItem@m_offset				Fmatrix <>			; 12
+	m_bone_id								word ?				; 76
+	m_enabled								byte ?				; 77
+											byte ? ; undefined
+CAttachableItem ends											; 80
+
+CHudItem struct ; (sizeof=60, align=4)
+	CHudItem@vfptr							dword ?				; 0		offset
+	m_state									dword ?				; 4
+	m_nextState								dword ?				; 8
+	m_bPending								byte ?				; 12
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_pHUD									dword ?				; 16	offset
+	hud_mode								dword ?				; 20
+	hud_sect								shared_str <>		; 24
+	m_bRenderHud							byte ?				; 28
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_dwStateTime							dword ?				; 32
+	dwFP_Frame								dword ?				; 36
+	dwXF_Frame								dword ?				; 40
+	m_bInertionEnable						byte ?				; 44
+	m_bInertionAllow						byte ?				; 45
+											byte ? ; undefined
+											byte ? ; undefined
+	m_animation_slot						dword ?				; 48
+	CHudItem@m_object						dword ?				; 52	offset
+	CHudItem@m_item							dword ?				; 56	offset
+CHudItem ends													; 60
+
+CInventoryItem struct ; (sizeof=216, align=8)
+	CAttachableItem <>											; 0
+	CHitImmunity <>												; 80
+	m_flags									word ?				; 132	flags16
+											byte ? ; undefined
+											byte ? ; undefined
+	m_pCurrentInventory						dword ?				; 136	offset
+	m_name									shared_str <>		; 140
+	m_nameShort								shared_str <>		; 144
+	m_nameComplex							shared_str <>		; 148
+	m_eItemPlace							dword ?				; 152	enum EItemPlace
+	m_slot									dword ?				; 156
+	m_cost									dword ?				; 160
+	m_weight								dword ?				; 164
+	m_fCondition							dword ?				; 168
+	m_Description							shared_str <>		; 172
+	m_dwItemRemoveTime						qword ?				; 176
+	m_dwItemIndependencyTime				qword ?				; 184
+	m_fControlInertionFactor				dword ?				; 192
+	m_icon_name								shared_str <>		; 196
+	m_net_updateData						dword ?				; 200	offset
+	m_holder_range_modifier					dword ?				; 204
+	m_holder_fov_modifier					dword ?				; 208
+	CInventoryItem@m_object					dword ?				; 212	offset
+CInventoryItem ends												; 216
+
+CInventoryItemObject struct ; (sizeof=648, align=8)
+	CInventoryItem <>											; 0
+	CPhysicItem <>												; 216
+CInventoryItemObject ends										; 648
+
+CHudItemObject struct ; (sizeof=712, align=8)
+	CInventoryItemObject <>											; 0
+	CHudItem <>														; 648
+											dword ? ; undefined
+CHudItemObject ends													; 712
+
+CWeapon@@_firedeps struct ; (sizeof=112, align=4)
+	m_FireParticlesXForm					Fmatrix <>				; 0
+	vLastFP									Fvector <>				; 64
+	vLastFP2								Fvector <>				; 76
+	vLastFD									Fvector <>				; 88
+	vLastSP									Fvector <>				; 100
+CWeapon@@_firedeps ends												; 112
+
+CWeapon struct ; (sizeof=1572, align=8)
+	CHudItemObject <>												; 0
+	CShootingObject <>												; 712
+	m_dwWeaponRemoveTime					qword ?					; 912
+	m_dwWeaponIndependencyTime				qword ?					; 920
+	m_bTriStateReload						byte ?					; 928
+	m_sub_state								byte ?					; 929
+	bWorking2								byte ?					; 930
+	bMisfire								byte ?					; 931
+	m_bAutoSpawnAmmo						dword ?					; 932
+	m_flagsAddOnState						byte ?					; 936
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_eScopeStatus							dword ?					; 940	enum ALife::EWeaponAddonStatus
+	m_eSilencerStatus						dword ?					; 944	enum ALife::EWeaponAddonStatus
+	m_eGrenadeLauncherStatus				dword ?					; 948	enum ALife::EWeaponAddonStatus
+	m_sScopeName							shared_str <>			; 952
+	m_sSilencerName							shared_str <>			; 956
+	m_sGrenadeLauncherName					shared_str <>			; 960
+	m_iScopeX								dword ?					; 964
+	m_iScopeY								dword ?					; 968
+	m_iSilencerX							dword ?					; 972
+	m_iSilencerY							dword ?					; 976
+	m_iGrenadeLauncherX						dword ?					; 980
+	m_iGrenadeLauncherY						dword ?					; 984
+	m_bScopeDynamicZoom						byte ?					; 988
+	m_bZoomEnabled							byte ?					; 989
+											byte ? ; undefined
+											byte ? ; undefined
+	m_fZoomFactor							dword ?					; 992
+	m_fZoomRotateTime						dword ?					; 996
+	m_UIScope								dword ?					; 1000	offset
+	m_fIronSightZoomFactor					dword ?					; 1004
+	m_fScopeZoomFactor						dword ?					; 1008
+	m_bZoomMode								byte ?					; 1012
+											byte ?					; 
+											byte ? ; undefined
+											byte ? ; undefined
+	m_fZoomRotationFactor					dword ?					; 1016
+	m_bHideCrosshairInZoom					byte ?					; 1020
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_strap_bone0							dword ?					; 1024	offset
+	m_strap_bone1							dword ?					; 1028	offset
+	m_StrapOffset							Fmatrix <>				; 1032
+	m_strapped_mode							byte ?					; 1096
+	m_can_be_strapped						byte ?					; 1097
+	CWeapon@m_Offset						Fmatrix <>				; 1098
+											byte ? ; undefined
+											byte ? ; undefined
+	eHandDependence							dword ?					; 1164	enum EHandDependence
+	m_bIsSingleHanded						byte ?					; 1168
+	vLoadedFirePoint						Fvector <>				; 1169
+	vLoadedFirePoint2						Fvector <>				; 1181
+	m_firedeps								CWeapon@@_firedeps <>	; 1193
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	camMaxAngle								dword ?					; 1308
+	camRelaxSpeed							dword ?					; 1312
+	camRelaxSpeed_AI						dword ?					; 1316
+	camDispersion							dword ?					; 1320
+	camDispersionInc						dword ?					; 1324
+	camDispertionFrac						dword ?					; 1328
+	camMaxAngleHorz							dword ?					; 1332
+	camStepAngleHorz						dword ?					; 1336
+	fireDispersionConditionFactor			dword ?					; 1340
+	misfireProbability						dword ?					; 1344
+	misfireConditionK						dword ?					; 1348
+	conditionDecreasePerShot				dword ?					; 1352
+	m_fPDM_disp_base						dword ?					; 1356
+	m_fPDM_disp_vel_factor					dword ?					; 1360
+	m_fPDM_disp_accel_factor				dword ?					; 1364
+	m_fPDM_disp_crouch						dword ?					; 1368
+	m_fPDM_disp_crouch_no_acc				dword ?					; 1372
+	m_vRecoilDeltaAngle						Fvector <>				; 1376
+	CWeapon@m_fMinRadius					dword ?					; 1388
+	CWeapon@m_fMaxRadius					dword ?					; 1392
+	m_sFlameParticles2						shared_str <>			; 1396
+	m_pFlameParticles2						dword ?					; 1400	offset
+	iAmmoElapsed							dword ?					; 1404
+	iMagazineSize							dword ?					; 1408
+	iAmmoCurrent							dword ?					; 1412
+	m_dwAmmoCurrentCalcFrame				dword ?					; 1416
+	m_bAmmoWasSpawned						byte ?					; 1420
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_ammoTypes								xr_vector <>			; 1424	xr_vector<shared_str,xalloc<shared_str> > ?
+	m_pAmmo									dword ?					; 1440	offset
+	m_ammoType								dword ?					; 1444
+	m_ammoName								shared_str <>			; 1448
+	m_bHasTracers							dword ?					; 1452
+	m_u8TracerColorID						byte ?					; 1456
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_set_next_ammoType_on_reload			dword ?					; 1460
+	m_magazine								xr_vector <>			; 1464	xr_vector<CCartridge,xalloc<CCartridge> > ?					; 
+	m_DefaultCartridge						CCartridge <>			; 1480
+	m_fCurrentCartirdgeDisp					dword ?					; 1536
+	m_ef_main_weapon_type					dword ?					; 1540
+	m_ef_weapon_type						dword ?					; 1544
+	m_addon_holder_range_modifier			dword ?					; 1548
+	m_addon_holder_fov_modifier				dword ?					; 1552
+	m_hit_probability						dword 4 dup(?)			; 1556
+											dword ? ; 1568	undefined
+CWeapon ends														; 1576
+
+svector@MotionID_8@ struct ; (sizeof=20, align=4)
+	array									MotionID 8 dup(<>)		; 0
+	count									dword ?					; 16
+svector@MotionID_8@ ends											; 20
+
+CWeaponMagazined@@SWMmotions struct ; (sizeof=140, align=4)
+	mhud_idle								svector@MotionID_8@ <>	; 0
+	mhud_idle_aim							svector@MotionID_8@ <>	; 20
+	mhud_reload								svector@MotionID_8@ <>	; 40
+	mhud_hide								svector@MotionID_8@ <>	; 60
+	mhud_show								svector@MotionID_8@ <>	; 80
+	mhud_shots								svector@MotionID_8@ <>	; 100
+	mhud_idle_sprint						svector@MotionID_8@ <>	; 120
+CWeaponMagazined@@SWMmotions ends									; 140
+
+CWeaponMagazined struct ; (sizeof=1960, align=8)
+	CWeapon <>															; 0
+	sndShow								HUD_SOUND <>					; 1576
+	sndHide								HUD_SOUND <>					; 1596
+	sndShot								HUD_SOUND <>					; 1616
+	sndEmptyClick						HUD_SOUND <>					; 1636
+	sndReload							HUD_SOUND <>					; 1656
+	m_pSndShotCurrent					dword ?							; 1676	offset
+	m_sSilencerFlameParticles			dword ?							; 1680	offset
+	m_sSilencerSmokeParticles			dword ?							; 1684	offset
+	sndSilencerShot						HUD_SOUND <>					; 1688
+	m_eSoundShow						dword ?							; 1708	enum ESoundTypes
+	m_eSoundHide						dword ?							; 1712	enum ESoundTypes
+	m_eSoundShot						dword ?							; 1716	enum ESoundTypes
+	m_eSoundEmptyClick					dword ?							; 1720	enum ESoundTypes
+	m_eSoundReload						dword ?							; 1724	enum ESoundTypes
+	mhud								CWeaponMagazined@@SWMmotions <> ; 1728
+	dwUpdateSounds_Frame				dword ?							; 1868
+	m_iQueueSize						dword ?							; 1872
+	m_iShotNum							dword ?							; 1876
+	m_iShootEffectorStart				dword ?							; 1880
+	m_vStartPos							Fvector <>						; 1884
+	m_vStartDir							Fvector <>						; 1896
+	m_bStopedAfterQueueFired			byte ?							; 1908
+	m_bFireSingleShot					byte ?							; 1909
+	m_bHasDifferentFireModes			byte ?							; 1910
+										byte ? ; undefined
+	m_aFireModes						xr_vector <>					; 1912	xr_vector<int,xalloc<int> > ?
+	m_iCurFireMode						dword ?							; 1928
+	m_sCurFireMode						string16 <>						; 1932
+	m_iPrefferedFireMode				dword ?							; 1948
+	m_bLockType							byte ?							; 1952
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+										dword ? ; undefined
+CWeaponMagazined ends													; 1960
+
 

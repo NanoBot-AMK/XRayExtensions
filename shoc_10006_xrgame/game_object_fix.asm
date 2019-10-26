@@ -490,6 +490,10 @@ game_object_fix proc
 	PERFORM_EXPORT_VOID__FLOAT_FLOAT	CScriptGameObject__SetCarWpnCurRotation,	"car_weapon_rotation"
 	PERFORM_EXPORT_FLOAT__VOID			CScriptGameObject__GetCarWpnCurDirH,		"car_weapon_dir_h"
 	PERFORM_EXPORT_FLOAT__VOID			CScriptGameObject__GetCarWpnCurDirP,		"car_weapon_dir_p"
+	; задать лучшие оружие сталкеру.
+	PERFORM_EXPORT_GO__VOID				CScriptGameObject__GetScriptBestWeapon,		"get_script_best_weapon"
+	PERFORM_EXPORT_VOID__GO_BOOL		CScriptGameObject__SetScriptBestWeapon,		"set_script_best_weapon"
+	
 	; идём обратно
 	jmp back_from_game_object_fix
 game_object_fix endp
@@ -6705,5 +6709,70 @@ CScriptGameObject__GetCarWpnCurDirP proc
 	.endif
 	retn
 CScriptGameObject__GetCarWpnCurDirP endp
+
+align_proc
+CScriptGameObject__SetScriptBestWeapon proc best_wpn:dword, not_check_can_kill:byte
+	push	esi
+	push	ebx
+	mov		eax, [ecx+4]	; &object()	// CGameObject
+	smart_cast _AVCAI_Stalker, _AVCGameObject, eax
+	.if (eax)
+		mov		esi, eax
+		ASSUME	esi:ptr CAI_Stalker
+		; CWeapon* wpn = smart_cast<CWeapon*>(best_wpn->object()));
+		mov		eax, best_wpn
+		.if (eax)
+			mov		eax, [eax+4]
+			smart_cast _AVCWeapon, _AVCGameObject, eax	; best_wpn должно быть оружием, иначе непысь зависает, а потом игра вылетает!
+			mov		ebx, eax
+			.if (ebx)
+				mov		al, true
+				.if (!not_check_can_kill)	
+					; al = wpn->can_kill();
+					mov		ecx, ebx
+					mov		edx, [ecx]
+					mov		eax, [edx+0F8h]
+					call	eax
+				.endif
+				.if (al)
+					; m_script_best_weapon = wpn;
+					mov		[esi].m_script_best_weapon, ebx
+					mov		al, not_check_can_kill
+					mov		[esi].m_script_not_check_can_kill, al
+					; обновим оружие
+					call	CAI_Stalker__update_best_item_info
+				.endif
+			.endif
+		.else
+			mov		[esi].m_script_best_weapon, eax
+		.endif
+		ASSUME	esi:nothing
+	.endif
+	pop		ebx
+	pop		esi
+	ret		8
+CScriptGameObject__SetScriptBestWeapon endp
+
+align_proc
+CScriptGameObject__GetScriptBestWeapon proc
+	push	edi
+	; CAI_Stalker*	stalker = smart_cast<CAI_Stalker*>(&object()));
+	mov		eax, [ecx+4]	; &object()
+	smart_cast _AVCAI_Stalker, _AVCGameObject, eax
+	.if (eax)
+		mov		edx, eax
+		ASSUME	edx:ptr CAI_Stalker
+		; CInventoryItem* item = stalker->m_script_best_weapon;
+		mov		eax, [edx].m_script_best_weapon	; CInventoryItem
+		.if (eax)
+			; return (item->lua_game_object());
+			lea		edi, [eax+0D8h]		; CInventoryItem преобразуем в CGameObject
+			call	CGameObject__lua_game_object
+		.endif
+		ASSUME	edx:nothing
+	.endif
+	pop		edi
+	ret
+CScriptGameObject__GetScriptBestWeapon endp
 
 
