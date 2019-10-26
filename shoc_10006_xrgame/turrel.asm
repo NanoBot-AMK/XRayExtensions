@@ -6,8 +6,8 @@
 ;#define CLSID_TURREL		MK_CLSID('C','_','T','U','R','R','E','L')
 angle_use_turrel_cos		equ 0.17364818	; = cos(80.0) ; минимальный угол от направлени€ ствола и взгл€да актора дл€ использовани€ турели.
 ;const float angle_use_turrel			= 80.f;
-static_str	aOffset_driver_pl,	"offset_driver_place"
-static_str	aHeight_pos,		"height_pos"
+const_static_str	aOffset_driver_pl,	"offset_driver_place"
+const_static_str	aHeight_pos,		"height_pos"
 
 align_proc
 CCar__UseSelect proc pos_:dword, dir_:dword, foot_pos:dword
@@ -60,7 +60,7 @@ local offset_vodila:Fvector4
 	.endif
 	; if(this->CLS_ID == CLSID_TURREL)
 	lea		ecx, [edi].CHolderCustom@vfptr		; CHolderCustom
-	.if ([edi].CLS_ID.hi=='C_TU' && [edi].CLS_ID.lo=='RREL')
+	.if (EQ_QWORD([edi].CLS_ID, 'C_TURREL'))
 		push	foot_pos
 		push	dir_
 		push	pos_
@@ -146,7 +146,7 @@ local fire_dir:Fvector4, cam_dir:Fvector4, angle_cos:dword
 CCarTurrel__Use endp
 
 ; анимаци€ пулемЄтчика дл€ турели ѕ ћ
-;static_str	aPkm_attack_0,		"pkm_attack_0"			;стрел€ем
+;const_static_str	aPkm_attack_0,		"pkm_attack_0"			;стрел€ем
 
 align_proc
 SVehicleAnimCollection__Create_turrel proc m_vehicles_type_collections:dword, V:dword
@@ -160,7 +160,7 @@ local p_motion_ID:dword
 		ASSUME	edi:ptr SVehicleAnimCollection
 		;idles[0] = V->ID_Cycle("pkm_idle_0");
 		mov		ebx, ds:CKinematicsAnimated__ID_Cycle ; CKinematicsAnimated::ID_Cycle(char const *)
-		push	static_str$("pkm_idle_0")			;идлова€
+		push	const_static_str$("pkm_idle_0")			;идлова€
 		lea		eax, p_motion_ID
 		push	eax
 		mov		ecx, V
@@ -168,7 +168,7 @@ local p_motion_ID:dword
 		mov		cx, [eax]
 		mov		[edi].idles[0], cx
 		;steer_left = V->ID_Cycle("pkm_turn_left_0");
-		push	static_str$("pkm_turn_left_0")		;разворот влево
+		push	const_static_str$("pkm_turn_left_0")		;разворот влево
 		lea		edx, p_motion_ID
 		push	edx
 		mov		ecx, V
@@ -176,7 +176,7 @@ local p_motion_ID:dword
 		mov		ax, [eax]
 		mov		[edi].steer_left, ax
 		;steer_right = V->ID_Cycle("pkm_turn_right_0");
-		push	static_str$("pkm_turn_right_0")		;разворот вправо
+		push	const_static_str$("pkm_turn_right_0")		;разворот вправо
 		lea		ecx, p_motion_ID
 		push	ecx
 		mov		ecx, V
@@ -313,8 +313,8 @@ local mat_cam_bone:Fmatrix4, P:Fvector4, Da:Fvector4
 CCar__cam_Update_turrel endp
 
 ;offset aCar_definition	;'car_definition'			;;
-static_str	aLimit_x_rot, "limit_x_rot"
-static_str	aLimit_y_rot, "limit_y_rot"
+const_static_str	aLimit_x_rot, "limit_x_rot"
+const_static_str	aLimit_y_rot, "limit_y_rot"
 
 align_proc
 CCarWeapon__CCarWeapon_chunk proc

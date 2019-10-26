@@ -5,7 +5,7 @@ arg_0= dword ptr  8
 arg_8= dword ptr  10h
 	mov     ecx, [ebp+arg_0]
 	push    0
-	push    static_str$("adjust_height_to_text")
+	push    const_static_str$("adjust_height_to_text")
 	push    esi
 	push    edi
 	call    ebx ; CXml::ReadAttribInt(char const *,int,char const *,int) ; CXml::ReadAttribInt(char const *,int,char const *,int)
@@ -17,7 +17,7 @@ arg_8= dword ptr  10h
 	.endif
 	mov     ecx, [ebp+arg_0]
 	push    0
-	push    static_str$("adjust_width_to_text")
+	push    const_static_str$("adjust_width_to_text")
 	push    esi
 	push    edi
 	call    ebx ; CXml::ReadAttribInt(char const *,int,char const *,int) ; CXml::ReadAttribInt(char const *,int,char const *,int)
@@ -30,7 +30,7 @@ arg_8= dword ptr  10h
 	;Делаем то что вырезали
 	mov     ecx, [ebp+arg_0]
 	push    0
-	jmp back_from_cuistatic_xml_add
+	jmp		return_cuistatic_xml_add
 cuistatic_xml_add endp
 
 ;------------------------------------------------------------

@@ -1,5 +1,6 @@
 include global_ns_reg_macro2.asm
 
+align_proc
 global_space_ext2 proc ; вставка, дополн€юща€ функцию экспорта глобальных функций
 	; здесь делаем то, что вырезали
 	call	register__gs_sell_condition__fl_fl
@@ -15,10 +16,11 @@ global_space_ext2 proc ; вставка, дополн€юща€ функцию экспорта глобальных функци
 	;
 	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT		SetStaticRescalefactor,	"set_static_rescale_factor"
 	GLOBAL_NS_PERFORM_EXPORT__FLOAT__VOID			GetStaticRescalefactor, "get_static_rescale_factor"
-	; идЄм обратно
-	jmp back_from_global_space_ext2
+	
+	jmp		return_global_space_ext2
 global_space_ext2 endp
 
+align_proc
 global_space_ext2_additional proc
 	; здесь делаем то, что вырезали
 	GLOBAL_NS_SCOPE_ADD
@@ -34,7 +36,7 @@ global_space_ext2_additional proc
 	GLOBAL_NS_SCOPE_ADD
 	GLOBAL_NS_SCOPE_ADD
 	; идЄм обратно
-	jmp back_from_global_space_ext2_additional
+	jmp		return_global_space_ext2_additional
 global_space_ext2_additional endp
 
 align_proc
@@ -69,15 +71,15 @@ SetFloatArgs34 proc C arg1:dword, arg2:dword
 	ret
 SetFloatArgs34 endp
 
-ifdef PZ_BUILD
+IFDEF PZ_BUILD
 	; PZ settings
 static_float		g_hud_inertia_factor, 5.0
 static_float		g_hud_inertia_param_2, 0.07
-else
+ELSE
 	; default settings
 static_float		g_hud_inertia_factor, 5.0 ; TENDTO_SPEED
 static_float		g_hud_inertia_param_2, 0.050000001 ; CHWON_CALL_UP_SHIFT
-endif
+ENDIF
 align_proc
 SetHudInertia proc C hud_inertia:dword, arg2:dword
 	mrm		g_hud_inertia_factor, hud_inertia

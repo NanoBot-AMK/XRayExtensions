@@ -1,33 +1,29 @@
+
+align_proc
 actor_visual_fix proc
-	mov		ecx, [esi+298h]
-	mov		eax, [ecx+38h]
+	mov		ecx, [esi].CActor.m_inventory
+	mov		eax, [ecx].CInventory.m_slots._Myfirst
 	add		eax, 60h
-	mov		eax, [eax+4]
+	mov		eax, [eax].CInventorySlot.m_pIItem
 	test	eax, eax
 	jnz		loc_1024C35F
-	; делаем вырезанное
-;	mov		ecx, [esi+298h]
-	jmp back_from_actor_visual_fix
+	jmp		return_actor_visual_fix
 actor_visual_fix endp
 
+align_proc
 actor_visual_drop_fix proc
 	mov     dword ptr [eax+4], 0
 	mov		edx, [ebp+0]
 	mov		eax, [edx+0A4h]
 	mov		ecx, ebp
 	call	eax
-	
 	; провер€ем номер слота
-	cmp		eax, 6
-	jnz		short no_need_to_reset_visual
-	
-	; ок, выкидывают броню из слота. ѕросто вызовем дл€ нее OnMoveToRuck
-	mov		edx, [ebp+0]
-	mov		edx, [edx+9Ch]
-	mov		ecx, ebp
-	call	edx
-	
-	; делаем вырезанное
-no_need_to_reset_visual:
-	jmp back_from_actor_visual_drop_fix
+	.if (eax!=6)
+		; ок, выкидывают броню из слота. ѕросто вызовем дл€ нее OnMoveToRuck
+		mov		edx, [ebp+0]
+		mov		edx, [edx+9Ch]
+		mov		ecx, ebp
+		call	edx
+	.endif
+	jmp		return_actor_visual_drop_fix
 actor_visual_drop_fix endp

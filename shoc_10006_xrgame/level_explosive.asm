@@ -583,7 +583,7 @@ local TICS:_QWORD, dTics:real8
 	push	ecx
 	push	ecx
 	movsd	real8 ptr [esp], xmm0
-	push	static_str$("tics = %.0f")
+	push	const_static_str$("tics = %.0f")
 	call	Msg
 	add		esp, 12
 	;PRINT_UINT "tics = %d", eax

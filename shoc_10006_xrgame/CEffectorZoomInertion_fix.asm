@@ -1,12 +1,12 @@
+
+align_proc
 CEffectorZoomInertion__Process_fix proc
-	mov eax, [g_CEffectorZoomInertion__Process]
-	test eax, eax
-	jz no_replacement
-	jmp [g_CEffectorZoomInertion__Process]
-no_replacement:
-	sub     esp, 0Ch
-	push    ebx
-	push    esi
-	;
-	jmp back_from_CEffectorZoomInertion__Process_fix
+	mov		eax, g_CEffectorZoomInertion__Process
+	.if (eax)
+		jmp		eax
+	.endif
+	sub		esp, 12
+	push	ebx
+	push	esi
+	jmp		return_CEffectorZoomInertion__Process_fix
 CEffectorZoomInertion__Process_fix endp

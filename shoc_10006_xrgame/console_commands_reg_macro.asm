@@ -13,7 +13,7 @@ lab1:
 		push	high_bond
 		push	low_bond
 		push	offset var_to_bind
-		push	static_str$(command_name_str)
+		push	const_static_str$(command_name_str)
 		mov		ecx, offset cmd_obj
 		call	ds:CCC_Integer__CCC_Integer ; CCC_Integer::CCC_Integer(char const *,int *,int,int)
 		push	offset obj_destructor ; void (__cdecl *)()
@@ -46,7 +46,7 @@ lab1:
 		push	HB_
 		push	LB_
 		push	offset var_to_bind
-		push	static_str$(command_name_str)
+		push	const_static_str$(command_name_str)
 		mov		ecx, offset cmd_obj
 		call	ds:CCC_Float__CCC_Float 
 		push	offset obj_destructor ; void (__cdecl *)()
@@ -75,7 +75,7 @@ lab1:
 		mov		flag_was_registered, 1
 		push	mask_value
 		push	offset bitfield_to_bind
-		push	static_str$(command_name_str)
+		push	const_static_str$(command_name_str)
 		mov		ecx, offset cmd_obj
 		call	ds:CCC_Mask__CCC_Mask ; CCC_Mask::CCC_Mask(char const *,_flags<uint> *,uint)
 		push	offset obj_destructor ; void (__cdecl *)()

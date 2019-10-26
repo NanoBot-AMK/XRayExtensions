@@ -1,74 +1,66 @@
 include global_ns_reg_macro.asm
 ;===============| расширение регистрации глобального пространства имён |=======
+align_proc
 global_space_ext proc ; вставка, дополняющая функцию экспорта глобальных функций
 	; здесь делаем то, что вырезали
 	call	error_log_register
 	; добавляем свой код
 	; регистрация функции вывода в лог, вместо нерабочей "log"
-	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR my_log_fun, "log1"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR	my_log_fun, 			"log1"
 	; регистрация функции крэша игры с выводом причины в лог
-	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR msg_and_fail, "fail"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR 	msg_and_fail, 			"fail"
 	; регистрация функции "bind_to_dik"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT bind_to_dik, "bind_to_dik"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	bind_to_dik, 			"bind_to_dik"
 	; регистрация функции "set_extensions_flags"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT set_extensions_flags, "set_extensions_flags"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	set_extensions_flags, 	"set_extensions_flags"
 	; функция установки глобальных флагов актора
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT set_actor_flags, "set_actor_flags"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	set_actor_flags, 		"set_actor_flags"
 	; функция получения глобальных флагов актора
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT get_actor_flags, "get_actor_flags"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	get_actor_flags, 		"get_actor_flags"
 	; регистрация функции "get_extensions_flags"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT get_extensions_flags, "get_extensions_flags"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	get_extensions_flags, 	"get_extensions_flags"
 	;add	 esp, 0Ch
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg0, "set_int_arg0"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg1, "set_int_arg1"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg2, "set_int_arg2"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg3, "set_int_arg3"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg4, "set_int_arg4"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg5, "set_int_arg5"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg6, "set_int_arg6"
-	;GLOBAL_NS_PERFORM_EXPORT__BOOL__VOID IsPdaMenuShown, "is_pda_shown"
-	; ; регистрация функции "flush1", вместо нерабочей "flush"
-	; ; регистрация тестовой функции "log2"
-	 ; lea	   eax, [ebp-1]
-	 ; push	   eax
-	 ; push	   offset my_log2
-	 ; push	   offset alog2	  ; "log2"
-	 ; push	   esi
-	 ; call	   flush_register
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetTradeFiltrationOn, "set_trade_filtration_on"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetTradeFiltrationOff, "set_trade_filtration_off"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetManualGroupingOn, "set_manual_grouping_on"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetManualGroupingOff, "set_manual_grouping_off"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetManualHighlightOn, "set_manual_highlight_on"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetManualHighlightOff, "set_manual_highlight_off"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT GetManualHighlight, "get_manual_highlight"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetHighlightColor, "set_highlight_color"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SumArgs, "sum_args"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SubArgs, "sub_args"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetIntArg0, 			"set_int_arg0"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetIntArg1, 			"set_int_arg1"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetIntArg2, 			"set_int_arg2"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetIntArg3, 			"set_int_arg3"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetIntArg4, 			"set_int_arg4"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetIntArg5, 			"set_int_arg5"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetIntArg6, 			"set_int_arg6"
+	;GLOBAL_NS_PERFORM_EXPORT__BOOL__VOID	IsPdaMenuShown,			"is_pda_shown"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetTradeFiltrationOn, 	"set_trade_filtration_on"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetTradeFiltrationOff, 	"set_trade_filtration_off"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetManualGroupingOn, 	"set_manual_grouping_on"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetManualGroupingOff, 	"set_manual_grouping_off"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetManualHighlightOn, 	"set_manual_highlight_on"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetManualHighlightOff, 	"set_manual_highlight_off"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	GetManualHighlight, 	"get_manual_highlight"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SetHighlightColor, 		"set_highlight_color"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SumArgs, 				"sum_args"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	SubArgs, 				"sub_args"
 	
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT GetGoodwill, "GetGoodwill"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	GetGoodwill, 			"GetGoodwill"
 	
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT DelayedInventoryUpdate, "update_inventory_window"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	DelayedInventoryUpdate,	"update_inventory_window"
 	
-	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR init_external_libs, "init_external_libs"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR 	init_external_libs, 	"init_external_libs"
 
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT print_level_time, "print_level_time"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT print_alife_time, "print_alife_time"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT set_ignore_game_state, "set_ignore_game_state_update"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	print_level_time, 		"print_level_time"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	print_alife_time, 		"print_alife_time"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	set_ignore_game_state, 	"set_ignore_game_state_update"
 
 	; скриншот
-	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR take_screenshot0, "screenshot0"
-	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR take_screenshot1, "screenshot1"
-	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR take_screenshot2, "screenshot2"
-	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR take_screenshot3, "screenshot3"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR 	take_screenshot0, 		"screenshot0"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR 	take_screenshot1, 		"screenshot1"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR 	take_screenshot2, 		"screenshot2"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR 	take_screenshot3, 		"screenshot3"
 
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT set_input_language, "set_input_language"
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT get_input_language, "get_input_language"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	set_input_language, 	"set_input_language"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	get_input_language, 	"get_input_language"
 	
-	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT my_flush, "flush_log"
+	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT 	my_flush, 				"flush_log"
 	
-	; идём обратно
-	jmp back_from_global_space_ext
+	jmp		return_global_space_ext
 global_space_ext endp
 
 align_proc
@@ -77,23 +69,10 @@ my_flush proc
 	retn
 my_flush endp
 
-; align_proc
-; my_log2 proc near
-	; sub		esp, 8
-	; fld		ds:value1
-	; fstp	QWORD  ptr [esp]
-	; push	static_str$("qwerty %e")
-	; call	ds:Msg
-	; add		esp, 12
-	; retn
-; my_log2 endp
-; static_float	value1, 1.23456e12
-; static_int		value2, 12345678h
-
 align_proc
 my_log_fun proc C param_str:dword
 	push	param_str
-	push	static_str$("%s")
+	push	const_static_str$("%s")
 	call	ds:Msg
 	add		esp, 8
 	ret
@@ -137,21 +116,6 @@ get_extensions_flags proc
 	retn
 get_extensions_flags endp
 
-;g_int_argument_0 dword 0
-;g_int_argument_1 dword 0
-;g_int_argument_2 dword 0
-;g_int_argument_3 dword 0
-;g_int_argument_4 dword 0
-;g_int_argument_5 dword 0
-
-;SetIntArg0 proc
-;int_arg = dword ptr  4
-;	mov		eax, [esp+int_arg]
-;	mov		g_int_argument_0, eax
-;	retn
-;SetIntArg0 endp
-
-
 SET_INT_ARG_N 0
 SET_INT_ARG_N 1
 SET_INT_ARG_N 2
@@ -159,34 +123,21 @@ SET_INT_ARG_N 3
 SET_INT_ARG_N 4
 SET_INT_ARG_N 5
 SET_INT_ARG_N 6
+
 align_proc
 IsPdaMenuShown proc
 	mov		eax, 1
 	retn
 IsPdaMenuShown endp
 
-msg_and_fail proc near
-	push	ebp
-	mov		ebp, esp
-	
-	mov		eax, [ebp+8]
-	push	eax
-	;push	 offset aS_4	 ; "%s"
-	;call	 ds:[Msg] 
-	;add	 esp, 8
-	mov		ecx, ds:Debug ; this
-	push	offset ignore_always
-	push	offset aEmpty ; "xrServer::Process_event_ownership"
-	push	0h			   ; line
-	push	offset aEmpty ; "E:\\stalker\\sources\\trunk\\xr_3da\\xrGame\\"...
-	push	eax ; "e_parent"
-	call	ds:xrDebug__fail
+static_byte		ignore_always, 1
+static_byte		aEmpty, 0
 
-	pop		ebp
-	retn
+align_proc
+msg_and_fail proc C param_str:dword
+	R_ASSERT	param_str, "msg_and_fail"
+	ret
 msg_and_fail endp
-ignore_always db 1
-aEmpty db 0
 
 align_proc
 set_actor_flags proc C flags:dword
@@ -323,7 +274,7 @@ set_ignore_game_state endp
 
 LOAD_DLL MACRO module_name_str:REQ, g_lib_hinst:REQ
 LOCAL module_name
-static_str		module_name, module_name_str
+const_static_str		module_name, module_name_str
 	mov		eax, g_lib_hinst
 	.if (!eax)
 		push	offset module_name
@@ -342,7 +293,7 @@ ENDM
 
 GET_PROC_ADDR MACRO g_lib_hinst:REQ, fun_name_str:REQ, g_fun_addr:REQ
 LOCAL fun_name
-static_str		fun_name, fun_name_str
+const_static_str		fun_name, fun_name_str
 	push	offset fun_name
 	push	g_lib_hinst
 	call	GetProcAddress
@@ -360,9 +311,6 @@ static_int		g_ogse_lib_hinst, 0
 static_int		g_CEffectorZoomInertion__Process, ?
 static_int		g_CCameraManager__Update3, ?	
 static_int		g_CCar__cam_Update, ?
-;g_CEffectorZoomInertion__Process dd ?
-;g_CCameraManager__Update3 dd ?	
-;g_CCar__cam_Update dd ?
 
 align_proc
 init_external_libs proc

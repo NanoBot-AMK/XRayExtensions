@@ -23,7 +23,7 @@ CUIComboBox_fix proc
 	PERFORM_EXPORT_CUI__VOID__STRING	CUIComboBox@@AddItem,	"AddItem"
 	PERFORM_EXPORT_CUI__STRING__VOID	CUIComboBox@@GetText,	"GetText"
 	
-	jmp		back_from_CUIComboBox_fix
+	jmp		return_CUIComboBox_fix
 CUIComboBox_fix endp
 
 align_proc
@@ -43,11 +43,9 @@ CUIComboBox@@GetText endp
 
 align_proc
 CUIComboBox__SaveValue_fix proc
-	cmp		dword ptr[ecx+40], 012345678h
-	jnz		continue_normal
-	;PRINT "skip"
-	retn
-continue_normal:
+	.if (dword ptr[ecx+40] == 012345678h)
+		retn
+	.endif
 	;PRINT "continue normal"
 	push	esi
 	push	edi

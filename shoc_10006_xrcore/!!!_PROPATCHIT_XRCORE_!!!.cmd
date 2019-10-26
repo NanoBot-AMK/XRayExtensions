@@ -12,7 +12,7 @@ if exist addr.inc goto mmm1
 
 if exist mydll.obj del mydll.obj
 
-..\tools\AddCode.exe xrcore_orig.dll xrcore.dll mydll.dll corrections_list.txt
+..\tools\AddCode.exe xrcore_orig.dll xrcore.dll mydll.dll corrections_list.txt 0E00000E0h
 
 if exist mydll.dll del mydll.dll
 

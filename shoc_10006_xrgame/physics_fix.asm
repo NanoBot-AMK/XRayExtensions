@@ -49,18 +49,11 @@ CPhysicsShellHolder@@Hit_chank proc
 	fstp	dword ptr [esp]
 	call	eax				; CPhysicsShellHolder::PHHit
 	.if ([esi].CGameObject.m_flCallbackKey & eCallbackAllHit)
-		push	ebx
 		ASSUME	edi:ptr SHit
 		Level__Objects_net_Find	[edi].weaponID
-		mov		ecx, eax
-		call	CGameObject@@lua_game_object
-		mov		ebx, eax
-		mov		ecx, [edi].who
-		call	CGameObject@@lua_game_object
-		mov		ecx, eax
-		CALLBACK__GO_FLOAT_VECTOR_GO_u16	esi, eAllHitObjects, ebx, [edi].power, [edi].dir, ecx, [edi].boneID
+		mov		edx, eax
+		CALLBACK__GO_FLOAT_VECTOR_GO_u16	esi, eAllHitObjects, edx, [edi].power, [edi].dir, [edi].who, [edi].boneID
 		ASSUME	edi:nothing
-		pop		ebx
 	.endif
 	pop		edi
 	pop		esi

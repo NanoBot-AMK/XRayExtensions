@@ -3,9 +3,6 @@
 ; Колбеки
 ; Рефакторинг НаноБот
 ;====================================================================
-eWeaponOnShoot		= dword ptr 181		; колбек на выстрел
-eWeaponStartBullet	= dword ptr 182		; колбек на старт пули
-eWeaponStopBullet	= dword ptr 183		; колбек на стоп пули
 
 const_static_str	aCallback_on,		"callback_on" ; название булевого параметра в конфиге патрона для включения колбеков для старта и стопа пули.
 const_static_str	aAllow_ricochet,	"allow_ricochet"
@@ -33,7 +30,7 @@ UpdateAddonsVisibility_fix proc
 	.if ([edi].m_flagsAddOnState & 040h)
 		;PRINT_UINT "UpdateAddonsVisibility_fix object: %x", edi
 		lea		eax, [edi].CGameObject@vfptr		;+216 CGameObject <- CWeapon
-		CALLBACK__VOID	eax, 154
+		CALLBACK__VOID	eax, eUpdateAddonsVisibility
 	.endif
 	;PRINT "UpdateAddonsVisibility_fix 2"
 	; делаем вырезанное
@@ -53,22 +50,22 @@ UpdateAddonsVisibility_fix endp
 
 align_proc
 UpdateHUDAddonsVisibility_fix proc
-	push	eax
+;	push	eax
 	;PRINT_UINT "UpdateHUDAddonsVisibility: %x", eax
 	.if ([edi].m_flagsAddOnState & 040h)
 		;PRINT "UpdateHUDAddonsVisibility 1"
 		lea		eax, [edi].CGameObject@vfptr		;+216 CGameObject <- CWeapon
-		CALLBACK__VOID	eax, 155
+		CALLBACK__VOID	eax, eUpdateHudAddonsVisibility
 	.endif
 	ASSUME	edi:nothing
-	pop		eax
+;	pop		eax
 	; делаем вырезанное
 	push	ebx
 	push	edi
 	push	offset aWpn_scope ; "wpn_scope"
 	mov		ecx, esi
 	; идём обратно
-	jmp		back_from_UpdateHUDAddonsVisibility_fix
+	jmp		return_UpdateHUDAddonsVisibility_fix
 UpdateHUDAddonsVisibility_fix endp
 
 ;инлайн функция, использовать только в условных блоках .if, .while и т.д.

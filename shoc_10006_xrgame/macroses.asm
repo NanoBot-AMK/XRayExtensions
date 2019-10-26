@@ -13,8 +13,13 @@ VIMM_EXPR			equ (VALID_REF OR IMM_EXPR)		;
 float			typedef REAL4 
 double			typedef REAL8
 
+;только дл€ выравнивани€ процедур!
 align_proc MACRO
-align 16
+LOCAL m1,m2
+m1:	align 16
+m2:	org		m1
+	db		15 dup (0CCh)
+	org		m2
 ENDM
 
 ;include macros_eval.asm
@@ -51,6 +56,13 @@ name_param		REAL4	param
 .code
 ENDM
 
+const_static_float MACRO name_param:REQ, param:VARARG
+.const
+align 4
+name_param		REAL4	param
+.code
+ENDM
+
 static_xmm4 MACRO name_param:REQ, param:VARARG
 .data
 align 16
@@ -72,8 +84,22 @@ name_param		DWORD	param
 .code
 ENDM
 
+const_static_int MACRO name_param:REQ, param:VARARG
+.const
+align 4
+name_param		DWORD	param
+.code
+ENDM
+
 static_byte MACRO name_param:REQ, param:VARARG
 .data
+align 1
+name_param		BYTE	param
+.code
+ENDM
+
+const_static_byte MACRO name_param:REQ, param:VARARG
+.const
 align 1
 name_param		BYTE	param
 .code
@@ -178,7 +204,7 @@ PRINT_STR MACRO val_txt:REQ
 	pusha
 	push	val_txt
 	call	Msg
-	add		esp, 04h
+	add		esp, 4
 	popa
 ENDM
 
@@ -186,7 +212,7 @@ PRINT MACRO msg_txt:REQ
 	pusha
 	push	const_static_str$(msg_txt)
 	call	Msg
-	add		esp, 04h
+	add		esp, 4
 	popa
 ENDM
 
@@ -195,7 +221,7 @@ PRINT_UINT MACRO fmt_txt:REQ, val:REQ
 	push	val
 	push	const_static_str$(fmt_txt)
 	call	Msg
-	add		esp, 08h
+	add		esp, 8
 	popa
 ENDM
 
@@ -213,23 +239,23 @@ ENDM
 
 FLUSH_LOG MACRO
 	pusha
-	call	[FlushLog]
+	call	FlushLog
 	popa
 ENDM
 
-RT_DYNAMIC_CAST MACRO source, dest, reg
+dynamic_cast MACRO class_1:REQ, class_2:REQ, object:REQ
 	push	0
-	push	offset dest
-	push	offset source
+	push	offset @CatStr(_AV,<class_1>)
+	push	offset @CatStr(_AV,<class_2>)
 	push	0
-	push	reg
+	push	object
 	call	__RTDynamicCast
 	add		esp, 14h
 ENDM
 
 PRINT_VECTOR MACRO fmt_txt:REQ, val:REQ
 	pusha
-	@push2mem(val)
+	pushvar	val
 	push	const_static_str$(fmt_txt)
 	call	Log_vector3
 	add		esp, 8
@@ -288,13 +314,17 @@ smart_cast	MACRO	class_1_or_virt_class:REQ, class_2_or_object:REQ, object
 		mov		edx, dword ptr [eax+virt@@CGameObject.cast_&class_1_or_virt_class&]
 		call	edx
 	ELSE
-		push	0
-		push	offset @CatStr(_AV,<class_1_or_virt_class>)
-		push	offset @CatStr(_AV,<class_2_or_object>)
-		push	0
-		push	object
-		call	__RTDynamicCast
-		add		esp, 20
+		IFIDN <class_2_or_object>,<CInventoryItem>
+			smart_castV	class_1_or_virt_class, class_2_or_object, object
+		ELSE
+			push	0
+			push	offset @CatStr(_AV,<class_1_or_virt_class>)
+			push	offset @CatStr(_AV,<class_2_or_object>)
+			push	0
+			push	object
+			call	__RTDynamicCast
+			add		esp, 20
+		ENDIF
 	ENDIF
 ENDM
 ;приведени€ через виртуальные методы
@@ -316,7 +346,9 @@ ENDM
 ;============================================================================================
 ;	ћакросы колбеков, названи€ соотвествует передаваемым параметрам
 CALLBACK__GO	MACRO	_this:REQ, type_callback:REQ, param1:REQ
-	push	param1
+	regvar	eax, param1
+	CGameObject@@lua_game_object()
+	push	eax
 	push	type_callback
 	mov		ecx, _this
 	call	CGameObject__callback
@@ -324,14 +356,32 @@ CALLBACK__GO	MACRO	_this:REQ, type_callback:REQ, param1:REQ
 	call	script_callback__GO
 ENDM
 
+CALLBACK__GO_GO	MACRO	_this:REQ, type_callback:REQ, obj1:REQ, obj2:REQ
+	regvar	eax, obj2
+	CGameObject@@lua_game_object()
+	push	eax
+	regvar	eax, obj1
+	CGameObject@@lua_game_object()
+	push	eax
+	push	type_callback
+	mov		ecx, _this
+	call	CGameObject__callback
+	push	eax
+	call	script_callback__GO_GO
+ENDM
+
 CALLBACK__GO_GO_INT_VECTOR_FLOAT MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ, vector4:REQ, param5:REQ
-	push	param5
+	pushvar	param5
 	push	vector4.z
 	push	vector4.y
 	push	vector4.x
 	push	param3
-	push	param2
-	push	param1
+	regvar	eax, param2
+	CGameObject@@lua_game_object()
+	push	eax
+	regvar	eax, param1
+	CGameObject@@lua_game_object()
+	push	eax
 	push	type_callback
 	mov		ecx, _this
 	call	CGameObject__callback
@@ -342,7 +392,9 @@ ENDM
 CALLBACK__GO_BOOL_U32 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ
 	push	param3
 	push	param2
-	push	param1
+	regvar	eax, param1
+	CGameObject@@lua_game_object()
+	push	eax
 	push	type_callback
 	mov		ecx, _this
 	call	CGameObject__callback
@@ -350,11 +402,26 @@ CALLBACK__GO_BOOL_U32 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ
 	call	script_callback__GO_bool_u32
 ENDM
 
-CALLBACK__GO_FLOAT_VECTOR_GO_s16 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ
+CALLBACK__GO_FLOAT_VECTOR_GO_s16 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
+IF (TYPE (param5) EQ 2)
+	movzx	eax, param5
+	push	eax
+ELSE
+	push	param5
+ENDIF
 	push	param4
+IF (TYPE (vector3) EQ 12)		;;Fvector
 	push	vector3.z
 	push	vector3.y
 	push	vector3.x
+ELSEIF (TYPE (vector3) EQ 4)	;;указатель
+	mov		eax, vector3
+	push	[eax].Fvector.z
+	push	[eax].Fvector.y
+	push	[eax].Fvector.x
+ELSE
+	.err <unknow type>
+ENDIF
 	push	param2
 	push	param1
 	push	type_callback
@@ -365,16 +432,58 @@ CALLBACK__GO_FLOAT_VECTOR_GO_s16 MACRO	_this:REQ, type_callback:REQ, param1:REQ,
 ENDM
 
 CALLBACK__GO_FLOAT_VECTOR_GO_u16 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
-	IF (TYPE (param5) EQ 2)
-		movzx	eax, param5
-		push	eax
-	ELSE
-		push	param5
-	ENDIF
-	push	param4
+IF (TYPE (param5) EQ 2)
+	movzx	eax, param5
+	push	eax
+ELSE
+	push	param5
+ENDIF
+	regvar	eax, param4
+	call	CGameObject@@lua_game_object
+	push	eax
+IF (TYPE (vector3) EQ 12)		;;Fvector
 	push	vector3.z
 	push	vector3.y
 	push	vector3.x
+ELSEIF (TYPE (vector3) EQ 4)	;;указатель
+	mov		eax, vector3
+	push	[eax].Fvector.z
+	push	[eax].Fvector.y
+	push	[eax].Fvector.x
+ELSE
+	.err <unknow type>
+ENDIF
+	push	param2
+	regvar	eax, param1
+	call	CGameObject@@lua_game_object
+	push	eax
+	push	type_callback
+	mov		ecx, _this
+	call	CGameObject__callback
+	push	eax
+	call	script_callback__GO_float_vector_GO_u16
+ENDM
+
+CALLBACK__SGO_FLOAT_VECTOR_SGO_u16 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
+IF (TYPE (param5) EQ 2)
+	movzx	eax, param5
+	push	eax
+ELSE
+	push	param5
+ENDIF
+	push	param4
+IF (TYPE (vector3) EQ 12)		;;Fvector
+	push	vector3.z
+	push	vector3.y
+	push	vector3.x
+ELSEIF (TYPE (vector3) EQ 4)	;;указатель
+	mov		eax, vector3
+	push	[eax].Fvector.z
+	push	[eax].Fvector.y
+	push	[eax].Fvector.x
+ELSE
+	.err <unknow type>
+ENDIF
 	push	param2
 	push	param1
 	push	type_callback
@@ -386,7 +495,9 @@ ENDM
 
 CALLBACK__GO_STR	MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ
 	push	param2
-	push	param1
+	regvar	eax, param1
+	call	CGameObject@@lua_game_object
+	push	eax
 	push	type_callback
 	mov		ecx, _this
 	call	CGameObject__callback
@@ -457,8 +568,8 @@ CALLBACK__STR_u16	MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ
 ENDM
 
 CALLBACK__INT_INT	MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ
-	push	param2
-	push	param1
+	pushvar	param2
+	pushvar	param1
 	push	type_callback
 	mov		ecx, _this
 	call	CGameObject__callback
@@ -1143,14 +1254,14 @@ exit:
 ENDM
 
 xr_memory$	MACRO reg:VARARG	;;REQ
-	@push2mem(reg)
+	pushvar	reg
 	mov		ecx, ds:Memory				; xrMemory Memory
 	call	ds:xrMemory__mem_alloc
 	EXITM	<eax>
 ENDM
 
 xr_memory	MACRO reg:VARARG	;;REQ
-	@push2mem(reg)
+	pushvar	reg
 	mov		ecx, ds:Memory				; xrMemory Memory
 	call	ds:xrMemory__mem_alloc
 ENDM
@@ -1205,21 +1316,21 @@ Level@@Objects_net_Find MACRO obj_id:REQ
 ENDM
 
 CObject@@H_SetParent MACRO this_:req, new_parent:req, just_before_destroy:=<0>
-	@push2mem	(just_before_destroy)
-	@push2mem	(new_parent)
-	@reg2mem	(ecx, this_)
+	pushvar	just_before_destroy
+	pushvar	new_parent
+	regvar	ecx, this_
 	call	ds:CObject__H_SetParent
 	EXITM <>
 ENDM
 
 CObject@@H_Root MACRO this_:req
-	@reg2mem	(ecx, this_)
+	regvar	ecx, this_
 	call	ds:H_Root
 	EXITM <eax>
 ENDM
 
 CObject@@Radius MACRO this_:req
-	@reg2mem	(ecx, this_)
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+14h]
 	call	eax
@@ -1227,8 +1338,8 @@ CObject@@Radius MACRO this_:req
 ENDM
 
 CObject@@Center MACRO this_:req, pos:req
-	@push2mem	(pos)
-	@reg2mem	(ecx, this_)
+	pushvar	pos
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+10h]
 	call	eax
@@ -1236,10 +1347,10 @@ CObject@@Center MACRO this_:req, pos:req
 ENDM
 
 ref_sound@@create MACRO S:req, fName:req, sound_type:req, game_type:req
-	@push2mem(game_type)
-	@push2mem(sound_type)
-	@push2mem(fName)
-	@push2mem(S)
+	pushvar	game_type
+	pushvar	sound_type
+	pushvar	fName
+	pushvar	S
 	mov		ecx, ds:CSound_manager_interface__Sound
 	mov		ecx, [ecx]
 	mov		edx, [ecx]
@@ -1249,11 +1360,11 @@ ref_sound@@create MACRO S:req, fName:req, sound_type:req, game_type:req
 ENDM
 ;( ref_sound& S, CObject* O,	const Fvector &pos,	u32 flags=0, float delay=0.f)
 ref_sound@@play_at_pos MACRO S:req, O:req, pos:req, flags:=<0>, delay:=<0>
-	@push2mem(delay)
-	@push2mem(flags)
-	@push2mem(pos)
-	@push2mem(O)
-	@push2mem(S)
+	pushvar	delay
+	pushvar	flags
+	pushvar	pos
+	pushvar	O
+	pushvar	S
 	mov		ecx, ds:CSound_manager_interface__Sound
 	mov		ecx, [ecx]
 	mov		edx, [ecx]
@@ -1263,8 +1374,8 @@ ref_sound@@play_at_pos MACRO S:req, O:req, pos:req, flags:=<0>, delay:=<0>
 ENDM
 
 CPhysicsShell@@get_LinearVel MACRO this_:req, velocity:req
-	@push2mem(velocity)
-	@reg2mem(ecx, this_)
+	pushvar	velocity
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+9Ch]
 	call	eax
@@ -1272,7 +1383,7 @@ CPhysicsShell@@get_LinearVel MACRO this_:req, velocity:req
 ENDM
 
 CPhysicsShell@@getMass MACRO this_:req
-	@reg2mem(ecx, this_)
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+48h]
 	call	eax
@@ -1280,9 +1391,9 @@ CPhysicsShell@@getMass MACRO this_:req
 ENDM
 
 CPhysicsShell@@applyImpulse MACRO this_:req, dir:req, val:req
-	@push2mem(val)
-	@push2mem(dir)
-	@reg2mem(ecx, this_)
+	pushvar	val
+	pushvar	dir
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+60h]
 	call	eax
@@ -1290,9 +1401,9 @@ CPhysicsShell@@applyImpulse MACRO this_:req, dir:req, val:req
 ENDM
 
 CPhysicsShell@@applyForce MACRO this_:req, dir:req, val:req
-	@push2mem(val)
-	@push2mem(dir)
-	@reg2mem(ecx, this_)
+	pushvar	val
+	pushvar	dir
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+5Ch]
 	call	eax
@@ -1300,11 +1411,11 @@ CPhysicsShell@@applyForce MACRO this_:req, dir:req, val:req
 ENDM
 
 CPhysicsShell@@Activate MACRO this_:req, transform:req, lin_vel:req, ang_vel:req, disable:=<0>
-	@push2mem(disable)
-	@push2mem(ang_vel)
-	@push2mem(lin_vel)
-	@push2mem(transform)
-	@reg2mem(ecx, this_)
+	pushvar	disable
+	pushvar	ang_vel
+	pushvar	lin_vel
+	pushvar	transform
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+8]
 	call	eax
@@ -1312,8 +1423,8 @@ CPhysicsShell@@Activate MACRO this_:req, transform:req, lin_vel:req, ang_vel:req
 ENDM
 
 CPhysicsShell@@InterpolateGlobalTransform MACRO this_:req, m:req
-	@push2mem(m)
-	@reg2mem(ecx, this_)
+	pushvar	m
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+10h]
 	call	eax
@@ -1321,8 +1432,8 @@ CPhysicsShell@@InterpolateGlobalTransform MACRO this_:req, m:req
 ENDM
 
 CPhysicsShell@@GetGlobalTransformDynamic MACRO this_:req, m:req
-	@push2mem(m)
-	@reg2mem(ecx, this_)
+	pushvar	m
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+14h]
 	call	eax
@@ -1330,8 +1441,8 @@ CPhysicsShell@@GetGlobalTransformDynamic MACRO this_:req, m:req
 ENDM
 
 CPhysicsShell@@TransformPosition MACRO this_:req, m:req
-	@push2mem(m)
-	@reg2mem(ecx, this_)
+	pushvar	m
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+0ACh]
 	call	eax
@@ -1339,8 +1450,8 @@ CPhysicsShell@@TransformPosition MACRO this_:req, m:req
 ENDM
 
 CPhysicsShell@@SetTransform MACRO this_:req, m:req
-	@push2mem(m)
-	@reg2mem(ecx, this_)
+	pushvar	m
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+0C4h]
 	call	eax
@@ -1348,8 +1459,8 @@ CPhysicsShell@@SetTransform MACRO this_:req, m:req
 ENDM
 
 CPhysicsShell@@set_CallbackData MACRO this_:req, cd:req
-	@push2mem(cd)
-	@reg2mem(ecx, this_)
+	pushvar	cd
+	regvar	ecx, this_
 	mov		edx, [ecx]
 	mov		eax, [edx+90h]
 	call	eax
@@ -1470,14 +1581,14 @@ LOCAL file_name
 	file_name	CATSTR <">,file_name,<">	;; добавл€ем кавычки
 	mov		ecx, ds:Debug
 	push	offset ignore_always
-	IFNB <name_proc>
-	push	const_static_str$(name_proc)		;; им€ процедуры
-	ELSE
+IFNB <name_proc>
+	push	const_static_str$(name_proc)	;; им€ процедуры
+ELSE
 	push	offset aEmpty
-	ENDIF
-	push	@Line			 			;; номер строки
-	push	const_static_str$(file_name)		;; им€ файла
-	push	const_static_str$(msg_txt)		;; сообщение
+ENDIF
+	push	@Line			 				;; номер строки
+	push	const_static_str$(file_name)	;; им€ файла
+	pushvar	msg_txt
 	call	ds:xrDebug__fail
 ENDM
 
@@ -1498,7 +1609,7 @@ ENDM
 Fvector@@random_dir MACRO vec_this:req
 	push	edi
 	push	esi
-	@reg2mem(esi, vec_this)
+	regvar	esi, vec_this
 	mov     edi, ds:Random
 	call	Func@Fvector@@random_dir
 	pop		esi
@@ -1507,67 +1618,69 @@ Fvector@@random_dir MACRO vec_this:req
 ENDM
 
 Fvector@@getH MACRO vec_this:req
-	@reg2mem(ecx, vec_this)
+	regvar	ecx, vec_this
 	call	Func@Fvector@@getH
 	EXITM <>
 ENDM
 
 Fvector@@getP MACRO vec_this:req
-	@reg2mem(ecx, vec_this)
+	regvar	ecx, vec_this
 	call	Func@Fvector@@getP
 	EXITM <>
 ENDM
 
 @random_dir MACRO vec_this:req, src_dir:req, dispersion:req
-	@push2mem	(dispersion)
-	@push2mem	(src_dir)
-	@reg2mem	(eax, vec_this)
+	pushvar	dispersion
+	pushvar	src_dir
+	regvar	eax, vec_this
 	call	random_dir
 	EXITM <>
 ENDM
 
-@reg2mem MACRO reg:req, mem:req
-	LOCAL _mem
-	IF @InStr(1, <&mem>, <&>) EQ 1
-		_mem equ @SubStr(<&mem>, 2)
-;;		%echo @CatStr(%OPATTR (_mem))
-		IF ((OPATTR _mem) AND DIRECT_ADDR)
-		EXITM <mov	reg, offset _mem>
-		ELSE
-		EXITM <lea	reg, _mem>
-		ENDIF
+regvar MACRO reg:req, mem:req
+LOCAL _mem
+IF @InStr(1, <&mem>, <&>) EQ 1
+	_mem equ @SubStr(<&mem>, 2)
+;;	% echo @CatStr(%OPATTR (_mem))
+	IF ((OPATTR _mem) AND DIRECT_ADDR)
+		mov		reg, offset _mem
+	ELSE
+		lea		reg, _mem
 	ENDIF
-	EXITM <mov	reg, mem>
+ELSEIF @InStr(1, <&mem>, <">) EQ 1
+	mov		reg, const_static_str$(mem)
+ELSEIFDIFI <reg>, <mem>
+	mov		reg, mem
+ENDIF
 ENDM
 
-@push2mem MACRO mem:req
-	LOCAL _mem
-	IF @InStr(1, <&mem>, <&>) EQ 1
-		_mem equ @SubStr(<&mem>, 2)
-		IF ((OPATTR (_mem)) AND DIRECT_ADDR)
-			push 	offset _mem
-		ELSE
-			lea		eax, _mem
-			push	eax
-		ENDIF
-	ELSEIF @InStr(1, <&mem>, <">) EQ 1
-		push	const_static_str$(mem)
+pushvar MACRO mem:req
+LOCAL _mem
+IF @InStr(1, <&mem>, <&>) EQ 1
+	_mem equ @SubStr(<&mem>, 2)
+	IF ((OPATTR (_mem)) AND DIRECT_ADDR)
+		push 	offset _mem
 	ELSE
-		push	mem
+		lea		eax, _mem
+		push	eax
 	ENDIF
-	EXITM <>
+ELSEIF @InStr(1, <&mem>, <">) EQ 1
+	push	const_static_str$(mem)
+ELSE
+	push	mem
+ENDIF
 ENDM
 
 @STRCMP MACRO str_shader1:req, str2:req
-	@reg2mem (eax, str_shader1)
-	@reg2mem (ecx, str2)
+	regvar	eax, str_shader1
+	regvar	ecx, str2
 	call	xr_strcmp
 	EXITM <eax>
 ENDM
 ;str_source -> str_dest		//возвращает в eax длину скопированой строки.
 StrCopy MACRO str_source:req, str_dest:req, char_separator
-	@reg2mem (ecx, str_source)
-	@reg2mem (eax, str_dest)
+	regvar	ecx, str_source
+	regvar	eax, str_dest
 	push	eax
 	.while (true)
 		mov		dl, [ecx]
@@ -1589,31 +1702,31 @@ ENDIF
 ENDM
 
 @ITOA MACRO _Value:req, _Dest:req, _Radix:req
-	@push2mem (_Radix)
-	@push2mem (_Dest)
-	@push2mem (_Value)
+	pushvar	_Radix
+	pushvar	_Dest
+	pushvar	_Value
 	call	ds:_itoa
 	add		esp, 12
 	EXITM <>
 ENDM
 
 @ATOI MACRO _Dest:req
-	@push2mem (_Dest)
+	pushvar	_Dest
 	call	ds:atoi
 	add		esp, 4
 	EXITM <eax>
 ENDM
 
 @ATOF MACRO _Dest:req
-	@push2mem (_Dest)
+	pushvar	_Dest
 	call	ds:atof
 	add		esp, 4
 	EXITM <>
 ENDM
 
 @LINE_EXIST MACRO name_sect:req, name_param:req
-	@push2mem (name_param)
-	@push2mem (name_sect)
+	pushvar	name_param
+	pushvar	name_sect
 	mov		eax, ds:pSettings	;; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:line_exist		;; CInifile::line_exist(char const *,char const *)
@@ -1622,8 +1735,8 @@ ENDM
 
 ;возвращает в стеке сопроцессора.
 @R_FLOAT MACRO name_sect:req, name_param:req
-	@push2mem (name_param)
-	@push2mem (name_sect)
+	pushvar	name_param
+	pushvar	name_sect
 	mov		eax, ds:pSettings			; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:r_float
@@ -1631,8 +1744,8 @@ ENDM
 ENDM
 
 @R_U32 MACRO name_sect:req, name_param:req
-	@push2mem (name_param)
-	@push2mem (name_sect)
+	pushvar	name_param
+	pushvar	name_sect
 	mov		eax, ds:pSettings			; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:r_u32
@@ -1640,8 +1753,8 @@ ENDM
 ENDM
 
 @R_U8 MACRO name_sect:req, name_param:req
-	@push2mem (name_param)
-	@push2mem (name_sect)
+	pushvar	name_param
+	pushvar	name_sect
 	mov		eax, ds:pSettings			; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:r_u8
@@ -1649,8 +1762,8 @@ ENDM
 ENDM
 
 @R_BOOL MACRO name_sect:req, name_param:req
-	@push2mem (name_param)
-	@push2mem (name_sect)
+	pushvar	name_param
+	pushvar	name_sect
 	mov		eax, ds:pSettings			; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:r_bool
@@ -1658,8 +1771,8 @@ ENDM
 ENDM
 
 @R_STRING MACRO name_sect:req, name_param:req
-	@push2mem (name_param)
-	@push2mem (name_sect)
+	pushvar	name_param
+	pushvar	name_sect
 	mov		eax, ds:pSettings			; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:r_string
@@ -1667,7 +1780,7 @@ ENDM
 ENDM
 
 @R_SECTION MACRO name_sect:req
-	@push2mem (name_sect)
+	pushvar	name_sect
 	mov		eax, ds:pSettings			; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:r_section
@@ -1676,9 +1789,9 @@ ENDM
 
 CGameObject@@u_EventGen MACRO P:req, type_:req, dest:req
 	push	esi
-	@push2mem (dest)
-	@push2mem (type_)
-	@reg2mem (esi, P)
+	pushvar	dest
+	pushvar	type_
+	regvar	esi, P
 	call	CGameObject__u_EventGen
 	add		esp, 8
 	pop		esi
@@ -1688,7 +1801,7 @@ ENDM
 CGameObject@@u_EventSend MACRO P:req, dwFlags:=<8>
 	push	0
 	push	dwFlags
-	@push2mem (P)
+	pushvar	P
 	mov		eax, ds:g_pGameLevel	; IGame_Level * g_pGameLevel
 	mov		eax, [eax]
 	mov		edx, [eax+160h]
@@ -1697,6 +1810,15 @@ CGameObject@@u_EventSend MACRO P:req, dwFlags:=<8>
 	call	edx
 	EXITM <>
 ENDM
+
+;cond_reg = cond_reg ? const1 : const2	//cond_reg регистр, если != 0, то присваиваетс€ первое значение, иначе второе.
+TERNARY MACRO cond_reg:req, const1:req, const2:req
+	neg		cond_reg
+	sbb		cond_reg, cond_reg
+	and		cond_reg, const1 - const2
+	add		cond_reg, const2
+ENDM
+
 ;		value equ @SubStr(<&expression>, num+2)
 ;		dest equ @SubStr(<&expression>, 1, num-1)
 ;		%echo value

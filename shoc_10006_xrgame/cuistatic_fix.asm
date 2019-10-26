@@ -1,17 +1,16 @@
 
 align_proc
 cuistatic_fix proc
-	; делаем то, что вырезали
+	;вырезанное
 	call	sub_103F1781
-	; делаем свое
 	PERFORM_EXPORT_CUI_VOID__BOOL			CUIStatic__SetTextComplexMode_,	"SetTextComplexMode"
 	PERFORM_EXPORT_CUIWND__VOID__VOID		CUIStatic__AdjustWidthToText_,	"AdjustWidthToText"
 	PERFORM_EXPORT_CUIWND__VOID__VOID		CUIStatic__AdjustHeightToText_,	"AdjustHeightToText"
 	PERFORM_EXPORT_CUI_VOID__UINT			CUIStatic__SetVTextAlignment_,	"SetVTextAlign"
 	PERFORM_EXPORT_CUI_VOID__FLOAT_FLOAT	CUIStatic__SetTextPos_,			"SetTextPos"
 	PERFORM_EXPORT_CUI_VOID__BOOL			CUIStatic__CanRotate,			"CanRotate"
-	; идём обратно
-	jmp		back_from_cuistatic_fix
+	
+	jmp		return_cuistatic_fix
 cuistatic_fix endp
 ; =========================================================================================
 ; ========================= added by Ray Twitty (aka Shadows) =============================
@@ -79,14 +78,11 @@ CUIStatic__OnFocusRecieve_callback proc
 	mov		static_for_callback, eax
 	smart_cast	CUICellItem, CUIStatic, eax
 	.if (eax)
-		mov		eax, [eax].CUICellItem.m_pData		;void*	сюда этот класс помещают CInventoryItem
-		.if (eax)
-			mov		edi, [eax].CInventoryItem.CInventoryItem@m_object
-			.if (edi)
-				call	CGameObject__lua_game_object
-				.if (eax)
-					CALLBACK__GO	g_Actor, 141, eax
-				.endif
+		mov		edx, [eax].CUICellItem.m_pData		;void*	сюда этот класс помещают CInventoryItem
+		.if (edx)
+			mov		eax, [edx].CInventoryItem.CInventoryItem@m_object
+			.if (eax)
+				CALLBACK__GO	g_Actor, 141, eax
 			.endif
 		.endif
 	.endif
@@ -94,7 +90,7 @@ CUIStatic__OnFocusRecieve_callback proc
 	popa
 	;вырезаное
 	mov		edx, [ecx+204h]
-	jmp		CUIStatic__OnFocusRecieve_callback_back
+	jmp		return_CUIStatic__OnFocusRecieve_callback
 CUIStatic__OnFocusRecieve_callback endp
 
 align_proc
@@ -104,14 +100,11 @@ CUIStatic__OnFocusLost_callback proc
 	mov		static_for_callback, ecx
 	smart_cast	CUICellItem, CUIStatic, ecx
 	.if (eax)
-		mov		eax, [eax].CUICellItem.m_pData
-		.if (eax)
-			mov		edi, [eax].CInventoryItem.CInventoryItem@m_object
-			.if (edi)
-				call	CGameObject__lua_game_object
-				.if (eax)
-					CALLBACK__GO	g_Actor, 142, eax
-				.endif
+		mov		edx, [eax].CUICellItem.m_pData
+		.if (edx)
+			mov		eax, [edx].CInventoryItem.CInventoryItem@m_object
+			.if (eax)
+				CALLBACK__GO	g_Actor, 142, eax
 			.endif
 		.endif
 	.endif
@@ -120,6 +113,5 @@ CUIStatic__OnFocusLost_callback proc
 	;вырезаное
 	mov		eax, ecx
 	mov		ecx, [eax+3Ch]
-	jmp		CUIStatic__OnFocusLost_callback_back
+	jmp		return_CUIStatic__OnFocusLost_callback
 CUIStatic__OnFocusLost_callback endp
-

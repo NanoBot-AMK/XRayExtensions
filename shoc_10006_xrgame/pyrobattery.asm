@@ -349,7 +349,7 @@ local pos:Fvector4, dir:Fvector4, mass:real4, angle:real4, matrix_start:Fmatrix4
 			lea		edi, [edx].str_value.value
 			.if (@LINE_EXIST(edi, ebx))
 				mov		ebx, @R_STRING(edi, ebx)
-				lea		ecx, [esi].CGameObject@vfptr
+				lea		eax, [esi].CGameObject@vfptr
 				mov		ecx, CGameObject@@lua_game_object()
 				CScriptGameObject@@SetVisualName(ebx)
 			.endif

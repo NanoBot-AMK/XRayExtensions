@@ -1,17 +1,17 @@
 include matrix_reg_macro.asm
 
-REGISTER__MATRIX__PMATR_PMATR									register__matrix__mul43,				"mul_43"
-
+;;REGISTER__MATRIX__PMATR_PMATR									register__matrix__mul43,	
+align_proc
 matrix_fix proc
 	call	register_matrix__this_float
 	;-----------------------------------------------------
-	PERFORM_EXPORT__MATRIX__THIS__FLOAT							matrix__transpose,						"transpose"
-	PERFORM_EXPORT__MATRIX__THIS__PMATR_PMATR					register__matrix__mul43,				matrix__mul_43
-	PERFORM_EXPORT__MATRIX__THIS__FLOAT_FLOAT_FLOAT				matrix__transform_tiny,					"transform_tiny"
-	PERFORM_EXPORT__MATRIX__THIS__FLOAT_FLOAT_FLOAT				matrix__transform_dir,					"transform_dir"
+	PERFORM_EXPORT__MATRIX__THIS__FLOAT							matrix__transpose,					"transpose"
+	PERFORM_EXPORT__MATRIX__THIS__PMATR_PMATR					matrix__mul_43,						"mul_43"
+	PERFORM_EXPORT__MATRIX__THIS__FLOAT_FLOAT_FLOAT				matrix__transform_tiny,				"transform_tiny"
+	PERFORM_EXPORT__MATRIX__THIS__FLOAT_FLOAT_FLOAT				matrix__transform_dir,				"transform_dir"
 	
 	;-----------------------------------------------------
-	jmp		back_from_matrix_fix
+	jmp		return_matrix_fix
 matrix_fix endp
 
 align_proc

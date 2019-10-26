@@ -2,20 +2,21 @@
 
 align_proc
 CGameObject@@lua_game_object proc (dword)
-;ecx - this		CGameObject*
-	ASSUME	ecx:ptr CGameObject
-	xor		eax, eax
-	.if (ecx)
-		.if (![ecx].m_lua_game_object)
+;eax - this		CGameObject*
+	.if (eax)
+		push	ecx
+		mov		ecx, eax
+		mov     eax, [ecx].CGameObject.m_lua_game_object
+		.if (!eax)
 			push	edi
+			push	edx
 			mov		edi, ecx
 			call	CGameObject__lua_game_object
-			mov		ecx, edi
+			pop		edx
 			pop		edi
 		.endif
-		mov     eax, [ecx].m_lua_game_object
+		pop		ecx
 	.endif
-	ASSUME	ecx:nothing
-	retn
+	ret
 CGameObject@@lua_game_object endp
 

@@ -12,7 +12,7 @@ if exist addr.inc goto end_if
 
 if exist mydll.obj del mydll.obj
 
-..\tools\AddCode.exe xrRender_R3_orig.dll xrRender_R3.dll mydll.dll corrections_list.txt
+..\tools\AddCode.exe xrRender_R3_orig.dll xrRender_R3.dll mydll.dll corrections_list.txt 0E00000E0h
 
 if exist mydll.dll del mydll.dll
 

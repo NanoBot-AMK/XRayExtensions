@@ -1709,13 +1709,8 @@ align_proc
 CScriptGameObject@@GetHolderOwner proc
 	smart_cast	CHolderCustom, [ecx+4]
 	.if (eax)
-		ASSUME	eax:ptr CHolderCustom
-		mov		ecx, [eax].m_owner
-		xor		eax, eax
-		.if (ecx)
-			call	CGameObject@@lua_game_object
-		.endif
-		ASSUME	eax:nothing
+		mov		eax, [eax].CHolderCustom.m_owner
+		CGameObject@@lua_game_object()
 	.endif
 	ret
 CScriptGameObject@@GetHolderOwner endp

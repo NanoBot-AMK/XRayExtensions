@@ -158,8 +158,8 @@ local h_line_throw_target:dword, dist_target:dword
 	ret
 calc_bullet endp
 
-static_str		aMin_dist_target, "min_dist_target"
-static_str		aThreshold_vel_x, "threshold_vel_x"
+const_static_str		aMin_dist_target, "min_dist_target"
+const_static_str		aThreshold_vel_x, "threshold_vel_x"
 
 ; расчёт упреждающей точки для движущейся цели
 align_proc

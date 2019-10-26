@@ -1,119 +1,118 @@
 include cuiwindow_reg_macro.asm
 
+align_proc
 cuiwindow_fix proc
-	; сохраняем всё
-	pusha
-	; добавляем своё
-	PERFORM_EXPORT_CUIWND__VOID__VOID UIWindow__DetachFromParent, "DetachFromParent"
-	PERFORM_EXPORT_CUIWND__VOID__VOID CUIWindow__BringToTop, "BringToTop"
-	PERFORM_EXPORT_CUIWND__VOID__VOID CUIWindow__Update_virtualcall, "Update"
-	PERFORM_EXPORT_CUIWND__FLOAT__VOID CUIWindow__GetVPos, "GetVPos"
-	PERFORM_EXPORT_CUIWND__FLOAT__VOID CUIWindow__GetHPos, "GetHPos"
-	PERFORM_EXPORT_CUIWND__FLOAT__VOID CUIWindow__GetCursorX, "GetCursorX"
-	PERFORM_EXPORT_CUIWND__FLOAT__VOID CUIWindow__GetCursorY, "GetCursorY"
-	PERFORM_EXPORT_CUIWND__FLOAT__VOID CUIWindow__GetAbsolutePosX, "GetAbsolutePosX"
-	PERFORM_EXPORT_CUIWND__FLOAT__VOID CUIWindow__GetAbsolutePosY, "GetAbsolutePosY"
-	; восстанавливаем всё
-	popa
 	; делаем то, что вырезали 
-	push    ecx
-	mov     ecx, esp
-	push    eax
-	call    edi
-	; идём обратно
-	jmp back_from_cuiwindow_fix
+	push	ecx
+	mov		ecx, esp
+	push	eax
+	call	edi
+	PERFORM_EXPORT_CUIWND__VOID__VOID		CUIWindow@@DetachFromParent,		"DetachFromParent"
+	PERFORM_EXPORT_CUIWND__VOID__VOID		CUIWindow@@BringToTop,				"BringToTop"
+	PERFORM_EXPORT_CUIWND__VOID__VOID		CUIWindow@@Update_virtualcall,		"Update"
+	PERFORM_EXPORT_CUIWND__FLOAT__VOID		CUIWindow@@GetVPos,					"GetVPos"
+	PERFORM_EXPORT_CUIWND__FLOAT__VOID		CUIWindow@@GetHPos,					"GetHPos"
+	PERFORM_EXPORT_CUIWND__FLOAT__VOID		CUIWindow@@GetCursorX,				"GetCursorX"
+	PERFORM_EXPORT_CUIWND__FLOAT__VOID		CUIWindow@@GetCursorY,				"GetCursorY"
+	PERFORM_EXPORT_CUIWND__FLOAT__VOID		CUIWindow@@GetAbsolutePosX,			"GetAbsolutePosX"
+	PERFORM_EXPORT_CUIWND__FLOAT__VOID		CUIWindow@@GetAbsolutePosY,			"GetAbsolutePosY"
+	
+	jmp		return_cuiwindow_fix
 cuiwindow_fix endp
 
-UIWindow__DetachFromParent proc
-	mov     eax, [ecx+2Ch] ; parent
-	test    eax, eax
-	jz      exit ; no parent
-	push    ecx
-	mov     ecx, eax
-	mov     eax, [ecx]
-	call    dword ptr [eax+38h] ; 
-exit:
-	retn
-UIWindow__DetachFromParent endp
+align_proc
+CUIWindow@@DetachFromParent proc
+	ASSUME	ecx:ptr CUIWindow
+	mov		eax, [ecx].m_pParentWnd
+	.if (eax)
+		push	ecx
+		mov		ecx, eax
+		mov		edx, [eax]
+		mov		eax, [edx+38h]
+		call	eax
+	.endif
+	ret
+CUIWindow@@DetachFromParent endp
 
-CUIWindow__BringToTop proc
-	mov     eax, [ecx+2Ch] ; parent
-	test    eax, eax
-	jz      exit ; no parent
-	; eax == this == parent windows
-	push    ecx ; аргумент в стеке - окно, которое понимаем наверх
-	call CUIWindow__BringToTop_
-exit:
-	retn
-CUIWindow__BringToTop endp
+align_proc
+CUIWindow@@BringToTop proc
+	mov		eax, [ecx].m_pParentWnd
+	.if (eax)
+		; eax == this == parent windows
+		push	ecx ; аргумент в стеке - окно, которое понимаем наверх
+		call	CUIWindow@@BringToTop_
+	.endif
+	ret
+CUIWindow@@BringToTop endp
 
-g_counter_just_for_show dd 0
+static_int		g_counter_just_for_show, 0
+
+align_proc
 scroll_vew_fix proc
-
-	pusha
-	mov eax, dword ptr[g_counter_just_for_show]
-	PRINT_UINT "cntr=%d", eax
-	inc eax
-	mov dword ptr[g_counter_just_for_show], eax
-	popa
+	PRINT_UINT "cntr=%d", g_counter_just_for_show
+	inc		g_counter_just_for_show
 	; делаем то, что вырезали 
-	push    ecx
-	push    esi
-	push    edi
-	mov     edi, ecx
+	push	ecx
+	push	esi
+	push	edi
+	mov		edi, ecx
 	; идём обратно
-	jmp back_from_scroll_vew_fix
+	jmp		back_from_scroll_vew_fix
 scroll_vew_fix endp
 
-CUIWindow__Update_virtualcall proc near
-	mov     eax, [ecx]
-	jmp     dword ptr [eax+10h]
-CUIWindow__Update_virtualcall endp
+align_proc
+CUIWindow@@Update_virtualcall proc 
+	mov		eax, [ecx]
+	jmp		dword ptr [eax+10h]
+CUIWindow@@Update_virtualcall endp
 
-CUIWindow__GetHPos proc
-	fld     dword ptr [ecx+5]
-	retn
-CUIWindow__GetHPos endp
+align_proc
+CUIWindow@@GetHPos proc
+	fld		[ecx].m_wndPos.x
+	ret
+CUIWindow@@GetHPos endp
 
-CUIWindow__GetVPos proc
-	fld     dword ptr [ecx+9]
-	retn
-CUIWindow__GetVPos endp
-
+align_proc
+CUIWindow@@GetVPos proc
+	fld		[ecx].m_wndPos.y
+	ret
+CUIWindow@@GetVPos endp
 ; =========================================================================================
 ; ========================= added by Ray Twitty (aka Shadows) =============================
 ; =========================================================================================
 ; ====================================== START ============================================
 ; =========================================================================================
-CUIWindow__GetCursorX proc
-	fld     dword ptr [ecx+68]
-	retn
-CUIWindow__GetCursorX endp
+align_proc
+CUIWindow@@GetCursorX proc
+	fld		[ecx].cursor_pos.x
+	ret
+CUIWindow@@GetCursorX endp
 
-CUIWindow__GetCursorY proc
-	fld     dword ptr [ecx+72]
-	retn
-CUIWindow__GetCursorY endp
+align_proc
+CUIWindow@@GetCursorY proc
+	fld		[ecx].cursor_pos.y
+	ret
+CUIWindow@@GetCursorY endp
 ; =========================================================================================
 ; ======================================= END =============================================
 ; =========================================================================================
-
-CUIWindow__GetAbsolutePosX proc
+align_proc
+CUIWindow@@GetAbsolutePosX proc
 	fldz
-sum:
-	fadd	dword ptr[ecx+5]
-	mov     ecx, [ecx+2Ch]
-	test	ecx, ecx
-	jnz		short sum
-	retn
-CUIWindow__GetAbsolutePosX endp
+	.repeat
+		fadd	[ecx].m_wndPos.x
+		mov		ecx, [ecx].m_pParentWnd
+	.until (ecx==NULL)
+	ret
+CUIWindow@@GetAbsolutePosX endp
 
-CUIWindow__GetAbsolutePosY proc
+align_proc
+CUIWindow@@GetAbsolutePosY proc
 	fldz
-sum:
-	fadd	dword ptr[ecx+9]
-	mov     ecx, [ecx+2Ch]
-	test	ecx, ecx
-	jnz		short sum
-	retn
-CUIWindow__GetAbsolutePosY endp		
+	.repeat
+		fadd	[ecx].m_wndPos.y
+		mov		ecx, [ecx].m_pParentWnd
+	.until (ecx==NULL)
+	ASSUME	ecx:nothing
+	ret
+CUIWindow@@GetAbsolutePosY endp

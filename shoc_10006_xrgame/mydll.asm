@@ -125,6 +125,7 @@ include explosive_rocket.asm
 include level_explosive.asm
 include anomaly.asm
 include vector_fix.asm
+include physics_script.asm
 include register_classes_fix.asm
 
 end LibMain

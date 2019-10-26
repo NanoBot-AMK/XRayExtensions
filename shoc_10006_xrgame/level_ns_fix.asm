@@ -105,7 +105,7 @@ level_script_extension_2 endp
 ;==============================================================================
 
 align_proc
-level_ns_extension_2: ; здесь надо добавлять столько раз   "mov ecx, eax" + "call esi", сколько добавляли функций
+level_ns_extension_2 proc ; здесь надо добавлять столько раз   "mov ecx, eax" + "call esi", сколько добавляли функций
 ; делаем то, что вырезали
 	mov		ecx, eax
 	call	esi ; luabind::scope::operator,(luabind::scope) ; luabind::scope::operator,(luabind::scope)
@@ -237,8 +237,9 @@ level_ns_extension_2: ; здесь надо добавлять столько раз   "mov ecx, eax" + "cal
 	mov		ecx, eax
 	call	esi
 	
-; идём обратно
-	jmp 	back_to_level_ns_ext_2
+	jmp 	return_level_ns_ext_2
+level_ns_extension_2 endp
+
 ;===============| расширение регистрации пространства имён actor_stats |=============
 level_ns_extension_3 proc
 	;вырезаное

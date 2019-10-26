@@ -1,17 +1,18 @@
 include console_commands_reg_macro.asm
 
+align_proc
 add_console_commands_fix proc 
 	xor		 eax, eax
 	mov		 g_bHudAdjustMode, eax
-REGISTER_CC_INT2   g_bHudAdjustMode,  "hud_adjust_mode",	0, 5
+REGISTER_CC_INT2	g_bHudAdjustMode,	"hud_adjust_mode",	0, 5
 	;xor	 eax, eax
 	;mov	 [g_fHudAdjustValue], eax
-REGISTER_CC_FLOAT2 g_fHudAdjustValue, "hud_adjust_value", 0.0, 1.0
-REGISTER_CC_FLOAT2 g_ui_mouse_sens, "mouse_ui_sens", 1.0, 10.0
+REGISTER_CC_FLOAT2	g_fHudAdjustValue,	"hud_adjust_value", 0.0, 1.0
+REGISTER_CC_FLOAT2	g_ui_mouse_sens,	"mouse_ui_sens",	1.0, 10.0
 ifndef OGSE_BUILD
-	REGISTER_CC_FLAG g_ammo_on_belt, 1h, "g_ammunition_on_belt"
+REGISTER_CC_FLAG	g_ammo_on_belt, 1h, "g_ammunition_on_belt"
 endif
-REGISTER_CC_FLAG g_mouse_wheel_sc, 1h, "mouse_wheel_slot_changing"
+REGISTER_CC_FLAG	g_mouse_wheel_sc, 1h,	"mouse_wheel_slot_changing"
 
 ifdef OGSE_BUILD
 	REGISTER_CC_INT2   g_ogse_nv_bind,			 "ogse_nv_bind",		   0, 07FFFFFFFh
@@ -29,10 +30,10 @@ endif
 ; =========================================================================================
 ; ====================================== START ============================================
 ; =========================================================================================
-REGISTER_CC_FLOAT2 g_fov, "cam_fov", 55.0, 90.0
-REGISTER_CC_FLOAT2 00506BA4h, "hud_fov", 0.0, 1.0
-REGISTER_CC_FLOAT2 phTimefactor, "ph_timefactor", 0.0, 10.0
-REGISTER_CC_FLOAT2 phGravity, "ph_gravity", 0.0, 100.0
+REGISTER_CC_FLOAT2	g_fov,			"cam_fov",			55.0, 90.0
+REGISTER_CC_FLOAT2	00506BA4h,		"hud_fov",			0.0, 1.0
+REGISTER_CC_FLOAT2	phTimefactor,	"ph_timefactor",	0.0, 10.0
+REGISTER_CC_FLOAT2	phGravity,		"ph_gravity",		0.0, 100.0
 ifdef DEBUG_COMMANDS
 	REGISTER_CC_FLAG psActorFlags, 8, "g_unlimitedammo"
 	REGISTER_CC_FLAG psActorFlags, 1, "g_god"

@@ -207,7 +207,7 @@ local data[MAX_SEGMENTS_PYRO]:dword, str_data[4096]:byte, str_data2[64]:byte
 							inc		edx
 						.endw
 						.if ([edi]==0)
-							R_ASSERT  "Неполные данные!", "CExplosiveRocketPyro@@InitStart"
+							R_ASSERT  "Неполные данные.", "CExplosiveRocketPyro@@InitStart"
 						.endif
 						@ATOF(&str_data2)
 						fmul	DEG2RAD
@@ -233,7 +233,7 @@ local data[MAX_SEGMENTS_PYRO]:dword, str_data[4096]:byte, str_data2[64]:byte
 				;	PRINT_UINT "count_sec = %d", count_sec
 				.endif
 			.else
-				R_ASSERT	"Unknown type_figure!", "CExplosiveRocketPyro@@InitStart"
+				R_ASSERT	"Unknown type_figure.", "CExplosiveRocketPyro@@InitStart"
 			.endif
 			;step = PI_MUL_2/count
 			movflt	step, PI_MUL_2

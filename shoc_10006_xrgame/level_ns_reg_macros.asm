@@ -27,7 +27,7 @@ register_level__base_prototype endp
 
 PERFORM_EXPORT_LEVEL__BASEPROTOTYPE MACRO func_to_export:REQ, fun_name_str:REQ, virtual_tabl_name:REQ
 	mov		eax, esp
-	invoke	register_level__base_prototype, eax, static_str$(fun_name_str), addr func_to_export, addr virtual_tabl_name
+	invoke	register_level__base_prototype, eax, const_static_str$(fun_name_str), addr func_to_export, addr virtual_tabl_name
 ENDM
 
 PERFORM_EXPORT_LEVEL__VOID__FLOAT					MACRO	fun_to_export:REQ, fun_name_str:REQ

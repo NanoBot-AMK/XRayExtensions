@@ -15,17 +15,15 @@ ENDM
 
 align_proc
 CUIWpnParams__Check_fix proc
-	; делаем свое
 	CUIWPN_PARAMS_CHECK_SECTION "wpn_knife"
 	CUIWPN_PARAMS_CHECK_SECTION "mp_wpn_knife"
-	ifdef OGSE_BUILD
-		CUIWPN_PARAMS_CHECK_SECTION "wpn_knife_m1"
-		CUIWPN_PARAMS_CHECK_SECTION "wpn_montirovka"
-	endif
-	; делаем вырезанное
+IFDEF OGSE_BUILD
+	CUIWPN_PARAMS_CHECK_SECTION "wpn_knife_m1"
+	CUIWPN_PARAMS_CHECK_SECTION "wpn_montirovka"
+ENDIF
+	;вырезанное
 	CUIWPN_PARAMS_CHECK_SECTION "wpn_binoc"
-	; возвращаемся
-	jmp     back_from_CUIWpnParams__Check_fix
+	jmp     return_CUIWpnParams__Check_fix
 CUIWpnParams__Check_fix endp
 ; =========================================================================================
 ; ======================================= END =============================================

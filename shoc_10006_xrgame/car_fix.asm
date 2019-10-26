@@ -30,7 +30,7 @@ CActor__init_camera_holder endp
 align_proc
 CCar__CarExplode_ext proc
 ;edi - CCar	= CGameObject*	+0h
-	CALLBACK__GO	edi, GameObject__eDeath, NULL
+	CALLBACK__VOID	edi, GameObject__eDeath
 	; return;		// выход из CCar::CarExplode()
 	pop		edi
 	pop		esi
@@ -83,9 +83,7 @@ CCar__attach_Actor_ext proc
 		ASSUME	edx:nothing, ebx:nothing
 	.endif
 	ASSUME	edi:nothing, esi:nothing
-	mov		edi, ebx	; actor
-	call	CGameObject__lua_game_object
-	CALLBACK__GO	esi, eAttachActorVehicle, eax
+	CALLBACK__GO	esi, eAttachActorVehicle, ebx
 	;return;	//
 	pop		ebx
 	pop		esi

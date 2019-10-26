@@ -257,3 +257,21 @@ CCustomRocket@@OpenParachute proc
 	ASSUME	esi:nothing
 	ret
 CCustomRocket@@OpenParachute endp
+
+;фикс ошибки при взрыве ракеты методом explode(0)
+align_proc
+CScriptGameObject@@explode_fix proc
+;ebx	explosive	CExplosive*	
+	smart_cast	CExplosiveRocket, CExplosive, ebx
+	.if (eax)
+		;rocket->Contact(object().Position(), normal);
+		mov		ebx, eax	;CExplosiveRocket*
+		mov		eax, [ebx]
+		mov		edx, [eax+1E8h]
+	.else
+		;explosive->GenExplodeEvent(object().Position(), normal);
+		mov		eax, [ebx]
+		mov		edx, [eax+4Ch]
+	.endif
+	jmp		return_CScriptGameObject@@explode_fix
+CScriptGameObject@@explode_fix endp

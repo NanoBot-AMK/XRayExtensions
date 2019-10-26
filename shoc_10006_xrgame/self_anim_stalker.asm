@@ -100,18 +100,18 @@ PRINT_INT_INT_INT MACRO fmt_txt:REQ, val1:REQ, val2:REQ, val3:REQ
 ENDM
 
 ;-------------------
-static_str		aAnim_params	, "anim_params"
-static_str		aNo_prefix		, "no_prefix"
-static_str		aPrint_anim_l	, "print_anim_load"
+const_static_str		aAnim_params	, "anim_params"
+const_static_str		aNo_prefix		, "no_prefix"
+const_static_str		aPrint_anim_l	, "print_anim_load"
 
-static_str		aState_name		, "tbl_state_names"
-static_str		aWeapon_name	, "tbl_weapon_names"
-static_str		aWeapon_acti	, "tbl_weapon_action_names"
-static_str		aMovement_na	, "tbl_movement_names"
-static_str		aMovement_ac	, "tbl_movement_action_names"
-static_str		aIn_place_na	, "tbl_in_place_names"
-static_str		aGlobal_name	, "tbl_global_names"
-static_str		aHead_names		, "tbl_head_names"
+const_static_str		aState_name		, "tbl_state_names"
+const_static_str		aWeapon_name	, "tbl_weapon_names"
+const_static_str		aWeapon_acti	, "tbl_weapon_action_names"
+const_static_str		aMovement_na	, "tbl_movement_names"
+const_static_str		aMovement_ac	, "tbl_movement_action_names"
+const_static_str		aIn_place_na	, "tbl_in_place_names"
+const_static_str		aGlobal_name	, "tbl_global_names"
+const_static_str		aHead_names		, "tbl_head_names"
 										;	0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 _static			count_weapon_action_names	dd 	1, 4, 1, 1, 3, 0, 4, 2, 2, 2, 0, 2, 4, 2, 2, -1
 _static			count_global_names			dd 	0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, -1

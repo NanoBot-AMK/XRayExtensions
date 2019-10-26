@@ -1,10 +1,11 @@
-CUITalkWnd__Hide_fix:
+
+align_proc
+CUITalkWnd__Hide_fix proc
 	push	offset aUi_talk_hide
 	call	SendInfoToActor
 	add		esp, 4
-	
-	; Вырезанное.
+	;вырезанное.
 	mov		eax, [esi]
 	mov		edx, [eax+74h]
-	
-	jmp		CUITalkWnd__Hide_fix_back
+	jmp		return_CUITalkWnd__Hide_fix
+CUITalkWnd__Hide_fix endp

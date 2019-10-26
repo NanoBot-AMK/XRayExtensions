@@ -1,61 +1,73 @@
-0x10190492 5 ; jmp global_space_ext ; скриптовые методы в глобальное пространство имен (часть 1)
-0x10149CA2 5 ; jmp global_space_ext2 ; скриптовые методы в глобальное пространство имен (часть 2)
-0x10149D24 5 ; jmp global_space_ext2_additional ; скриптовые методы в глобальное пространство имен (часть 3)
+10190492h 5  ; jmp global_space_ext ; скриптовые методы в глобальное пространство имен (часть 1)
+10149CA2h 7  ; jmp global_space_ext2 ; скриптовые методы в глобальное пространство имен (часть 2)
+10149D24h 8  ; jmp global_space_ext2_additional ; скриптовые методы в глобальное пространство имен (часть 3)
 10155D8Ch 11 ; jmp game_object_fix ; новые скриптовые методы в CScriptGameObject
 1014A84Bh 9  ; jmp game_object_fix2 ; новые скриптовые свойства в CScriptGameObject
 1048300Ch 4		;CActor@@HitSignal_callback ; скриптовый колбек на хит актора
 10483CFCh 4		;->>-
-0x10204D75 5 ; jmp on_belt_callback
-0x10204F13 5 ; jmp on_ruck_callback
-0x10204BCF 5 ; jmp on_slot_callback
-0x1004C9AD 5 ; jmp alife_simulator_fix ; скриптовые методы в класс CALifeSimulator
+10204D75h 12 ; jmp on_belt_callback
+10204F13h 11 ; jmp on_ruck_callback
+10204BCFh 8  ; jmp on_slot_callback
+1004C9ADh 5 ;скриптовые методы в класс CALifeSimulator
+;переделка CALifeSimulator_register__CSE_Abstract__LPCSTR_pFvector_u32_u32_u16
+1004C99Bh 7
+1004E6C4h 5
+;----------------------
 ;0x1024C290 1 ; retn ; правка смены визуала актора (устарела, внизу есть альтернативный вариант - примечание by Macron)
 0x1028E30E 5 ; jmp add_console_commands_fix ; новые консольные команды
-0x102862E0 5 ; jmp inventory_box_fix ; скриптовый колбек на перемещение предмета в ящик
+102862FEh 6  ; jmp inventory_box_fix ; скриптовый колбек на перемещение предмета в ящик
 0x101AEF0F 7 ; level_script_extension_1 ; скриптовые методы в пространство level (часть 1)
 0x101AF1C1 8 ; level_ns_extension_2 	; скриптовые методы в пространство level (часть 2)
 0x101AF2DD 7 ; level_script_extension_2	; скриптовые методы в пространство actor_stats (часть 1)
 0x101AF31B 8 ; level_ns_extension_3		; скриптовые методы в пространство actor_stats (часть 2)
 ; отключение вывода в лог ненужной информации
-0x103561C9 5 ; jmp     addr_103561DD ; skip annoying msg "sv ownership id_parent ..."
-0x103561DD 8 ; part2: mov esi,10h; nop; nop; nop;
-0x1035646D 5 ; jmp     addr_10356481 ; skip annoying msg "sv reject. id_parent ..."
-0x10356481 8 ; part2: mov ebx,10h; nop; nop; nop;
-0x10355D85 5 ; jmp addr_10355D9B ; skip annoying msg "sv destroy object ..."
-0x103B8DEB 5 ; jmp addr_103B8DFF ; skip annoying msg "[16-9] get_xml_name for ..."
+103561C9h 7 ; jmp addr_103561DD ; skip annoying msg "sv ownership id_parent ..."
+1035646Dh 7 ; jmp addr_10356481 ; skip annoying msg "sv reject. id_parent ..."
+10355D85h 6 ; jmp addr_10355D9B ; skip annoying msg "sv destroy object ..."
+103B8DEBh 5 ; jmp addr_103B8DFF ; skip annoying msg "[16-9] get_xml_name for ..."
 
-0x1004C3D2 5 ; jmp release_fix ; при попытке удалить объект два раза через alife():release() игра теперь вылетает
-0x101477AF 6 ; отключение проверки при выкидывании из ящиков скриптовой функцией CScriptGameObject::DropItem
+1004C3D2h 8  ; jmp release_fix ; при попытке удалить объект два раза через alife():release() игра теперь вылетает
+101477AFh 6  ; отключение проверки при выкидывании из ящиков скриптовой функцией CScriptGameObject::DropItem
 0x102042FD 6 ; активировать 8-й слот (детекторы)
 0x1026C54B 8 ; скриптовый колбек на смерть машины
 0x102693AE 2 ; m_car_panel_visible ;управления видимостью панели машины, работает индивидуально! (c) НаноБот
 0x103FB34F 5 ; jmp cuiwindow_fix ; скриптовые методы в класс CUIWindow
-0x102C4632 5 ; jmp ctime_fix ; скриптовые методы в класс CTime
-0x101398CD 5 ; jmp matrix_fix ; скриптовые методы в класс matrix
+102C4632h 5 ; jmp ctime_fix ; скриптовые методы в класс CTime
+;оптимизация CTime_register__void__int_int_int
+102C4627h 7
+102C55C1h 5
+102C4686h 7
+102C5861h 5
+;---------
+101398CDh 5 ; jmp matrix_fix ; скриптовые методы в класс matrix
+;оптимизация register_matrix__this__pMatrix_pMatrix
+10139820h 7
+1013A41Bh 5
+;------------
 0x1045E73C 6 ; фикс имени скриптовой функции speed
 ;0x103C911D 5 ; тестовое слежение за закрытием диалога разговора
 ;0x10054AD7 7 ; фикс оффлайнового движения неписей
-;0x1005568F 5 ; jmp mmm_fix
+;1005568Fh 11 ; jmp mmm_fix
 
 101562D5h 8 ; убираем лишние действия при выключении уже выключенной инфопорции
 
-;0x10221D75 12 ; блокирование кривого движкового переключения гранат (включаем только если имеем альтернативную скриптовую схему)
+;10221D75h 9 ; блокирование кривого движкового переключения гранат (включаем только если имеем альтернативную скриптовую схему)
 
 ; =========================================================================================
 ; !!! кастомную заливку можно включать, когда имеем альтернативную скриптовую обвязку !!!
 ; А то в окне торговли станут невидимыми квестовые предметы раньше подсвечиваемые красным (примечание by Macron).
-;0x103BF3C7 5 ; jmp CUITradeWnd__FillList_fix ; кастомная заливка предметов в окне торговли
+;103BF3DBh 21 ; jmp CUITradeWnd__FillList_fix ; кастомная заливка предметов в окне торговли
 ;0x103CBF49 5 ; jmp CUICarBodyWnd__UpdateLists_fix ; кастомная заливка предметов в окне обыска ящиков
 ; !!! ручное управление можно включать, когда имеем альтернативную скриптовую обвязку !!!
-;0x103BE8C0 5 ; jmp CUITradeWnd__CanMoveToOther_fix ; ручное управление торгуемостью предметов
-;0x10416E89 5 ; jmp CUIInventoryCellItem__EqualTo_fix ; ручное управление группируемостью предметов
+;103BE8C0h 9  ; CUITradeWnd__CanMoveToOther_fix ; ручное управление торгуемостью предметов
+;10416E83h 6 ; jmp CUIInventoryCellItem__EqualTo_fix ; ручное управление группируемостью предметов
 ; =========================================================================================
 
 ; выводит в лог информацию типа "finished creating object" и т.п. (примечание by Macron)
 ;0x101AC832 5 ; jmp CLevel__g_sv_Spawn_fix ; отладочное сообщение о начале создания объекта
 ;0x101AC95A 5 ; jmp CLevel__g_sv_Spawn_fix2 ; отладочное сообщение о завершении создания объекта
 
-;0x1020921F 5 ; jmp CInventoryItem_constructor_fix
+;0x1020921F 6 ; jmp CInventoryItem_constructor_fix
 ;0x102094A8 5 ; jmp CInventoryItem_destructor_fix
 0x104A067C 4 ; замена пустого виртуального метода Projector::Hit на наш
 
@@ -75,8 +87,8 @@
 ; восстанавливает солнечный диск, но могут заглючить скриптовые выбросы/погода (примечание by Macron)
 0x102AC460 5 ; jmp game_cl_GameState__net_import_GameTime_dbg_fix
 
-;0x1020CFD1 5 ; jmp CInventoryOwner__OnEvent_dbg_fix
-0x1020D3F5 5 ; jmp near CInventoryOwner__TransferInfo_omit_event_send
+;1020CFD1h 11 ; jmp CInventoryOwner__OnEvent_dbg_fix
+1020D3F5h 11 ; jmp near CInventoryOwner__TransferInfo_omit_event_send
 
 ;0x10253E2B 40 ; searchlight__turn_on
 
@@ -86,17 +98,19 @@
 ;0x1025828A 5 ; jmp CCustomZone__feel_touch_contact_dbg_fix
 ;0x10056370 5  ;	jmp CGameGraph__distance_fix
 
-;0x102065B7 9 ; jmp loc_1020663C_return_true ; фикс инвентаря часть 1
-;0x1020432D 5 ; jmp CInventory__CInventory_fix ; фикс инвентаря часть 2
-;0x102046B1 5 ; jmp CInventory__Take_fix ; фикс инвентаря часть 3
-;0x10204ED4 5 ; jmp CInventory__Ruck_fix ; фикс инвентаря часть 4
-;0x10204A57 5 ; jmp CInventory__DropItem_fix ; фикс инвентаря часть 5
+1020432Dh 10  ; расширения конструктора CInventory
+;;;1020DAB6h 15  ; CInventoryOwner::CInventoryOwner()
+;;;10266D80h 15  ; CCar::CCar()
+;102065B7h 6  ; jmp loc_1020663C_return_true ; фикс инвентаря часть 1
+;102046B1h 14 ; jmp CInventory__Take_fix ; фикс инвентаря часть 3
+;10204ED4h 18 ; jmp CInventory__Ruck_fix ; фикс инвентаря часть 4
+;10204A57h 12 ; jmp CInventory__DropItem_fix ; фикс инвентаря часть 5
 
-;0x102D5B17 5 ; jmp time_fix_jmp_label
+;102D5B17h 3 ; jmp time_fix_jmp_label
 
 ;-------------- тест камеры машины
-;0x1026F96E 5 ; 	jmp CCar__cam_Update_fix
-;0x1026F820 5 ; jmp CCar__cam_Update_fix0 ; замена камеры машины
+;1026F980h 6 ; call	g_CCameraManager__Update3
+;1026F820h 6 ; jmp CCar__cam_Update_fix0 ; замена камеры машины
 ;-------------- end
 ;0x101DE76F 6 ; fdiv    ds:g_fov
 ;0x1023B20D 8 ; divss   xmm0, ds:g_fov
@@ -104,11 +118,11 @@
 ;0x10287828 8 ; divss   xmm0, ds:g_fov
 
 0x1021CA2F 5 ; jmp UpdateAddonsVisibility_lab
-0x1021CA37 5 ; jmp UpdateAddonsVisibility_fix
-0x1021C632 5 ; jmp UpdateHUDAddonsVisibility_fix
+1021CA2Fh 23 ; jmp UpdateAddonsVisibility_fix
+1021C632h 9  ; jmp UpdateHUDAddonsVisibility_fix
 ;0x1021B80F 6
 
-;0x100138F0 5 ;	jmp CHitMemoryManager__add3_fix
+;;;0x100138F0 5 ;	jmp CHitMemoryManager__add3_fix
 ;0x101A6DC0 5 ; jmp call_mouse_move_callback
 
 ; восстановление работы параметр virtual_size для ламп
@@ -118,44 +132,54 @@
 ; можно использовать, только когда оно действительно надо, иначе возможны вылеты
 ;0x101F269A 5 ; jmp CHangingLamp__net_Spawn_fix_2
 
-0x101E1180 5 ; 	jmp CEntityAlive__Hit_fix
-;0x101DFA30 5 ; 	jmp CEntity__Hit_fix
-;0x10015B4E 5 ;  убираем фейковый хит из менеджера памяти
+;колбеки на хит объекта CEntityAlive
+10073989h 5
+1007B277h 5
+100F6B00h 5
+101197A1h 5
+101C665Ah 5
+101C6717h 5
+1048504Ch 4
+;------------------
+;10015B4Eh 2 ;  убираем фейковый хит из менеджера памяти
 ;0x101E1189 3 ; 	sub     esp, 50h ; 3 байта
 0x101E35EC 4 ; убираем степень двойки иммунитета пси-хита
 
 ; скриптовый колбек на предиспользование предмета
-0x1020616D 5 ; jmp CInventory__Eat_fix
+1020616Dh 8 ; jmp CInventory__Eat_fix
 
-0x1019FFA0 5 ; jmp [CEffectorZoomInertion__Process]
+1019FFA0h 5 ; jmp	CEffectorZoomInertion__Process
 
 ; rus_phantom aka _призрак_
 0x103BFF64 5 ; скриптовый колбек на выделение контакта в ПДА во вкладке "Контакты"
 0x103E5C6E 5 ; добавляет в xml параметры adjust_height_to_text и adjust_width_to_text
 
+1020DD36h 19 ;CInventoryOwner@@CInventoryOwner_fix
 ; использование патронов на поясе
-0x10205D71 5
-0x1021C266 5
+10205D71h 5
+1021C266h 6
 ; использование гранат на поясе
-;0x10221BFD 5
-;0x10221C2C 5
-;0x10205F1B 5
-;0x10222067 5
-;0x10221C58 2
-;0x10221B93 5
+10205C20h 256
+10221C2Ch 5
+;;10221BA6h 6
+10205F1Bh 6
+10222067h 8
+10221C58h 2
+;;10221B83h 8
+;;10221B93h 5
 
 ; новые слоты в инвентаре (нож, бинокль, фонарь)
-;0x103BA6AD 5 ;CUIInventoryWnd__Init__
-;0x103BBD8D 5 ;CUIInventoryWnd__InitInventory__
-;0x103BC590 5 ;CUIInventoryWnd__GetSlotList
-;0x103BC5E0 5 ;CUIInventoryWnd__ClearAllLists
-;0x10204311 5 ;CInventory__Init__ отключение худа слотов
-;0x1042AA44 5 ;память под объект CInventory
-;0x1042B8A8 5 ;память под объект CInventory
-;0x10206C02 3 ;количество слотов в xr_vector_CInventorySlot_xalloc_CInventorySlot____resize
-;0x10206C1F 5 ;количество слотов в xr_vector_CInventorySlot_xalloc_CInventorySlot____resize
-;0x10206C35 6 ;количество слотов в xr_vector_CInventorySlot_xalloc_CInventorySlot____resize
-;0x10206951 6 ;количество слотов в CInventory__SetSlotsBlocked
+;103BA6ADh 5  ;CUIInventoryWnd__Init__
+;103BBD8Dh 8  ;CUIInventoryWnd__InitInventory__
+;103BC590h 80 ;CUIInventoryWnd__GetSlotList
+;103BC5E0h 5  ;CUIInventoryWnd__ClearAllLists
+;10204311h 5  ;CInventory__Init__ отключение худа слотов
+;1042AA44h 5  ;память под объект CUIInventoryWnd
+;1042B8A8h 5  ;память под объект CUIInventoryWnd
+;10206C02h 3  ;количество слотов в xr_vector_CInventorySlot_xalloc_CInventorySlot____resize
+;10206C1Fh 5  ;количество слотов в xr_vector_CInventorySlot_xalloc_CInventorySlot____resize
+;10206C35h 6  ;количество слотов в xr_vector_CInventorySlot_xalloc_CInventorySlot____resize
+;10206951h 6  ;количество слотов в CInventory__SetSlotsBlocked
 
 ; учет предмета в шлемовом слоте при расчете хита актору (включать, если есть слот шлема)
 ;0x101C9B80 5
@@ -165,23 +189,33 @@
 ;0x103BD592 5
 
 ; тень ГГ на R2 (требует также включения в рендере)
-;0x101C85CF 6 ; jmp CActor__Update_fix
-;0x101C8946 5
+;101C85CFh 6 ; jmp CActor__Update_fix
+;101C8946h 20
 
-;kstn-------------->
+;-------------------------------
 ;Перекл. на болт + откл/вкл колеса мышки для переключения м/у слотами
-0x101DEEA0 7 ; jmp CActor__OnNextWeaponSlot
-0x101DEF40 7 ; jmp CActor__OnPrevWeaponSlot
+104830E4h 4  ; 
+10483DD4h 4
+104830E8h 4
+10483DD8h 4
+1053C55Ch 28
+101DEECCh 3
+101DEED3h 3
+101DEEDBh 3
+101DEF04h 3
+101DEF6Ch 3
+101DEF73h 3
+;------------------------------
 
 ;Инверсия колеса мышки для смены оружия
 ;0x101DE3F2 6 ; CActor__IR_OnMouseWheel
 ;0x101DE400 6 ; CActor__IR_OnMouseWheel
 
 ;Коллбэк актора на выделение предмета в инвентаре
-0x103E1B28 5 ; jmp CUIItemInfo__InitItem_EXT_CHUNK
+103E1B28h 5 ; jmp CUIItemInfo__InitItem_EXT_CHUNK
 
 ;Исправление растянутых иконок подбираемых предметов на 16:9
-0x103D24BB 6 ; jmp CUIMainIngameWnd__UpdatePickUpItem_EXT_CHUNK
+103D24D9h 5 ; jmp CUIMainIngameWnd__UpdatePickUpItem_EXT_CHUNK
 
 ;Исправление растянутых иконок патронов в ui актора на 16:9
 0x103D0D70 6 ; jmp CUIMainIngameWnd__SetAmmoIcon_EXT_CHUNK
@@ -194,41 +228,42 @@
 ;------------------<
 
 ; скриптовые методы в CUIListWnd
-0x10420423 5 ; jmp CUIListWnd__script_register_fix
+0x10420424 6 ; jmp CUIListWnd__script_register_fix
 
 ; поддержка русского языка в поле ввода (язык переключается функцией set_input_language(0/1))
-0x103F5F3A 5 ; jmp CUICustomEdit_fix
-0x103F4B21 5 ; jmp CUICustomEdit__KeyPressed_fix
-0x103F4CCD 5 ; jmp CUICustomEdit__KeyPressed_fix_1
-0x103F4CE6 5 ; jmp CUICustomEdit__KeyPressed_fix_2
-0x103F4CFF 5 ; jmp CUICustomEdit__KeyPressed_fix_3
-0x103F4D15 5 ; jmp CUICustomEdit__KeyPressed_fix_4
-0x103F4D60 5 ; jmp CUICustomEdit__KeyPressed_fix_5
-0x103F4D79 5 ; jmp CUICustomEdit__KeyPressed_fix_6
-0x103F4D47 5 ; jmp CUICustomEdit__KeyPressed_fix_7
+;103F5F3Ah 7  ;регистрация CUICustomEdit
+103F4B21h 5  ; jmp CUICustomEdit__KeyPressed_fix
+103F4CD3h 10 ; jmp CUICustomEdit__KeyPressed_fix_1
+103F4CECh 10 ; jmp CUICustomEdit__KeyPressed_fix_2
+103F4CFFh 13 ; jmp CUICustomEdit__KeyPressed_fix_3
+103F4D1Bh 10 ; jmp CUICustomEdit__KeyPressed_fix_4
+103F4D66h 10 ; jmp CUICustomEdit__KeyPressed_fix_5
+103F4D7Fh 10 ; jmp CUICustomEdit__KeyPressed_fix_6
+103F4D4Dh 10 ; jmp CUICustomEdit__KeyPressed_fix_7
 
 ; скриптовые методы в CUITrackBar
-0x1040B935 5 ; jmp CUITrackBar_fix
+1040B935h 5 ; jmp CUITrackBar_fix
 
 ; ???
-0x103D7BC4 5 ; jmp CUIOptionsItem__SaveOptFloatValue_fix
-0x1040E540 5 ; jmp CUIComboBox__SaveValue_fix
+103D7BC4h 5 ; jmp CUIOptionsItem__SaveOptFloatValue_fix
+1040E540h 5 ; jmp CUIComboBox__SaveValue_fix
 
 ; вырезаем кривой постэффект контролёра
-;0x100E15A4 5 ; jmp CController__CController_fix
-;0x100E21A6 5 ; jmp CController__Load_fix_lab1
-;0x100E2BC4 5 ; вырезаем вызов CControllerAura__update_frame
-;0x100E2C21 5 ; вырезаем вызов CControllerAura__update_schedule
-;0x100E2C43 5 ; jmp loc_100E2C77
-;0x100E2C99 5 ; jmp loc_100E2CCD
+;100E15A4h 8 ; jmp CController__CController_fix
+;100E21A6h 24; CController::Load
+;100E2BC4h 5 ; вырезаем вызов CControllerAura__update_frame
+;100E2C21h 5 ; вырезаем вызов CControllerAura__update_schedule
+;100E2C43h 6 ; CController::Die
+;100E2C99h 6 ; jmp loc_100E2CCD
+
 ; вырезаем эффект приближения камеры
-;0x1019C4C3 10 ; jmp loc_1019CCFD
+;1019C4C0h 5
 
 ; скриптовые методы в CUIComboBox
 0x1040EF76 5 ; jmp CUIComboBox_fix
 
 ; исправляеем феерический баг движка в функции CUIComboBox::SetListLength
-0x1040DF6A 5 ; jmp loc_1040DFA5
+0x1040DF6A 2 ; jmp loc_1040DFA5
 
 ; добавляем свои опции, требующие рестарта видео (после нажатия кнопки "Применить" в окне опций или после ввода команды vid_restart)
 0x103D7C60 5 ; jmp CUIOptionsItem__SaveValue_fix
@@ -238,10 +273,17 @@
 ;0x103DF1A6 5 ; jmp no_third_optins_row
 
 ; добавление скриптовых свойств в класс CSE_Abstract
-0x102EA535 5 ; jmp CSE_Abstract__script_register_fix
+102EA534h 36 ; jmp CSE_Abstract__script_register_fix
+;оптимизация cse_abstract_register__vector__rw_prop
+102EB06Dh 3
+102EB0DAh 3
+102EB0C4h 5
+102EB12Fh 5
+102EB149h 3
+;-------------------
 
 ; затычка на вылет "по xrServer::Process_event_reject ... e_parent && e_entity"
-0x10356433 5 ; jmp xrServer__Process_event_reject_fix
+10356433h 5 ; jmp xrServer__Process_event_reject_fix
 
 ; скриптовые методы в класс CSE_ALifeObject
 0x102F3663 5 ; jmp CSE_ALifeObject__script_register_fix
@@ -258,14 +300,12 @@
 ; =========================================================================================
 ; ====================================== START ============================================
 ; =========================================================================================
-0x103581CE 8 ; для работы консольной команды ph_gravity
-0x103CC560 2 ; костыль от вылета при юзе предмета из трупа (часть 1) [Cut X-Ray]
-0x103CC564 2 ; костыль от вылета при юзе предмета из трупа (часть 2) [Cut X-Ray]
-0x103CC56A 5 ; костыль от вылета при юзе предмета из трупа (часть 3) [Cut X-Ray]
-0x103F12C5 5 ; регистрация скрипт. методов в классе CUIStatic
-0x103BB997 5 ; скрипт. коллбек на дроп предмета из интерфейса инвентаря
-0x103E0123 5 ; фикс статика биографии в ПДА, в "Рангах"
-0x103E0D97 5 ; убираем из описания ножей прогресс-бары оружия
+103581CEh 8  ; для работы консольной команды ph_gravity
+103CC55Eh 6  ; костыль от вылета при юзе предмета из трупа [Cut X-Ray]
+103F12C5h 5  ; регистрация скрипт. методов в классе CUIStatic
+103BB997h 9  ; скрипт. коллбек на дроп предмета из интерфейса инвентаря
+103E0123h 7  ; фикс статика биографии в ПДА, в "Рангах"
+103E0D97h 5  ; убираем из описания ножей прогресс-бары оружия
 
 ; требует дополнительных секций в xml, иначе будут вылеты при обращении к PDA/карте (примечание by Macron)
 ;0x103C0D87 5 ; фикс выдачи инфо во вкладках ПДА (часть 1)
@@ -273,13 +313,13 @@
 
 ;0x103DBC23 5 ; выдача инфо при переключ. между "описанием задания" и "картой" во вкладке "Задания" (часть 1)
 ;0x103DA737 5 ; выдача инфо при переключ. между "описанием задания" и "картой" во вкладке "Задания" (часть 2)
-0x101C6D69 5 ; скрипт. коллбек на появление хитэффектора на экране (часть 1)
-0x1007DC5B 5 ; скрипт. коллбек на появление хитэффектора на экране (часть 2)
+101C6D69h 8  ; скрипт. коллбек на появление хитэффектора на экране (часть 1)
+1007DC5Bh 8  ; скрипт. коллбек на появление хитэффектора на экране (часть 2)
 0x104BD2DC 1 ; убираем из лога сообщения "!SV:ge_destroy: [%d] not found on server"
-;0x1024DB00 10 ; инерция во время прицеливания из оружия
+;1024DB00h 10 ; инерция во время прицеливания из оружия
 ;0x1044D15E 6 ; круглый курсор, как в билдах [Cut X-Ray]
-0x101C43F8 2 ; исправление вида от 3-го лица (часть 1) [Cut X-Ray]
-0x101D20B0 2 ; исправление вида от 3-го лица (часть 2) [Cut X-Ray]
+101C43F8h 2  ; исправление вида от 3-го лица (часть 1) [Cut X-Ray]
+101D20B0h 2  ; исправление вида от 3-го лица (часть 2) [Cut X-Ray]
 ;0x10017E9B 6 ; шкала "освещения ГГ" вместо шкалы "заметности ГГ", как в билдах (часть 1) [Cut X-Ray]
 ;0x103D09CF 3 ; шкала "освещения ГГ" вместо шкалы "заметности ГГ", как в билдах (часть 2) [Cut X-Ray]
 ;0x10269AE2 4 ; руки на руле в машине (часть 1) [Cut X-Ray]
@@ -312,9 +352,9 @@
 ; =========================================================================================
 
 ; ======================== Cut X-Ray start ============================
-0x10443CED 8 ; предотвращение вылета при невключении ствола в mp_ranks
+10443CEDh 8 ; предотвращение вылета при невключении ствола в mp_ranks
 ;0x101C748C 10 ; смерть от первого лица
-0x103917B5 5 ; коллизия трупов для ГГ
+103917AAh 2 ; коллизия трупов для ГГ
 
 0x101CF1E4 2 ; запрет на использование любого оружия на лестнице
 0x1053E810 4 ; запрет на использование любого оружия в машине
@@ -334,7 +374,7 @@
 
 ; by Real Wolf
 0x102485D4 6 ; Коллбек на переключение фонаря.
-0x1006CA0A 5 ; Исправление вылета при дублировании story id и вывод самого айди в лог.
+1006CA0Fh 48 ; Исправление вылета при дублировании story id и вывод самого айди в лог.
 0x103CADB8 5 ; Исправление невыдачи инфопоршня при закрытии окна разговора.
 0x1014369F 5 ; Скриптовый коллбек (135 для CAI_Stalker), который вызывается после вызова функции set_dest_level_vertex_id.
 
@@ -346,11 +386,13 @@
 ;0x104A5BAC 1 ; Отключение вывода в лог "* Log file has been cleaned successfully!".
 0x1048C3C4 1 ; Отключение вывода в лог "Destroying local grenade[%d][%d]".
 
-0x10418330 5 ; Скриптовый коллбек (136 для CActor) на создание объекта CUICellItem. Передается игровой объект. Статик получать в коллбеке
-0x103FAD40 5 ; через подмененную функцию CUIFramWindow():GetTitleStatic()
-0x103F0D18 6 ; Скриптовый коллбек (141 для CActor) на получение фокуса объектом CUICellItem. Использование аналогично приведенному выше.
-0x103F0D50 5 ; Скриптовый коллбек (142 для CActor) на потерю фокуса объектом CUICellItem. Использование аналогично приведенному выше.
-0x1006A189 5 ; Скриптовый коллбек (140 для CActor), вызываемый сразу после сохранения игры.
+1041835Dh 7  ; Скриптовый коллбек (136 для CActor) на создание объекта CUICellItem. Передается игровой объект.
+10418398h 7
+104183B9h 7
+103FAD40h 5  ; Статик получать в коллбеке через подмененную функцию CUIFramWindow():GetTitleStatic()
+103F0D18h 6 ; Скриптовый коллбек (141 для CActor) на получение фокуса объектом CUICellItem. Использование аналогично приведенному выше.
+103F0D50h 5 ; Скриптовый коллбек (142 для CActor) на потерю фокуса объектом CUICellItem. Использование аналогично приведенному выше.
+1006A189h 5 ; Скриптовый коллбек (140 для CActor), вызываемый сразу после сохранения игры.
 
 ; Артефакты работают из всего инвентаря (рюкзак, слоты, пояс).
 ;0x101C9A71 6
@@ -360,7 +402,7 @@
 ;0x101C9B95 6
 ;0x101C9C12 3
 
-0x1044D5A3 6 ; Регулирование чувствительности мыши в UI через консольную команду mouse_ui_sens.
+1044D5A3h 6 ; Регулирование чувствительности мыши в UI через консольную команду mouse_ui_sens.
 ; =========================================================================================
 
 ; замена шейдера текстур прицелов на шейдер hud\scope
@@ -376,28 +418,30 @@
 103EDEEFh 8
 
 ; хак для более корректного учета бронебойности патронов (требуется правка конфигов патронов)
-;0x1024BEF7 5
+;1024BEFFh 6
 
 ; затычка от вылета в деструкторе CGameObject
 0x101E6505 5
 
 ; исправление неотключения света при выключении аномалии
-0x10257BA4 5
+10257BA4h 6
 
 ; экспорт состояния включенности для источника света фонаря актора
 ;0x101DE0A2 9
 
 ; фикс сброса положения скролла при перекладывании вещей в окне обыска (CUICarBodyWnd)
-0x103CC100 5
+103CC129h 10
 
 ; отладка анимок
-;0x10076229 5
-;0x100762BB 5
-;0x100762CC 5
-;0x100FA47B 5
+;;0x10076229 5
+;;0x100762BB 5
+;;0x100762CC 5
+;;0x100FA47B 5
 
 ; фикс вылета по отсутствию анимации критического хита
-0x100FF264 5
+;;;0x100FF264 5
+100FF273h 4
+;;;100FF2D7h 3
 
 ; отключение периодических автосейвов (отключено, потому что игра не становилась на паузу, и после этого отваливалась логика у объектов)
 ;0x101BE8C0 3
@@ -435,22 +479,22 @@
 0x10496E0C 4
 
 ; фикс аттача двух вещей неписям
-0x10207DF1 1
+10207DF1h 2
 
 ; фикс сброса визуала актора (чтобы выбрасываемый костюм не оставался на игроке при виде с внешней камеры - примечание by Macron)
-0x1024C2D2 5
-0x102049E1 5
+1024C2D2h 6
+102049E1h 7
 
 ; отключение квиксейва (потому что игра не становилась на паузу, и после этого отваливалась логика у объектов)
 ;(Пока проблем с квиксейвами не замечал, может от конкретного мода зависит? - примечание by Macron)
-;0x101A7081 1
+;101A7081h 2
 
 ; фикс очистки базы отношений (требуется скриптовая обвязка)
-;0x1005C7F8 5
-;0x10213AFD 5
+;1005C7F8h 9
+;10213AFDh 9
 
 ; фикс вылета по анимке критхита для анимслотов > 3
-0x100FF284 5
+100FF284h 6
 
 ; масштабирование scope_zoom_factor в зависимости от текущего fov
 0x1021CA90 5
@@ -459,7 +503,7 @@
 0x102343F0 5
 
 ; фикс вылета при активации артефактов, не использующих lvid и gvid
-0x102413C0 5
+102413C0h 11
 
 0x101E5177 2 ; при переходе в онлайн кондишен объекта не устанавливается в 1	CGameObject::spawn_supplies
 
@@ -710,3 +754,6 @@
 ;--------------------------------------------------------------
 102932BDh 5		;Возможность добавлять собственые классы.
 ;--------------------------------------------------------------
+10141738h 5		;фикс ошибки при взрыве ракеты методом explode(0)
+;--------------------------------------------------------------
+1036FA52h 5		;расширение пространства имён CPhysicsShell, скриптовый класс physics_shell

@@ -1,136 +1,81 @@
+
+align_proc
 on_belt_callback proc
-item            = dword ptr  4
-	call    UpdateInventoryWeightStatic
+;esi	this	CInventory*
+;ebp	pIItem	CInventoryItem*
+	call	UpdateInventoryWeightStatic
 	; вызываем колбек
-	mov     ecx, g_actor
-	cmp     [ecx+298h], esi ; esi == this
-	jnz     short exit ; Actor()->m_inventory == this
-	mov     ebx, [ebp + item]
-	test    ebx, ebx
-	jnz     short lab2
-	xor     edi, edi ; edi = 0
-	jmp     short lab3
-lab2:
-	mov     edx, [ebx]
-	mov     eax, [edx+12Ch]
-	mov     ecx, ebx
-	call    eax
-	mov     edi, eax
-lab3:
-	call    CGameObject__lua_game_object
-	push    eax
-	
-	push    130 ; type = ???
-	mov     ecx, g_Actor
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	call    script_use_callback
-exit:
-	; делаем то, что вырезали
-	pop     edi
-	pop     esi
-	pop     ebp
-	mov     al, 1
-	pop     ebx
-	add     esp, 8
-	retn    4
-	; обратно идти не надо
-msg_str db "on belt", 0	
+	mov		edi, g_Actor
+	.if ([edi].CActor.m_inventory == esi)	;только для актора
+		mov		ecx, [ebp].CInventoryItem.CAttachableItem@m_item
+		;smart_cast<CGameObject*>(pIItem->m_item);
+		mov		edx, [ecx]
+		mov		eax, [edx+12Ch]
+		call	eax
+		CALLBACK__GO	edi, eOnBelt, eax
+	.endif
+	pop		edi
+	pop		esi
+	pop		ebp
+	mov		al, 1
+	pop		ebx
+	add		esp, 8
+	retn	4
 on_belt_callback endp
 
-
+align_proc
 on_ruck_callback proc
-item            = dword ptr  4
-	call    UpdateInventoryWeightStatic
+;esi	this	CInventory*
+;ebp	pIItem	CInventoryItem*
+	call	UpdateInventoryWeightStatic
 	; вызываем колбек
-	mov     ecx, g_actor
-	cmp     [ecx+298h], esi ; esi == this
-	jnz     short exit ; Actor()->m_inventory == this
-	mov     ebx, [ebp + item]
-	test    ebx, ebx
-	jnz     short lab2
-	xor     edi, edi ; edi = 0
-	jmp     short lab3
-lab2:
-	mov     edx, [ebx]
-	mov     eax, [edx+12Ch]
-	mov     ecx, ebx
-	call    eax
-	mov     edi, eax
-lab3:
-	call    CGameObject__lua_game_object
-	push    eax
-	
-	push    131 ; type = ???
-	mov     ecx, g_Actor
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	call    script_use_callback
-exit:
-	; делаем то, что вырезали
-	pop     edi
-	pop     ebp
-	mov     al, 1
-	pop     ebx
-	add     esp, 0Ch
-	retn    4
-	; обратно идти не надо
+	mov		edi, g_Actor
+	.if ([edi].CActor.m_inventory == esi)	;только для актора
+		mov		ecx, [ebp].CInventoryItem.CAttachableItem@m_item
+		;smart_cast<CGameObject*>(pIItem->m_item);
+		mov		edx, [ecx]
+		mov		eax, [edx+12Ch]
+		call	eax
+		CALLBACK__GO	edi, eOnRuck, eax
+	.endif
+	pop		edi
+	pop		ebp
+	mov		al, 1
+	pop		ebx
+	add		esp, 0Ch
+	retn	4
 on_ruck_callback endp
 
-on_slot_callback proc ; esi == item, ebx == this
-;item            = dword ptr  4
-	;jmp exit
-	call    UpdateInventoryWeightStatic
+align_proc
+on_slot_callback proc
+;ebx	this	CInventory*
+;esi	pIItem	CInventoryItem*
+	call	UpdateInventoryWeightStatic
 	; вызываем колбек
-	mov     ecx, g_actor
-	cmp     [ecx+298h], ebx ; ebx == this
-	jnz     short exit ; Actor()->m_inventory == this
-	mov     ebx, esi
-	test    ebx, ebx
-	jnz     short lab2
-	xor     edi, edi ; edi = 0
-	jmp     short lab3
-lab2:
-	mov     edx, [ebx]
-	mov     eax, [edx+12Ch]
-	mov     ecx, ebx
-	call    eax
-	mov     edi, eax
-lab3:
-	call    CGameObject__lua_game_object
-	push    eax
-	
-	push    132 ; type = ???
-	mov     ecx, g_Actor
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	call    script_use_callback
-exit:
-	; делаем то, что вырезали
-	pop     edi
-	pop     esi
-	mov     al, 1
-	pop     ebx
-	retn    4
-	; обратно идти не надо
+	mov		edi, g_Actor
+	.if ([edi].CActor.m_inventory == ebx)	;только для актора
+		mov		ecx, [esi].CInventoryItem.CAttachableItem@m_item
+		;smart_cast<CGameObject*>(pIItem->m_item);
+		mov		edx, [ecx]
+		mov		eax, [edx+12Ch]
+		call	eax
+		CALLBACK__GO	edi, eOnSlot, eax
+	.endif
+	pop		edi
+	pop		esi
+	mov		al, 1
+	pop		ebx
+	retn	4
 on_slot_callback endp
 
+align_proc
 CUIItemInfo__InitItem_EXT_CHUNK proc
-	mov     edi, [ebx+0D4h]               ; CGameObject *this<edi>
-	call    CGameObject__lua_game_object
-	push    eax
-	push    133
-	mov     ecx, g_Actor
-	call    CGameObject__callback
-	push    eax
-	call    script_use_callback
-
-;	Вырезанное:
-	mov     eax, [esi+70h]
-	test    eax, eax
-
-;	Возврат:
-	jmp     CUIItemInfo__InitItem_EXT_CHUNK_OUT
+;ebx	pInvItem	CInventoryItem
+	CALLBACK__GO	g_Actor, eOnSelectItem, [ebx].CInventoryItem.CInventoryItem@m_object
+	;вырезанное
+	mov		eax, [esi+70h]
+	test	eax, eax
+	jmp		return_CUIItemInfo__InitItem_EXT_CHUNK
 CUIItemInfo__InitItem_EXT_CHUNK endp
 
 ; =========================================================================================
@@ -139,37 +84,30 @@ CUIItemInfo__InitItem_EXT_CHUNK endp
 ; ====================================== START ============================================
 ; =========================================================================================
 ; колбек на дроп из интерфейса инвентаря
+align_proc
 CUIInventoryWnd__SendEvent_Item_Drop proc
-	; делаем свое
-	pusha
-	mov     edi, [edi+0D4h] ; CGameObject *this<edi>
-	call    CGameObject__lua_game_object
-	push    eax
-	push    129
-	mov     ecx, g_Actor
-	call    CGameObject__callback
-	push    eax
-	call    script_use_callback
-	popa
-	; делаем вырезанное
-	mov     eax, [eax]
-	cmp     dword ptr [eax+44FCh], 0
-	; возвращаемся
-	jmp     back_from_CUIInventoryWnd__SendEvent_Item_Drop
+;edi	this	CInventoryItem*
+	push	eax
+	CALLBACK__GO	g_Actor, eOnDropItemInInventory, [edi].CInventoryItem.CInventoryItem@m_object
+	pop		eax
+	;вырезанное
+	mov		eax, [eax]
+	cmp		dword ptr [eax+44FCh], 0
+	jmp		return_CUIInventoryWnd__SendEvent_Item_Drop
 CUIInventoryWnd__SendEvent_Item_Drop endp
 
 ; обновление статика веса в инвентаре
+align_proc
 UpdateInventoryWeightStatic proc
-	call    GetGameSP
-	test    eax, eax
-	jz      exit
-	mov     eax, [eax+60] ; CUIInventoryWnd
-	lea     ecx, [eax+348h] ; weight_static
-	push    1
-	push    ecx
-	call    InventoryUtilities__UpdateWeight
-	add     esp, 8
-exit:
+	call	GetGameSP
+	.if (eax)
+		mov		eax, [eax+60] ; CUIInventoryWnd
+		lea		ecx, [eax+348h] ; weight_static
+		push	1
+		push	ecx
+		call	InventoryUtilities__UpdateWeight
+		add		esp, 8
+	.endif
 	retn
 UpdateInventoryWeightStatic endp
 ; =========================================================================================

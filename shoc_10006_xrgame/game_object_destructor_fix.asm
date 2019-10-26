@@ -14,5 +14,5 @@ game_object_destructor_fix proc
 		retn
 	.endif
 	mov		ecx, [eax]
-	jmp		back_from_game_object_destructor_fix
+	jmp		return_game_object_destructor_fix
 game_object_destructor_fix endp

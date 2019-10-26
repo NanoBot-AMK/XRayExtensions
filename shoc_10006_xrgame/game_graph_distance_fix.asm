@@ -7,7 +7,7 @@ game_graph__distance_fix proc
 		mov		[ebp+34h], ecx
 		jmp		loc_100569C9
 	.endif
-	; делаем вырезанное
+	;вырезанное
 	movss	xmm1, dword ptr [ebp+24h]
-	jmp		back_from_game_graph__distance_fix
+	jmp		return_game_graph__distance_fix
 game_graph__distance_fix endp

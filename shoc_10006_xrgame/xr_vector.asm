@@ -51,9 +51,9 @@ local new_vector:xr_vector
 xr_vector__push_back endp
 
 xr_vector@@push_back MACRO this_:req, sizeof_class:req, begin_size:=<256>
-	@push2mem	(begin_size)
-	@push2mem	(sizeof_class)
-	@reg2mem 	(ecx, this_)
+	pushvar	begin_size
+	pushvar	sizeof_class
+	regvar 	ecx, this_
 	call	xr_vector__push_back
 	EXITM <eax>
 ENDM

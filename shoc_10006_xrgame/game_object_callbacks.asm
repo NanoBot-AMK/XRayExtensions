@@ -56,13 +56,30 @@ eDesroyObjectInAnomaly						= dword ptr 34		; Колбек на разрушения объекта в ано
 eAllHitObjects								= dword ptr 35		; Колбек на хит, вызывается для всех объектов, требует включения скриптом.
 eEatObject									= dword ptr 36		; Колбек на поедание.
 eHitToAnomalyFromObject						= dword ptr 128		; хит аномалией объекта
+eOnDropItemInInventory						= dword ptr 129		; Выкидывание предмета из инвентаря
+eOnBelt										= dword ptr 130		; Помещение предмета на пояс
+eOnRuck										= dword ptr 131		; Помещение предмета в рюкзак
+eOnSlot										= dword ptr 132		; Помещение предмета в слот
+eOnSelectItem								= dword ptr 133		; Выделение предмета в инвентаре
 eOnSwitchTorch								= dword ptr 134		; переключение фонарика
 eSetLevelDestVertex							= dword ptr 135		; Вызов метода set_dest_level_vertex_id для сталкеров, передается левел вертекс
+eOnCreateIcon								= dword ptr 136		; Создание иконки
 eAttachActorVehicle							= dword ptr 137		; Посадка в машину
 eUseActorVehicle							= dword ptr 138		; Использование машины
 eDetachActorVehicle							= dword ptr 139		; Высадка из машины
 eOnSaveGame									= dword ptr 140		; сохранение игры
+;							= dword ptr 		; 
 eHitToActorFromMob							= dword ptr 144		; Хит актора от мобов
+eOnInvBoxPutItem							= dword ptr 151		; Помещение предмета в ящик
+eEntityAliveBeforeHit						= dword ptr 152		; Начало обработки хита.
+eEntityAliveHit								= dword ptr 153		; Передается вредитель
+eUpdateAddonsVisibility						= dword ptr 154		; Обновление видимости аддонов мировой модели оружия
+eUpdateHudAddonsVisibility					= dword ptr 155		; Обновление видимости аддонов худа оружия
+eOnBeforeUseItem							= dword ptr 156		; Событие перед использованием предмета
+ePDAContact									= dword ptr 180		; Выбор контакта в ПДА
+eWeaponOnShoot								= dword ptr 181		; колбек на выстрел
+eWeaponStartBullet							= dword ptr 182		; колбек на старт пули
+eWeaponStopBullet							= dword ptr 183		; колбек на стоп пули
 ;	};
 ;};
 
@@ -77,16 +94,11 @@ org		$-3	;зачистим (push ebp/mov ebp,esp) ebp и так указывает на параметры
 ;edi - hit_dir		Fvector
 	call	SHit__Write_Packet
 	push	esi
-	ASSUME	edi:ptr Fvector
 	Level__Objects_net_Find  id_to
-	mov		ecx, eax
-	call	CGameObject@@lua_game_object
 	mov		esi, eax
 	Level__Objects_net_Find  id_from
-	mov		ecx, eax
-	call	CGameObject@@lua_game_object
-	CALLBACK__GO_GO_INT_VECTOR_FLOAT	ebx, eHitToAnomalyFromObject, esi, eax, hit_type, [edi], hit_power
-	ASSUME	edi:nothing
+	mov		edx, eax
+	CALLBACK__GO_GO_INT_VECTOR_FLOAT	ebx, eHitToAnomalyFromObject, esi, edx, hit_type, [edi].Fvector, hit_power
 	pop		esi
 	jmp		return_CCustomZone__CreateHit_callback
 CCustomZone__CreateHit_callback endp
@@ -95,10 +107,8 @@ align_proc
 CCustomZone__enter_Zone_callback proc
 ;ebp - this		Touch@Feel
 ;esi - obj		CGameObject*
-	mov		ecx, esi
-	call	CGameObject@@lua_game_object
 	lea		edx, [ebp-CCustomZone.Feel@@Touch@vfptr]	;-19Ch = CGameObject
-	CALLBACK__GO	edx, GameObject__eZoneEnter, eax
+	CALLBACK__GO	edx, GameObject__eZoneEnter, esi
 	;Вырезанное
 	mov		eax, [esi]
 	mov		edx, [eax+80h]
@@ -109,10 +119,8 @@ align_proc
 CCustomZone__exit_Zone_callback proc
 ;ebx - this		Touch@Feel
 ;esi - obj		CGameObject*
-	mov		ecx, esi
-	call	CGameObject@@lua_game_object
 	lea		edx, [ebx-CCustomZone.Feel@@Touch@vfptr]	;-19Ch = CGameObject
-	CALLBACK__GO	edx,  GameObject__eZoneExit, eax
+	CALLBACK__GO	edx,  GameObject__eZoneExit, esi
 	;Вырезанное
 	mov		eax, [esi]
 	mov		edx, [eax+80h]
@@ -129,10 +137,8 @@ CTeleWhirlwindObject__destroy_object_callback proc
 	mov		edx, [edi].m_telekinesis
 	smart_cast	CMincer, CGameObject, [edx].m_owner_object
 	.if (eax)
-		mov		ecx, [edi].object
-		call	CGameObject@@lua_game_object
 		mov		edx, [edi].m_telekinesis
-		CALLBACK__GO	[edx].m_owner_object, eDesroyObjectInAnomaly, eax
+		CALLBACK__GO	[edx].m_owner_object, eDesroyObjectInAnomaly, [edi].object
 	.endif
 	ASSUME	edi:nothing, edx:nothing
 	jmp		return_CTeleWhirlwindObject__destroy_object_callback
@@ -168,11 +174,7 @@ CActor__attach_Vehicle_callback proc
 	add		esp, 14h
 	mov		ebp, eax	; CCar*
 	;----------
-	push	edi
-	mov		edi, eax
-	call	CGameObject__lua_game_object
-	CALLBACK__GO	g_Actor, eAttachActorVehicle, eax
-	pop		edi
+	CALLBACK__GO	g_Actor, eAttachActorVehicle, ebp
 	jmp		CActor__attach_Vehicle_callback_back
 CActor__attach_Vehicle_callback endp
 
@@ -180,11 +182,7 @@ align_proc
 CActor__detach_Vehicle_callback proc
 ;eax - CCar*
 	push	eax
-	push	edi
-	mov		edi, eax
-	call	CGameObject__lua_game_object
 	CALLBACK__GO	g_Actor, eDetachActorVehicle, eax
-	pop		edi
 	pop		eax
 	;Вырезанное
 	mov		ecx, [eax+1A4h]
@@ -195,14 +193,8 @@ align_proc
 CActor__use_Vehicle_callback proc
 ;edi - this		CActor*
 ;esi - object	CHolderCustom*
-	push	edi
 	smart_cast	CGameObject, CHolderCustom, esi
-	.if (eax)
-		mov		edi, eax
-		call	CGameObject__lua_game_object
-		CALLBACK__GO	g_Actor, eUseActorVehicle, eax
-	.endif
-	pop		edi
+	CALLBACK__GO	g_Actor, eUseActorVehicle, eax
 	;вырезаное
 	mov		edx, [esi]
 	mov		edx, [edx+24h]
@@ -238,8 +230,7 @@ CActor__HitMark_callback proc
 	pusha
 	CALLBACK__INT_INT	g_Actor, eHitToActorFromMob, type_hit_mob_stalker, edi
 	popa
-	; возвращаемся
-	jmp		back_from_CActor__HitMark_callback
+	jmp		return_CActor__HitMark_callback
 CActor__HitMark_callback endp
 
 ; от монстров
@@ -252,8 +243,7 @@ CBaseMonster__HitEntity_callback proc
 	pusha
 	CALLBACK__INT_INT	g_Actor, eHitToActorFromMob, type_hit_mob_monster, edi
 	popa
-	; возвращаемся
-	jmp		back_from_CBaseMonster__HitEntity_callback
+	jmp		return_CBaseMonster__HitEntity_callback
 CBaseMonster__HitEntity_callback endp
 ; =========================================================================================
 ; ======================================= END =============================================

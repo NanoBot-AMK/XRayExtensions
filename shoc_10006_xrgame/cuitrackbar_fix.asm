@@ -1,25 +1,23 @@
 
+align_proc
 CUITrackBar_fix proc
-	;
-	call    register__CUITrackBar__GetCheck
-	;
-PERFORM_EXPORT_CUIWND__FLOAT__VOID CUITrackBar__GetTestValue,      "GetFValue"
-;PERFORM_EXPORT_CUI__BOOL__VOID     CUITrackBar__IsFloat,           "IsFloat"
-PERFORM_EXPORT_CUI__BOOL__VOID     CUITrackBar__IsChanged_wrapper, "IsChanged"
-	;
-	jmp back_from_CUITrackBar_fix
-
+	call	register__CUITrackBar__GetCheck
+	PERFORM_EXPORT_CUIWND__FLOAT__VOID	CUITrackBar__GetTestValue,		"GetFValue"
+;	PERFORM_EXPORT_CUI__BOOL__VOID		CUITrackBar__IsFloat,			"IsFloat"
+	PERFORM_EXPORT_CUI__BOOL__VOID		CUITrackBar__IsChanged_wrapper,	"IsChanged"
+	
+	jmp		return_CUITrackBar_fix
 CUITrackBar_fix endp
 
-
+align_proc
 CUITrackBar__GetTestValue proc
-	fld     dword ptr [ecx+140]
+	fld		dword ptr [ecx+140]
 	retn
 CUITrackBar__GetTestValue endp
 
-CUITrackBar__IsFloat proc
-	add ecx, (140 - 48)
-	
+;align_proc
+;CUITrackBar__IsFloat proc
+;	add ecx, (140 - 48)
 	;mov eax, dword ptr [ecx+092]
 	;PRINT_UINT "092: %0x", eax
 	;mov eax, dword ptr [ecx+096]
@@ -44,31 +42,23 @@ CUITrackBar__IsFloat proc
 	;PRINT_UINT "132: %0x", eax
 	;mov eax, dword ptr [ecx+136]
 	;PRINT_UINT "136: %0x", eax
-	xor eax, eax
-	mov ah, [ecx+45]
-	retn
-CUITrackBar__IsFloat endp
+;	xor		eax, eax
+;	mov		ah, [ecx+45]
+;	retn
+;CUITrackBar__IsFloat endp
 
+align_proc
 CUITrackBar__IsChanged_wrapper proc
-	add ecx, (140 - 48)
-	jmp CUITrackBar__IsChanged
+	add		ecx, (140 - 48)
+	jmp		CUITrackBar__IsChanged
 CUITrackBar__IsChanged_wrapper endp
 
+align_proc
 CUIOptionsItem__SaveOptFloatValue_fix proc
-value           = dword ptr  4
-	;
-	push ecx
-	movzx ecx, byte ptr[eax]
-	;PRINT_UINT "%s", eax
-	test ecx, ecx
-	pop ecx
-	jz do_nothing
-	;
-	fld     [esp+200h+value]
-	;
-	jmp back_from_CUIOptionsItem__SaveOptFloatValue_fix
-do_nothing:
-	add     esp, 200h
-	retn    4
-	;
+	.if (byte ptr [eax])
+		fld		real4 ptr [esp+200h+4]	;value
+		jmp		return_CUIOptionsItem__SaveOptFloatValue_fix
+	.endif
+	add		esp, 200h
+	retn	4
 CUIOptionsItem__SaveOptFloatValue_fix endp

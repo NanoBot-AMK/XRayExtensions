@@ -4,8 +4,8 @@
 ; ====================================== START ============================================
 ; =========================================================================================
 ; фикс статика биографии во вкладке "Ранги"
-CUICharacterInfo__InitCharacter_fix:
-	; делаем свое
+align_proc
+CUICharacterInfo__InitCharacter_fix proc
 	; раскрасим текст
 	push	255 ; B
 	push	190 ; G
@@ -14,13 +14,13 @@ CUICharacterInfo__InitCharacter_fix:
 	mov     ecx, esi ; wnd
 	call    CUIStatic__SetTextColor_script
 	; SetTextComplexMode(true)
-	push    1 ; bool
+	push    true
 	mov     edi, esi ; wnd
 	call	CUIStatic__SetTextComplexMode
-	; делаем то что вырезали
+	;вырезанное
 	call    CUIStatic__AdjustHeightToText
-	; возвращаемся
-	jmp     back_from_CUICharacterInfo__InitCharacter_fix
+	jmp     return_CUICharacterInfo__InitCharacter_fix
+CUICharacterInfo__InitCharacter_fix endp
 ; =========================================================================================
 ; ======================================= END =============================================
 ; =========================================================================================

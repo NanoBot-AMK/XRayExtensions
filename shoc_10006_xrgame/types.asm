@@ -431,3 +431,28 @@ SOUND_TYPE_WEAPON_SNIPERRIFLE		= dword ptr SOUND_TYPE_WEAPON
 SOUND_TYPE_WEAPON_GRENADELAUNCHER	= dword ptr SOUND_TYPE_WEAPON
 SOUND_TYPE_WEAPON_ROCKETLAUNCHER	= dword ptr SOUND_TYPE_WEAPON
 ;};
+
+;// psDeviceFlags
+;enum {
+rsFullscreen					= dword ptr (1 shl 0)
+rsClearBB						= dword ptr (1 shl 1)
+rsVSync							= dword ptr (1 shl 2)
+rsWireframe						= dword ptr (1 shl 3)
+rsOcclusion						= dword ptr (1 shl 4)
+rsStatistic						= dword ptr (1 shl 5)
+rsDetails						= dword ptr (1 shl 6)
+rsRefresh60hz					= dword ptr (1 shl 7)
+rsConstantFPS					= dword ptr (1 shl 8)
+rsDrawStatic					= dword ptr (1 shl 9)
+rsDrawDynamic					= dword ptr (1 shl 10)
+rsDisableObjectsAsCrows			= dword ptr (1 shl 11)
+rsOcclusionDraw					= dword ptr (1 shl 12)
+rsOcclusionStats				= dword ptr (1 shl 13)
+mtSound							= dword ptr (1 shl 14)
+mtPhysics						= dword ptr (1 shl 15)
+mtNetwork						= dword ptr (1 shl 16)
+mtParticles						= dword ptr (1 shl 17)
+rsCameraPos						= dword ptr (1 shl 18)
+rsR2							= dword ptr (1 shl 19)
+	;// 20-32 bit - reserved to Editor
+;};
