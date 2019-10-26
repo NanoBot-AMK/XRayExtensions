@@ -1,9 +1,4 @@
 PERFORM_EXPORT__MATRIX__PMATR__FLOAT MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ecx, eax
 	xor     eax, eax
 	mov     [ebp-14h], eax
@@ -16,7 +11,7 @@ lab1:
 	lea     eax, [ebp-0Ch]
 	push    eax
 	
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push    ecx
 	call    register__matrix_div_number
 ENDM
@@ -185,13 +180,9 @@ PERFORM_EXPORT__MATRIX__PMATR_PMATR MACRO registering_function:REQ, fun_to_expor
 	call    registering_function
 ENDM
 
-REGISTER__MATRIX__PMATR_PMATR MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
-
-script_function_name db fun_name, 0
-
+REGISTER__MATRIX__PMATR_PMATR MACRO register_fun_name:REQ, fun_name_str:REQ
+align_proc
 register_fun_name proc near
-
 var_4C          = byte ptr -4Ch
 var_40          = dword ptr -40h
 var_3C          = dword ptr -3Ch
@@ -310,7 +301,7 @@ loc_1013A3FF:                           ; CODE XREF: register__mul_matrix+D4j
 	mov     ecx, [ebp+arg_0]
 	lea     eax, [ebp+var_4C]
 	push    eax
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [ebp+var_4C]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
@@ -338,13 +329,9 @@ PERFORM_EXPORT__MATRIX__PMATR__PVECTOR_PVECTOR_PVECTOR_PVECTOR MACRO registering
 	call    registering_function
 ENDM
 
-REGISTER__MATRIX__PMATR__PVECTOR_PVECTOR_PVECTOR_PVECTOR MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
-
-script_function_name db fun_name, 0
-
+REGISTER__MATRIX__PMATR__PVECTOR_PVECTOR_PVECTOR_PVECTOR MACRO register_fun_name:REQ, fun_name_str:REQ
+align_proc
 register_fun_name proc near
-
 var_4C          = byte ptr -4Ch
 var_10          = dword ptr -10h
 var_C           = dword ptr -0Ch
@@ -423,7 +410,7 @@ loc_1013A089:
 	mov     ecx, [ebp+arg_0]
 	lea     eax, [ebp+var_4C]
 	push    eax
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [ebp+var_4C]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)

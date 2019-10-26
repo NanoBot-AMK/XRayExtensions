@@ -4,9 +4,9 @@
 .model flat,  stdcall
 
 include addr.inc
-_CODE segment para public 'CODE' use32
-	assume cs:_CODE
-	assume ds:_CODE
+
+
+.code
 ; заглушка для линковшика
 LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD 
     ret
@@ -21,6 +21,13 @@ CBulletManager@@CreateExplosive 	PROTO :DWORD, :DWORD
 CBulletManager@@Explode				PROTO :DWORD, :DWORD, :DWORD, :DWORD
 CBulletManager@@DeleteExplosive 	PROTO :DWORD
 CBulletExplosive@@ExplodeParams		PROTO :DWORD, :DWORD
+CBaseMonster@@SetVisualName			PROTO NewVisual:dword
+CAI_Stalker@@SetVisualName			PROTO NewVisual:dword
+CEntity@@SetVisualName				PROTO NewVisual:dword
+CGameObject@@GetTexture				PROTO n_child:dword, n_texture:dword
+CGameObject@@Get_ref_texture		PROTO n_child:dword, n_texture:dword
+;calc_bullet							PROTO (byte) pos_start:ptr, pos_target:ptr, bullet:ptr, h_line_throw:ptr, time_bullet:ptr
+
 
 include macroses.asm
 ; вставки из целевой либы
@@ -36,8 +43,8 @@ include utils.asm
 include actor_input_fix.asm
 include global_ns_fix.asm
 include global_ns_fix2.asm
-include game_object_fix.asm
 include game_object_castings.asm
+include game_object_fix.asm
 include actor_hit_callback.asm
 include hit_memory_manager_fix.asm
 include actor_inventory_callbacks.asm
@@ -104,11 +111,12 @@ include relations_fix.asm
 include zoom_factor_fix.asm
 include art_activation_fix.asm
 include self_anim_stalker.asm
-include level_explosive.asm
+include trader.asm
+include ballistics_calc.asm
 include turrel.asm
+include level_explosive.asm
 include anomaly.asm
+include physics_fix.asm
 
-_CODE ENDS
 
 end LibMain
-

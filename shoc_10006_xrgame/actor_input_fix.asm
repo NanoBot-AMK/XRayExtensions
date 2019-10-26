@@ -4,7 +4,7 @@
 ; Так же эти колбеки вызываются в биндере активной вещи, и холдера.
 ; Это надо для скриптового оружия и для стрельбы из техники с оружием(БТР, турели, вертолёт?).
 ;
-; Рефакторинг (с) НаноБот		3.08.2017	20.11.2017
+; Рефакторинг (с) НаноБот		3.08.2017	27.09.2018
 ;============================================================================================
 
 DIK_LMENU			equ 56
@@ -33,16 +33,13 @@ eCallbackKeyHold					equ 00000100b
 eCallbackMouseWheel				 	equ 00001000b
 eCallbackMouseMove					equ 00010000b
 eCallbackShoot						equ 00100000b
-;						equ 01000000b
+eCallbackAllHit						equ 01000000b
 ;						equ 10000000b
 
 ; ----------------------- колбек на нажатие ----------------------------
 align_proc
-CLevel__IR_OnKeyboardPress_callback proc key:dword
+CLevel__IR_OnKeyboardPress_callback proc uses ebx edi esi key:dword
 ; ebx - CLevel
-	push	ebx
-	push	edi
-	push	esi
 	mov		ebx, ecx
 	mov		edi, key
 	mov		esi, g_Actor
@@ -54,11 +51,7 @@ CLevel__IR_OnKeyboardPress_callback proc key:dword
 		.endif
 		; блокировка цифр на основной клавиатуре
 		.if (g_bDisableNumBaseInput && edi>=DIK_1 && edi<=DIK_0)
-			; return;
-			pop		esi
-			pop		edi
-			pop		ebx
-			ret		4
+			ret
 		.endif
 		; колбеки в биндер активных вещей: оружия которое держим в руках, холдер в котором сидим.
 		; определим активное оружие
@@ -84,7 +77,7 @@ CLevel__IR_OnKeyboardPress_callback proc key:dword
 		; холдер
 		mov		eax, [esi].m_holder
 		.if	(eax)
-			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			smart_cast	CGameObject, CHolderCustom, eax
 			mov		edx, eax
 			.if ([edx].m_flCallbackKey & eCallbackKeyPress)
 				CALLBACK__INT_INT  edx, eOnKeyPress, edi, 0
@@ -104,11 +97,8 @@ CLevel__IR_OnKeyboardPress_callback endp
 
 ; ----------------- колбек на отпускание --------------------
 align_proc
-CLevel__IR_OnKeyboardRelease_callback proc key:dword
+CLevel__IR_OnKeyboardRelease_callback proc uses ebx edi esi key:dword
 ; ebx - CLevel
-	push	ebx
-	push	edi
-	push	esi
 	mov		ebx, ecx
 	mov		edi, key
 	mov		esi, g_Actor
@@ -120,11 +110,7 @@ CLevel__IR_OnKeyboardRelease_callback proc key:dword
 		.endif
 		; блокировка цифр на основной клавиатуре
 		.if (g_bDisableNumBaseInput && edi>=DIK_1 && edi<=DIK_0)
-			; return;
-			pop		esi
-			pop		edi
-			pop		ebx
-			ret		4
+			ret
 		.endif
 		; колбеки в биндер активных вещей: оружия которое держим в руках, холдер в котором сидим.
 		; определим активное оружие
@@ -141,7 +127,7 @@ CLevel__IR_OnKeyboardRelease_callback proc key:dword
 				shl		eax, 4
 				add		eax, [ecx+38h]
 				mov		eax, [eax+4]
-				mov		eax, [eax+0D4h]		; CGameObject*
+				mov		edx, [eax+0D4h]		; CGameObject*
 				.if ([edx].m_flCallbackKey & eCallbackKeyRelease)
 					CALLBACK__INT_INT  edx, eOnKeyRelease, edi, 0
 				.endif
@@ -150,7 +136,7 @@ CLevel__IR_OnKeyboardRelease_callback proc key:dword
 		; холдер
 		mov		eax, [esi].m_holder
 		.if	(eax)
-			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			smart_cast	CGameObject, CHolderCustom, eax
 			mov		edx, eax
 			.if ([edx].m_flCallbackKey & eCallbackKeyRelease)
 				CALLBACK__INT_INT  edx, eOnKeyRelease, edi, 0
@@ -170,11 +156,8 @@ CLevel__IR_OnKeyboardRelease_callback endp
 
 ; ----------------- колбек на удержание --------------------
 align_proc
-CLevel__IR_OnKeyboardHold_callback proc key:dword
+CLevel__IR_OnKeyboardHold_callback proc uses ebx edi esi key:dword
 ; ebx - CLevel
-	push	ebx
-	push	edi
-	push	esi
 	mov		ebx, ecx
 	mov		edi, key
 	mov		esi, g_Actor
@@ -186,11 +169,7 @@ CLevel__IR_OnKeyboardHold_callback proc key:dword
 		.endif
 		; блокировка цифр на основной клавиатуре
 		.if (g_bDisableNumBaseInput && edi>=DIK_1 && edi<=DIK_0)
-			; return;
-			pop		esi
-			pop		edi
-			pop		ebx
-			ret		4
+			ret
 		.endif
 		; колбеки в биндер активных вещей: оружия которое держим в руках, холдер в котором сидим.
 		; определим активное оружие
@@ -216,7 +195,7 @@ CLevel__IR_OnKeyboardHold_callback proc key:dword
 		; холдер
 		mov		eax, [esi].m_holder
 		.if	(eax)
-			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			smart_cast	CGameObject, CHolderCustom, eax
 			mov		edx, eax
 			.if ([edx].m_flCallbackKey & eCallbackKeyHold)
 				CALLBACK__INT_INT  edx, eOnKeyHold, edi, 0
@@ -273,7 +252,7 @@ CLevel__IR_OnMouseWheel_callback proc direction:dword
 		; холдер
 		mov		eax, [esi].m_holder
 		.if	(eax)
-			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			smart_cast	CGameObject, CHolderCustom, eax
 			mov		edx, eax
 			.if ([edx].m_flCallbackKey & eCallbackMouseWheel)
 				CALLBACK__INT_INT  edx, eOnMouseWheel, direction, 0
@@ -307,5 +286,3 @@ CLevel__IR_OnMouseMove_callback proc _dx:dword, _dy:dword
 	leave
 	jmp		CLevel__IR_OnMouseMove
 CLevel__IR_OnMouseMove_callback endp
-
-

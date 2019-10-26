@@ -1,4 +1,5 @@
-CUITalkDialogWnd__Hide_test:
+align_proc
+CUITalkDialogWnd__Hide_test proc
 	pusha
 	PRINT "CUITalkDialogWnd__Hide"
 	popa
@@ -13,8 +14,9 @@ CUITalkDialogWnd__Hide_test:
 	mov     byte ptr [esi+56h], 0
 	pop     esi
 	retn
+CUITalkDialogWnd__Hide_test endp
 
-ALIGN 8
+align_proc
 CLevel__g_sv_Spawn_fix proc
 	; делаем то, что вырезали
 	lea     edi, [ebx+54h]
@@ -33,6 +35,7 @@ CLevel__g_sv_Spawn_fix proc
 	jmp     back_from_CLevel__g_sv_Spawn_fix
 CLevel__g_sv_Spawn_fix endp
 
+align_proc
 CLevel__g_sv_Spawn_fix2 proc
 	PRINT "finished creating object"
 	pop     edi
@@ -42,6 +45,7 @@ CLevel__g_sv_Spawn_fix2 proc
 	retn    4
 CLevel__g_sv_Spawn_fix2 endp
 
+align_proc
 CWeapon__UpdateFireDependencies_internal_dbg_fix2 proc
 	PRINT_UINT "wpn=%x", ebx
 	PRINT_UINT "hud=%x", eax
@@ -57,6 +61,7 @@ CWeapon__UpdateFireDependencies_internal_dbg_fix2 endp
 
 g_saved_vector Vector3 {0.0, 0.0, 0.0}
 
+align_proc
 CShootingObject__RenderLight_dbg_fix2 proc
 	; своё
 	PRINT_VECTOR "fire point", eax
@@ -81,6 +86,7 @@ CShootingObject__RenderLight_dbg_fix2 proc
 	jmp back_from_CShootingObject__RenderLight_dbg_fix2
 CShootingObject__RenderLight_dbg_fix2 endp
 
+align_proc
 CCustomZone__feel_touch_contact_dbg_fix proc
 	; делаем то, что вырезали
 	mov     edx, [esi]
@@ -96,7 +102,7 @@ CCustomZone__feel_touch_contact_dbg_fix proc
 	jmp back_from_CCustomZone__feel_touch_contact_dbg_fix
 CCustomZone__feel_touch_contact_dbg_fix endp
 
-
+align_proc
 CGameGraph__distance_fix proc
 	call CGameGraph__distance_check
 	push eax
@@ -138,6 +144,7 @@ CALL_ACTOR_CALLBACK_INT_INT MACRO code:REQ, reg_arg1:REQ, reg_arg2:REQ
 	pop edx
 ENDM
 
+align_proc
 CGameGraph__distance_check proc
 	push ecx
 	push edx
@@ -192,8 +199,8 @@ is_ok:
 	retn
 CGameGraph__distance_check endp
 
-
-CEntityCondition__UpdateConditionTime_dbg proc near
+align_proc
+CEntityCondition__UpdateConditionTime_dbg proc 
 var_C           = qword ptr -0Ch
 	;PRINT " #"
 	PRINT "#CEntityCondition__UpdateConditionTime_dbg"
@@ -296,6 +303,7 @@ lab6:
 	retn
 CEntityCondition__UpdateConditionTime_dbg endp
 
+align_proc
 game_GameState__GetGameTime_dbg_fix proc
 var_8           = qword ptr -8
 ;	sub     esp, 8
@@ -376,7 +384,7 @@ var_8           = qword ptr -8
 	retn
 game_GameState__GetGameTime_dbg_fix endp
 
-
+align_proc
 game_sv_Single__GetGameTime_dbg_fix proc
 	PRINT "game_sv_Single__GetGameTime_dbg_fix #"
 	push    ebp
@@ -420,6 +428,7 @@ loc_102D5A4F:
 	retn
 game_sv_Single__GetGameTime_dbg_fix endp
 
+align_proc
 game_GameState__SetGameTimeFactor_dbg_fix proc
 arg_0 = dword ptr  4
 	PRINT "game_GameState__SetGameTimeFactor_dbg_fix #"
@@ -444,6 +453,7 @@ arg_0 = dword ptr  4
 	retn    4
 game_GameState__SetGameTimeFactor_dbg_fix endp
 
+align_proc
 game_GameState__SetGameTimeFactor__INT64_float_dbg_fix proc
 arg_0           = dword ptr  4
 arg_4           = dword ptr  8
@@ -466,6 +476,7 @@ arg_8           = dword ptr  0Ch
 	retn    0Ch
 game_GameState__SetGameTimeFactor__INT64_float_dbg_fix endp
 
+align_proc
 CScriptGameObject__Hit_dbg_fix proc
 	PRINT "SCRIPT HIT"
 	;
@@ -476,7 +487,7 @@ CScriptGameObject__Hit_dbg_fix proc
 	jmp back_from_CScriptGameObject__Hit_dbg_fix
 CScriptGameObject__Hit_dbg_fix endp
 
-
+align_proc
 CInventoryOwner__OnEvent_dbg_fix proc
 str_             = dword ptr  4
 
@@ -487,3 +498,4 @@ str_             = dword ptr  4
 	;
 	jmp back_from_CInventoryOwner__OnEvent_dbg_fix
 CInventoryOwner__OnEvent_dbg_fix endp
+

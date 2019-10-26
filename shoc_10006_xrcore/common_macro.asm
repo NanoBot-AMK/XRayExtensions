@@ -1,13 +1,23 @@
+; Макросы
+
+static_str$ MACRO any_text:VARARG
+LOCAL txtname
+.data
+align 4
+txtname		db any_text, 0
+.code
+EXITM <offset txtname>
+ENDM
+
 PRINT_UINT MACRO fmt_txt:REQ, val:REQ
-LOCAL lab1_
-LOCAL a_msg
-	jmp     lab1_
-a_msg db fmt_txt, 0
-lab1_:
 	pusha
 	push    val
-	push    offset a_msg
+	push    static_str$(fmt_txt)
 	call    Msg
 	add     esp, 08h
 	popa
+ENDM
+
+align_proc MACRO
+align 16
 ENDM

@@ -1,26 +1,26 @@
 .686
 .XMM
 
-.model flat,  C
+.model flat,  stdcall
 
 include addr.inc
 
-_code segment byte public 'CODE' use32
-	assume cs:_code
-	assume ds:_code
+.code
 ; заглушка для линковшика
 LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD 
     ret
 LibMain ENDP
 
-; вставки из целевой либы
-include xr_3da_stubs.asm 
+CHW@@ValidityRefreshRate		PROTO dwWidth:dword, dwHeight:dword, fmt:dword, refresh_rate:dword
+
+include macroses.asm
+include xr_3da_stubs.asm 	; вставки из целевой либы
 
 ; позиция в том месте, где в целевой DLL начинается наша секция
 org sec1_sec2_dist
 
 ;include empty.asm ; затычка для патчера
-include misc.asm
+include structures.asm
 include shaders_mapping_macro.asm
 include shaders_mapping.asm
 include console_comm_reg_macro.asm
@@ -29,7 +29,5 @@ include loadscreen_fix.asm
 include weather_parameters.asm
 include vsync_fix.asm
 
-_code ENDS
 
 end LibMain
-

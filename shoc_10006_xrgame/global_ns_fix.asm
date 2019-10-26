@@ -1,58 +1,24 @@
 include global_ns_reg_macro.asm
 ;===============| расширение регистрации глобального пространства имЄн |=======
-global_space_ext: ; вставка, дополн€юща€ функцию экспорта глобальных функций
+global_space_ext proc ; вставка, дополн€юща€ функцию экспорта глобальных функций
 	; здесь делаем то, что вырезали
-	call    error_log_register
+	call	error_log_register
 	; добавл€ем свой код
 	; регистраци€ функции вывода в лог, вместо нерабочей "log"
 	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR my_log_fun, "log1"
-	;add     esp, 0Ch
-    ;push    offset my_log_fun
-    ;push    offset alog1 ; "log1"
-	;push    [ebp+8h]
-    ;call    error_log_register
 	; регистраци€ функции крэша игры с выводом причины в лог
 	GLOBAL_NS_PERFORM_EXPORT__VOID__PCHAR msg_and_fail, "fail"
-	;add     esp, 0Ch
-    ;push    offset msg_and_fail
-    ;push    offset aFail ; "fail"
-	;push    [ebp+8h]
-    ;call    error_log_register
 	; регистраци€ функции "bind_to_dik"
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT bind_to_dik, "bind_to_dik"
-	;push    offset bind_to_dik
-	;push    offset aBind_to_dik  ; "bind_to_dik"
-	;push    [ebp+8h]
-	;call    bit_and_register
-	;add     esp, 0Ch
 	; регистраци€ функции "set_extensions_flags"
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT set_extensions_flags, "set_extensions_flags"
-	;push    offset set_extensions_flags
-	;push    offset aSet_extensions_flags  ; "set_extensions_flags"
-	;push    [ebp+8h]
-	;call    bit_and_register
-	;add     esp, 0Ch
 	; функци€ установки глобальных флагов актора
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT set_actor_flags, "set_actor_flags"
-	;push    offset set_actor_flags
-	;push    offset aSet_actor_flags  ; "set_actor_flags"
-	;push    [ebp+8h]
-	;call    bit_and_register
-	;add     esp, 0Ch
 	; функци€ получени€ глобальных флагов актора
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT get_actor_flags, "get_actor_flags"
-	;push    offset get_actor_flags
-	;push    offset aGet_actor_flags  ; "get_actor_flags"
-	;push    [ebp+8h]
-	;call    bit_and_register
-	;add     esp, 0Ch
 	; регистраци€ функции "get_extensions_flags"
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT get_extensions_flags, "get_extensions_flags"
-	;push    offset get_extensions_flags
-	;push    offset aGet_extensions_flags  ; "get_extensions_flags"
-	;push    [ebp+8h]
-	;call    bit_and_register
-	;add     esp, 0Ch
+	;add	 esp, 0Ch
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg0, "set_int_arg0"
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg1, "set_int_arg1"
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg2, "set_int_arg2"
@@ -62,19 +28,13 @@ global_space_ext: ; вставка, дополн€юща€ функцию экспорта глобальных функций
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetIntArg6, "set_int_arg6"
 	;GLOBAL_NS_PERFORM_EXPORT__BOOL__VOID IsPdaMenuShown, "is_pda_shown"
 	; ; регистраци€ функции "flush1", вместо нерабочей "flush"
-     ; lea     eax, [ebp-1]
-     ; push    eax
-     ; push    offset my_flush
-     ; push    offset aFlush1   ; "flush1"
-     ; push    esi
-     ; call    flush_register
 	; ; регистраци€ тестовой функции "log2"
-     ; lea     eax, [ebp-1]
-     ; push    eax
-     ; push    offset my_log2
-     ; push    offset alog2   ; "log2"
-     ; push    esi
-     ; call    flush_register
+	 ; lea	   eax, [ebp-1]
+	 ; push	   eax
+	 ; push	   offset my_log2
+	 ; push	   offset alog2	  ; "log2"
+	 ; push	   esi
+	 ; call	   flush_register
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetTradeFiltrationOn, "set_trade_filtration_on"
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetTradeFiltrationOff, "set_trade_filtration_off"
 	GLOBAL_NS_PERFORM_EXPORT__INT__INT_INT SetManualGroupingOn, "set_manual_grouping_on"
@@ -109,96 +69,71 @@ global_space_ext: ; вставка, дополн€юща€ функцию экспорта глобальных функций
 	
 	; идЄм обратно
 	jmp back_from_global_space_ext
+global_space_ext endp
 
-aFail   db "fail", 0
-alog1   db "log1", 0
-alog2   db "log2", 0
-aFlush1 db "flush1", 0
-aBind_to_dik db "bind_to_dik", 0
-aSet_extensions_flags  db "set_extensions_flags", 0
-aGet_extensions_flags  db "get_extensions_flags", 0
-aSet_actor_flags  db "set_actor_flags",0
-aGet_actor_flags  db "get_actor_flags",0
-
+align_proc
 my_flush proc
-	call    ds:[FlushLog]
+	call	ds:FlushLog
 	retn
 my_flush endp
 
-my_log2 proc near
-	sub   esp, 8
-	fld     cs:[value1]
-	fstp   QWORD  ptr [esp]
-	push    offset format_str
-	call ds:[Msg] 
-	add     esp, 0Ch
-	retn
-my_log2 endp
+; align_proc
+; my_log2 proc near
+	; sub		esp, 8
+	; fld		ds:value1
+	; fstp	QWORD  ptr [esp]
+	; push	static_str$("qwerty %e")
+	; call	ds:Msg
+	; add		esp, 12
+	; retn
+; my_log2 endp
+; static_float	value1, 1.23456e12
+; static_int		value2, 12345678h
 
-format_str db "qwerty %e", 0
-value1 REAL4  1.23456e12
-value2   dd 12345678h
+align_proc
+my_log_fun proc C param_str:dword
+	push	param_str
+	push	static_str$("%s")
+	call	ds:Msg
+	add		esp, 8
+	ret
+my_log_fun endp
 
-my_log_fun      proc near
-	push    ebp
-	mov     ebp, esp
-	mov     eax, [ebp+8]
-	push    eax
-	push    offset aS_4     ; "%s"
-	call    ds:[Msg] 
-	add     esp, 8
-	pop     ebp
-	retn
-my_log_fun      endp
-
-aF_4 db "%f", 0
-aS_4 db "%s", 0
-
-
-bind_to_dik proc near
-
-_action_id      = dword ptr  4
-;stub = dword ptr 4
-
-	mov     eax, [esp+_action_id]         ; 
-	cmp     eax, 76
-	jg      arg_out_of_range
-	cmp     eax, 0
-	jl      arg_out_of_range
-; аргумент в пределах допустимого диапазона
-	imul    eax, 0Ch                      ; 
-	add     eax, offset g_key_bindings    ; g_key_bindings[cmd]
-	mov     ecx, [eax+4]                  ; ecx = g_key_bindings[cmd].m_keyboard[0]
-	test    ecx, ecx                      ; if (ecx != 0)
-	jz      short lab1
-	mov     eax, [ecx+4]
-	retn
-lab1:
-	mov     eax, [eax+8]
-	test    eax, eax
-	jz      short not_binded
-	mov     eax, [eax+4]
-	retn
-not_binded:
-	xor     eax, eax
-	retn
-arg_out_of_range: ; аргумент вне допустимого диапазона
-	mov     eax, 100000
-	retn
+align_proc
+bind_to_dik proc C action_id:dword
+	ASSUME	ecx:ptr _keyboard, edx:ptr _binding
+	mov		eax, action_id
+	.if (sdword ptr eax>=0 && sdword ptr eax<=76)	; аргумент в пределах допустимого диапазона
+		lea		eax, [eax*2+eax]
+		lea		edx, g_key_bindings[eax*4]	; &g_key_bindings[cmd];		//_binding*
+		mov		ecx, [edx].m_keyboard[0]	; = g_key_bindings[cmd].m_keyboard[0]
+		.if (ecx)
+			mov		eax, [ecx].dik
+			ret
+		.endif
+		mov		ecx, [edx].m_keyboard[4]	; = g_key_bindings[cmd].m_keyboard[1]
+		.if (ecx)
+			mov		eax, [ecx].dik
+			ret
+		.endif
+		xor		eax, eax
+		ret
+	.endif
+	ASSUME	ecx:nothing, edx:nothing
+	mov		eax, 100000 ; аргумент вне допустимого диапазона
+	ret
 bind_to_dik endp
 
-extensions_flags dd 0
-
-set_extensions_flags proc near
-_flags      = dword ptr  4
-	mov     eax, [esp+_flags]
-	mov     extensions_flags, eax
-	retn
+static_int		extensions_flags, 0
+align_proc
+set_extensions_flags proc C flags:dword
+	mrm		extensions_flags, flags
+	ret
 set_extensions_flags endp
 
-get_extensions_flags proc near
-_flags      = dword ptr  4
-	mov     eax, [extensions_flags]
+align_proc
+get_extensions_flags proc
+	mov		eax, extensions_flags
 	retn
 get_extensions_flags endp
 
@@ -211,8 +146,8 @@ get_extensions_flags endp
 
 ;SetIntArg0 proc
 ;int_arg = dword ptr  4
-;	mov     eax, [esp+int_arg]
-;	mov     g_int_argument_0, eax
+;	mov		eax, [esp+int_arg]
+;	mov		g_int_argument_0, eax
 ;	retn
 ;SetIntArg0 endp
 
@@ -224,352 +159,283 @@ SET_INT_ARG_N 3
 SET_INT_ARG_N 4
 SET_INT_ARG_N 5
 SET_INT_ARG_N 6
-
+align_proc
 IsPdaMenuShown proc
-	mov eax, 1
+	mov		eax, 1
 	retn
 IsPdaMenuShown endp
 
 msg_and_fail proc near
-	push    ebp
-	mov     ebp, esp
+	push	ebp
+	mov		ebp, esp
 	
-	mov     eax, [ebp+8]
-	push    eax
-	;push    offset aS_4     ; "%s"
-	;call    ds:[Msg] 
-	;add     esp, 8
-	mov     ecx, ds:Debug ; this
-	push    offset ignore_always
-	push    offset aEmpty ; "xrServer::Process_event_ownership"
-	push    0h             ; line
-	push    offset aEmpty ; "E:\\stalker\\sources\\trunk\\xr_3da\\xrGame\\"...
-	push    eax ; "e_parent"
-	call    ds:xrDebug__fail
+	mov		eax, [ebp+8]
+	push	eax
+	;push	 offset aS_4	 ; "%s"
+	;call	 ds:[Msg] 
+	;add	 esp, 8
+	mov		ecx, ds:Debug ; this
+	push	offset ignore_always
+	push	offset aEmpty ; "xrServer::Process_event_ownership"
+	push	0h			   ; line
+	push	offset aEmpty ; "E:\\stalker\\sources\\trunk\\xr_3da\\xrGame\\"...
+	push	eax ; "e_parent"
+	call	ds:xrDebug__fail
 
-	pop     ebp
+	pop		ebp
 	retn
 msg_and_fail endp
 ignore_always db 1
 aEmpty db 0
 
-set_actor_flags proc near
-_flags      = dword ptr  4
-	mov     eax, [esp+_flags]
-	mov     psActorFlags, eax
-	retn
+align_proc
+set_actor_flags proc C flags:dword
+	mrm		psActorFlags, flags
+	ret
 set_actor_flags endp
 
-get_actor_flags proc near
-_flags      = dword ptr  4
-	mov     eax, [psActorFlags]
-	retn
+align_proc
+get_actor_flags proc
+	mov		eax, psActorFlags
+	ret
 get_actor_flags endp
 
-ALIGN 8
-g_trade_filtration_active dd 0
+static_int	g_trade_filtration_active, 0
+static_int	g_manual_grouping_active, 0
 
+align_proc
 SetTradeFiltrationOn proc
-	mov [g_trade_filtration_active], 1
-	retn
+	mov		g_trade_filtration_active, 1
+	ret
 SetTradeFiltrationOn endp
 
+align_proc
 SetTradeFiltrationOff proc
-	mov [g_trade_filtration_active], 0
-	retn
+	mov		g_trade_filtration_active, 0
+	ret
 SetTradeFiltrationOff endp
 
-g_manual_grouping_active dd 0
+align_proc
 SetManualGroupingOn proc
-	mov [g_manual_grouping_active], 1
-	retn
+	mov		g_manual_grouping_active, 1
+	ret
 SetManualGroupingOn endp
 
+align_proc
 SetManualGroupingOff proc
-	mov [g_manual_grouping_active], 0
-	retn
+	mov		g_manual_grouping_active, 0
+	ret
 SetManualGroupingOff endp
 
-g_manual_highlignt_active dd 0
+static_int	g_manual_highlignt_active, 0
+align_proc
 SetManualHighlightOn proc
-	mov [g_manual_highlignt_active], 1
-	retn
+	mov		g_manual_highlignt_active, 1
+	ret
 SetManualHighlightOn endp
 
+align_proc
 SetManualHighlightOff proc
-	mov [g_manual_highlignt_active], 0
-	retn
+	mov		g_manual_highlignt_active, 0
+	ret
 SetManualHighlightOff endp
 
+align_proc
 GetManualHighlight proc
-	mov eax, [g_manual_highlignt_active]
-	retn
+	mov		eax, g_manual_highlignt_active
+	ret
 GetManualHighlight endp
 
-g_highlight_colors dd 16 DUP(0)
-
-SetHighlightColor proc
-color   = dword ptr 0Ch
-col_idx = dword ptr 08h
-	push    ebp
-	mov     ebp, esp
-	push    esi
-	
-	mov     esi, [ebp + col_idx]
-	and     esi, 0Fh
-	mov     eax, [ebp + color]
-	mov     [g_highlight_colors+esi*4], eax
-	
-	pop     esi
-	mov     esp, ebp
-	pop     ebp
-	retn
+_static		g_highlight_colors dd 16 DUP(0)
+align_proc
+SetHighlightColor proc C color:dword, col_idx:dword
+	mov		edx, col_idx
+	and		edx, 0Fh
+	mov		eax, color
+	mov		[g_highlight_colors+edx*4], eax
+	ret
 SetHighlightColor endp
 
-SumArgs proc
-arg2 = dword ptr 8
-arg1 = dword ptr 4
-	mov     eax, [esp+arg1]
-	add     eax, [esp+arg2]
-	retn
+align_proc
+SumArgs proc C arg1:dword, arg2:dword
+	mov		eax, arg1
+	add		eax, arg2
+	ret
 SumArgs endp
 
-SubArgs proc
-arg2 = dword ptr 8
-arg1 = dword ptr 4
-	mov     eax, [esp+arg1]
-	sub     eax, [esp+arg2]
-	retn
+align_proc
+SubArgs proc C arg1:dword, arg2:dword
+	mov		eax, arg1
+	sub		eax, arg2
+	ret
 SubArgs endp
 
-
-GetGoodwill proc
-for_who  = dword ptr 08h
-to_who   = dword ptr 0Ch
-
-	push    ebp
-	mov     ebp, esp
-	push    edx
-	;---
-	mov     eax, [ebp + to_who]
-	push    eax
-	mov     eax, [ebp + for_who]
-	push    eax
-	call    RELATION_REGISTRY__GetGoodwill
-	;---
-	pop     edx
-	mov     esp, ebp
-	pop     ebp
-	retn
+align_proc
+GetGoodwill proc C uses edx for_who:dword, to_who:dword
+	push	to_who
+	push	for_who
+	call	RELATION_REGISTRY__GetGoodwill
+	ret
 GetGoodwill endp
 
 DelayedInventoryUpdate proc
 	pusha
-	call    GetGameSP
-	test    eax, eax
-	jz      exit
-	mov     eax,[eax+3Ch] ; InventoryMenu
-	test    eax, eax
-	jz      exit
-	mov     byte ptr [eax+64h], 1 ; m_b_need_reinit = true
+	call	GetGameSP
+	test	eax, eax
+	jz		exit
+	mov		eax,[eax+3Ch] ; InventoryMenu
+	test	eax, eax
+	jz		exit
+	mov		byte ptr [eax+64h], 1 ; m_b_need_reinit = true
 exit:	
 	popa
-	retn
+	ret
 DelayedInventoryUpdate endp
 
 print_level_time proc
-	mov     eax, ds:g_pGameLevel
-	mov     eax, [eax]
-	mov     ecx, [eax+45D0h]
-	mov     eax, ecx
-	mov     edx, [eax]
-	mov     eax, [edx+1Ch]
-	call    eax
+	mov		eax, ds:g_pGameLevel
+	mov		eax, [eax]
+	mov		ecx, [eax+45D0h]
+	mov		eax, ecx
+	mov		edx, [eax]
+	mov		eax, [edx+1Ch]
+	call	eax
 	PRINT "print_level_time"
-	PRINT_UINT "eax=%x", eax
-	PRINT_UINT "edx=%x", edx
-	retn
+	ret
 print_level_time endp
 
-print_alife_time proc
-	push edx
-	push edi
-	
-	mov     eax, g_ai_space
-	mov     eax, [eax+18h]
-	mov     ecx, [eax+0Ch]
-	mov     edx, [ecx+4]
-	mov     edi, [edx+eax+18h]
-	call    CALifeTimeManager__game_time
+print_alife_time proc uses edi
+	mov		eax, g_ai_space
+	mov		eax, [eax+18h]
+	mov		ecx, [eax+0Ch]
+	mov		edx, [ecx+4]
+	mov		edi, [edx+eax+18h]
+	call	CALifeTimeManager__game_time
 	PRINT "print_alife_time"
-	PRINT_UINT "eax=%x", eax
-	PRINT_UINT "edx=%x", edx
-
-	pop edi
-	pop edx
-	retn
+	ret
 print_alife_time endp
 
+align_proc
 set_ignore_game_state proc
-	mov [g_ignore_game_state_update], 1
-	retn
+	mov		g_ignore_game_state_update, 1
+	ret
 set_ignore_game_state endp
 
 LOAD_DLL MACRO module_name_str:REQ, g_lib_hinst:REQ
-LOCAL lab1
-LOCAL loaded
 LOCAL module_name
-	jmp     lab1
-module_name db module_name_str, 0
-lab1:
-	mov     eax, [g_lib_hinst]
-	test    eax, eax
-	jnz     loaded
-	push    offset module_name
-	call    [LoadLibraryA]
-	test    eax, eax
-	jnz     loaded
-	; failed to load lib
-	mov     eax, offset module_name
-	PRINT_UINT "Failed to load library '%s'", eax
-	push    offset module_name
-	call    msg_and_fail
-	add     esp, 4
-	retn
-loaded:
-	mov     [g_lib_hinst], eax
-	mov     edx, offset module_name
-	PRINT_UINT "Loaded: %s", edx
+static_str		module_name, module_name_str
+	mov		eax, g_lib_hinst
+	.if (!eax)
+		push	offset module_name
+		call	LoadLibraryA
+		.if (!eax)
+			PRINT_UINT "Failed to load library '%s'", offset module_name
+			push	offset module_name
+			call	msg_and_fail
+			add		esp, 4
+			retn
+		.endif
+	.endif
+	mov		g_lib_hinst, eax
+	PRINT_UINT "Loaded: %s", offset module_name
 ENDM
 
 GET_PROC_ADDR MACRO g_lib_hinst:REQ, fun_name_str:REQ, g_fun_addr:REQ
-LOCAL lab1
-LOCAL success
 LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
-	push    offset fun_name
-	push    [g_lib_hinst]
-	call    [GetProcAddress]
-	test    eax, eax
-	jnz     success
-	; can't get address
-	mov     eax, offset fun_name
-	PRINT_UINT   "can't get address of '%s'", eax
-	push    offset fun_name
-	call    msg_and_fail
-	add     esp, 4
-	retn
-success:
-	mov [g_fun_addr], eax
+static_str		fun_name, fun_name_str
+	push	offset fun_name
+	push	g_lib_hinst
+	call	GetProcAddress
+	.if (!eax)
+		PRINT_UINT "can't get address of '%s'", offset fun_name
+		push	offset fun_name
+		call	msg_and_fail
+		add		esp, 4
+		retn
+	.endif
+	mov		g_fun_addr, eax
 ENDM
 
-g_ogse_lib_hinst dd 0
+static_int		g_ogse_lib_hinst, 0
 g_CEffectorZoomInertion__Process dd ?
 g_CCameraManager__Update3 dd ?	
 g_CCar__cam_Update dd ?
 
+align_proc
 init_external_libs proc
 	LOAD_DLL "extensions\ogse.dll", g_ogse_lib_hinst
 	GET_PROC_ADDR g_ogse_lib_hinst, "CEffectorZoomInertion__Process", g_CEffectorZoomInertion__Process
-	GET_PROC_ADDR g_ogse_lib_hinst, "CCameraManager__Update3",        g_CCameraManager__Update3
-	GET_PROC_ADDR g_ogse_lib_hinst, "CCar__cam_Update",               g_CCar__cam_Update
-	
-	;
-	retn
+	GET_PROC_ADDR g_ogse_lib_hinst, "CCameraManager__Update3",		  g_CCameraManager__Update3
+	GET_PROC_ADDR g_ogse_lib_hinst, "CCar__cam_Update",				  g_CCar__cam_Update
+	ret
 init_external_libs endp
 
-take_screenshot0 proc
-fname  = dword ptr 08h
-	push    ebp
-	mov     ebp, esp
-	mov     eax, [ebp+fname]
-	push    eax
-	push    0 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
-	
-	mov     eax, ds:Render
-	mov     ecx, [eax]
-	mov     edx, [ecx]
-	mov     eax, [edx+0D0h]
-	call    eax
-
-	pop     ebp
-	retn
+align_proc
+take_screenshot0 proc C fname:dword
+	push	fname
+	push	0 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
+	mov		eax, ds:Render
+	mov		ecx, [eax]
+	mov		edx, [ecx]
+	mov		eax, [edx+0D0h]
+	call	eax
+	ret
 take_screenshot0 endp
 
-take_screenshot1 proc
-fname  = dword ptr 08h
-	push    ebp
-	mov     ebp, esp
-	mov     eax, [ebp+fname]
-	push    eax
-	push    1 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
-	
-	mov     eax, ds:Render
-	mov     ecx, [eax]
-	mov     edx, [ecx]
-	mov     eax, [edx+0D0h]
-	call    eax
-
-	pop     ebp
-	retn
+align_proc
+take_screenshot1 proc C fname:dword
+	push	fname
+	push	1 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
+	mov		eax, ds:Render
+	mov		ecx, [eax]
+	mov		edx, [ecx]
+	mov		eax, [edx+0D0h]
+	call	eax
+	ret
 take_screenshot1 endp
 
-take_screenshot2 proc
-fname  = dword ptr 08h
-	push    ebp
-	mov     ebp, esp
-	mov     eax, [ebp+fname]
-	push    eax
-	push    2 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
-	
-	mov     eax, ds:Render
-	mov     ecx, [eax]
-	mov     edx, [ecx]
-	mov     eax, [edx+0D0h]
-	call    eax
-
-	pop     ebp
-	retn
+align_proc
+take_screenshot2 proc C fname:dword
+	push	fname
+	push	2 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
+	mov		eax, ds:Render
+	mov		ecx, [eax]
+	mov		edx, [ecx]
+	mov		eax, [edx+0D0h]
+	call	eax
+	ret
 take_screenshot2 endp
 
-take_screenshot3 proc
-fname  = dword ptr 08h
-	push    ebp
-	mov     ebp, esp
-	mov     eax, [ebp+fname]
-	push    eax
-	push    3 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
-	
-	mov     eax, ds:Render
-	mov     ecx, [eax]
-	mov     edx, [ecx]
-	mov     eax, [edx+0D0h]
-	call    eax
-
-	pop     ebp
-	retn
+align_proc
+take_screenshot3 proc C fname:dword
+	push	fname
+	push	3 ; code: 0 - normal, 1 - cubemap, 2 - save, 3 - levelmap
+	mov		eax, ds:Render
+	mov		ecx, [eax]
+	mov		edx, [ecx]
+	mov		eax, [edx+0D0h]
+	call	eax
+	ret
 take_screenshot3 endp
 
-set_input_language proc
-lang      = dword ptr  4
-	mov     eax, [esp+lang]
-	mov     g_input_language, eax
-	retn
+align_proc
+set_input_language proc C lang:dword
+	m2m		g_input_language, lang
+	ret
 set_input_language endp
 
+align_proc
 get_input_language proc
-	mov     eax, [g_input_language]
-	retn
+	mov		eax, g_input_language
+	ret
 get_input_language endp
 
 rescan_pathes proc
 	push ecx
 	push eax
-	mov     ecx, ds:xr_FS
-	mov     ecx, [ecx]
-	call    [CLocatorAPI__rescan_pathes]
+	mov		ecx, ds:xr_FS
+	mov		ecx, [ecx]
+	call	CLocatorAPI__rescan_pathes
 	pop eax
 	pop ecx
 	retn

@@ -97,7 +97,7 @@ v33 = dword ptr  3Ch
 	retn    4
 matrix__set_m   endp
 
-ALIGN_8
+
 matrix__mul_43 proc
 	push        ebp  
 	mov         ebp,esp  
@@ -233,16 +233,13 @@ matrix__mul_43 proc
 	ret         8  
 matrix__mul_43 endp	
 	
-matrix__mul_43_xmm proc
-m1              = dword ptr  8
-m2              = dword ptr  0Ch
-	push    ebp
-	mov     ebp, esp
-	mov     edx, [ebp+m1]
+matrix__mul_43_xmm proc uses esi m1:dword, m2:dword
+	mov     edx, m1
 	movss   xmm0, dword ptr [edx]
 	cvtps2pd xmm0, xmm0
-	push    esi
-	mov     esi, [ebp+m2]
+	mov     esi, m2
+	mov     eax, ecx
+	
 	movss   xmm1, dword ptr [esi]
 	movss   xmm2, dword ptr [esi+4]
 	cvtps2pd xmm1, xmm1
@@ -259,7 +256,6 @@ m2              = dword ptr  0Ch
 	mulsd   xmm1, xmm2
 	addsd   xmm0, xmm1
 	cvtpd2ps xmm0, xmm0
-	mov     eax, ecx
 	movss   dword ptr [eax], xmm0
 	movss   xmm0, dword ptr [edx+14h]
 	movss   xmm1, dword ptr [esi+4]
@@ -485,9 +481,7 @@ m2              = dword ptr  0Ch
 	movss   dword ptr [eax+2Ch], xmm0
 	movss   xmm0, dword ptr ds:value_1_0
 	movss   dword ptr [eax+3Ch], xmm0
-	pop     esi
-	pop     ebp
-	retn    8
+	ret
 matrix__mul_43_xmm endp
 
 matrix__mul_43_  proc near
@@ -765,37 +759,37 @@ arg_v = dword ptr  8
 	ASSUME  eax:PTR Vector3
 
 	;res.x = m.i.x * v.x + m.k.x * v.z + m.j.x * v.y + m.c.x;
-	fld    [ecx].c_.x
-	fld    [ecx].i.x
-	fmul   [eax].x
+	fld    	[ecx].c_.x
+	fld    	[ecx].i.x
+	fmul   	[eax].x
 	faddp   st(1), st
-	fld    [ecx].k.x
-	fmul   [eax].z
+	fld    	[ecx].k.x
+	fmul   	[eax].z
 	faddp   st(1), st
-	fld    [ecx].j.x
-	fmul   [eax].y
+	fld    	[ecx].j.x
+	fmul   	[eax].y
 	faddp   st(1), st
 	;res.y = m.k.y * v.z + m.j.y * v.y + m.i.y * v.x + m.c.y;
-	fld    [ecx].c_.y
-	fld    [ecx].k.y
-	fmul   [eax].z
+	fld    	[ecx].c_.y
+	fld    	[ecx].k.y
+	fmul   	[eax].z
 	faddp   st(1), st
-	fld    [ecx].j.y
-	fmul   [eax].y
+	fld    	[ecx].j.y
+	fmul   	[eax].y
 	faddp   st(1), st
-	fld    [ecx].i.y
-	fmul   [eax].x
+	fld    	[ecx].i.y
+	fmul   	[eax].x
 	faddp   st(1), st
 	;res.z = m.k.z * v.z + m.j.z * v.y + m.i.z * v.x + m.c.z;
-	fld    [ecx].c_.z
-	fld    [ecx].k.z
-	fmul   [eax].z
+	fld    	[ecx].c_.z
+	fld    	[ecx].k.z
+	fmul   	[eax].z
 	faddp   st(1), st
-	fld    [ecx].j.z
-	fmul   [eax].y
+	fld    	[ecx].j.z
+	fmul   	[eax].y
 	faddp   st(1), st
-	fld    [ecx].i.z
-	fmul   [eax].x
+	fld    	[ecx].i.z
+	fmul   	[eax].x
 	faddp   st(1), st
 	
 	fstp    [eax].z

@@ -1,15 +1,13 @@
 ;===============================================================================
 ;		Турель на классе CCar
 ;
-; (с) НаноБот		27.09.2017		23.10.2017
+; (с) НаноБот		27.09.2017		7.12.2017
 ;===============================================================================
 ;#define CLSID_TURREL		MK_CLSID('C','_','T','U','R','R','E','L')
 angle_use_turrel_cos		equ 0.17364818	; = cos(80.0) ; минимальный угол от направления ствола и взгляда актора для использования турели.
 ;const float angle_use_turrel			= 80.f;
-align	4
-aOffset_driver_pl			db "offset_driver_place", 0
-align	4
-aHeight_pos					db "height_pos", 0
+static_str	aOffset_driver_pl,	"offset_driver_place"
+static_str	aHeight_pos,		"height_pos"
 
 align_proc
 CCar__UseSelect proc pos_:dword, dir_:dword, foot_pos:dword
@@ -136,8 +134,7 @@ local fire_dir:Fvector4, cam_dir:Fvector4, angle_cos:dword
 		;m_exit_position.set(fire_dir.x, fire_dir.y, fire_dir.z);
 		Fvector_set [edi].m_exit_position, fire_dir.x, fire_dir.y, fire_dir.z
 		; return (!!smart_cast<CActor*>(m_owner));
-		mov		eax, [edi].m_owner
-		smart_cast	_AVCActor, _AVCGameObject, eax
+		smart_cast	CActor, [edi].m_owner
 		test	eax, eax
 		setnz	al	; al = eax != 0
 	.endif
@@ -149,14 +146,7 @@ local fire_dir:Fvector4, cam_dir:Fvector4, angle_cos:dword
 CCarTurrel__Use endp
 
 ; анимация пулемётчика для турели ПКМ
-align 4
-aPkm_attack_0		db "pkm_attack_0", 0		;стреляем
-align 4
-aPkm_idle_0			db "pkm_idle_0", 0			;идловая
-align 4
-aPkm_turn_left		db "pkm_turn_left_0", 0		;разворот влево
-align 4
-aPkm_turn_right		db "pkm_turn_right_0", 0	;разворот вправо
+;static_str	aPkm_attack_0,		"pkm_attack_0"			;стреляем
 
 align_proc
 SVehicleAnimCollection__Create_turrel proc m_vehicles_type_collections:dword, V:dword
@@ -170,7 +160,7 @@ local p_motion_ID:dword
 		ASSUME	edi:ptr SVehicleAnimCollection
 		;idles[0] = V->ID_Cycle("pkm_idle_0");
 		mov		ebx, ds:CKinematicsAnimated__ID_Cycle ; CKinematicsAnimated::ID_Cycle(char const *)
-		push	offset aPkm_idle_0			; "pkm_idle_0"
+		push	static_str$("pkm_idle_0")			;идловая
 		lea		eax, p_motion_ID
 		push	eax
 		mov		ecx, V
@@ -178,7 +168,7 @@ local p_motion_ID:dword
 		mov		cx, [eax]
 		mov		[edi].idles[0], cx
 		;steer_left = V->ID_Cycle("pkm_turn_left_0");
-		push	offset aPkm_turn_left		; "pkm_turn_left_0"
+		push	static_str$("pkm_turn_left_0")		;разворот влево
 		lea		edx, p_motion_ID
 		push	edx
 		mov		ecx, V
@@ -186,7 +176,7 @@ local p_motion_ID:dword
 		mov		ax, [eax]
 		mov		[edi].steer_left, ax
 		;steer_right = V->ID_Cycle("pkm_turn_right_0");
-		push	offset aPkm_turn_right		; "pkm_turn_right_0"
+		push	static_str$("pkm_turn_right_0")		;разворот вправо
 		lea		ecx, p_motion_ID
 		push	ecx
 		mov		ecx, V
@@ -206,12 +196,12 @@ local p_motion_ID:dword
 SVehicleAnimCollection__Create_turrel endp
 
 align_proc
-CCar__cam_UpdateSelect proc _dt:dword, fov:dword
+CCar__cam_UpdateSelect proc uses esi edi _dt:dword, fov:dword
 ; ecx - CCar_CHolderCustom	// 24Ch
-	lea		eax, [ecx-24Ch]
-	ASSUME	eax:ptr CCar
-	; if(this->CLS_ID == CLSID_TURREL)
-	.if ([eax].CLS_ID.hi=='C_TU' && [eax].CLS_ID.lo=='RREL')	;'C_TURREL'
+	lea		esi, [ecx-24Ch]
+	ASSUME	esi:ptr CCar, edx:ptr CCarWeapon
+	mov		edx, [esi].m_car_weapon
+	.if (edx && [edx].m_camera_bone!=-1)
 		push	fov
 		push	_dt
 		call	CCar__cam_Update_turrel
@@ -220,7 +210,21 @@ CCar__cam_UpdateSelect proc _dt:dword, fov:dword
 		push	_dt
 		call	CCar__cam_Update
 	.endif
-	ASSUME	eax:nothing
+	ASSUME	edx:ptr CCameraBase, edi:ptr CCameraBase
+	;скопировать камеру машины в камеру актора от первого лица. Надо для работы фонарика актора, когда он находится в турели.
+	mov		ecx, [esi].m_ownerActor
+	.if (ecx)
+		mov		edi, [esi].camera[0]
+		ASSUME	ecx:ptr CActor
+		;cam_actor = OwnerActor()->cameras[0];
+		mov		edx, [ecx].cameras[0]
+		;cam_actor.yaw		= camera[0]->yaw;
+		mrm		[edx].yaw, [edi].yaw
+		;cam_actor.pitch	= camera[0]->pitch;
+		mrm		[edx].pitch, [edi].pitch
+		ASSUME	ecx:nothing
+	.endif
+	ASSUME	esi:nothing, edi:nothing, edx:nothing
 	ret		8
 CCar__cam_UpdateSelect endp
 
@@ -309,10 +313,8 @@ local mat_cam_bone:Fmatrix4, P:Fvector4, Da:Fvector4
 CCar__cam_Update_turrel endp
 
 ;offset aCar_definition	;'car_definition'			;;
-align 4
-aLimit_x_rot			db "limit_x_rot", 0
-align 4
-aLimit_y_rot			db "limit_y_rot", 0
+static_str	aLimit_x_rot, "limit_x_rot"
+static_str	aLimit_y_rot, "limit_y_rot"
 
 align_proc
 CCarWeapon__CCarWeapon_chunk proc
@@ -324,7 +326,7 @@ local strFire_bone[128]:byte
 	ASSUME	edi:ptr CCarWeapon
 	;вырезаное
 	mov		ebx, [esi+80h]	; CInifile* pUserData = K->LL_UserData();
-	mov		[edi].m_camera_bone, 0
+	mov		[edi].m_camera_bone, -1
 	;if(pUserData->line_exist("mounted_weapon_definition", "camera_bone"))
 	push	offset aCamera_bone				; "camera_bone"
 	push	offset aMounted_weapon			; "mounted_weapon_definition"
@@ -494,7 +496,7 @@ CActor__ShowCrosshairTurrel proc
 	.if (edx)
 		push	ebx
 		mov		ebx, eax
-		smart_cast	_AVCCar, _AVCHolderCustom, edx
+		smart_cast	CCar, CHolderCustom, edx
 		.if (eax)
 			ASSUME	eax:ptr CCar
 			push	esi
@@ -543,42 +545,35 @@ align_proc
 CCarWeapon__OnShotExt proc
 ;esi - CCarWeapon
 	call	CCarWeapon__OnShot
-	push	edi
 	ASSUME	esi:ptr CCarWeapon, edi:ptr CCar
-	mov		edi, [esi].m_object
-	;CKinematics*	K = smart_cast<CKinematics*>(m_object->Visual());
-	mov		ecx, [edi].Visual_
-	mov		eax, [ecx]
-	mov		edx, [eax+18h]
-	call	edx
-	mov		ecx, [esi].m_num_firebones
-	mov		edx, [esi].m_firebones
-	inc		ecx
-	.if ([esi].m_count_firebones==ecx)
-		xor		ecx, ecx
+	.if ([esi].m_count_firebones>1)
+		push	edi
+		mov		edi, [esi].m_object
+		;CKinematics*	K = smart_cast<CKinematics*>(m_object->Visual());
+		smart_castV	CKinematics, IRender_Visual, [edi].Visual_
+		mov		ecx, [esi].m_num_firebones
+		mov		edx, [esi].m_firebones
+		inc		ecx
+		.if ([esi].m_count_firebones==ecx)
+			xor		ecx, ecx
+		.endif
+		mov		[esi].m_num_firebones, ecx
+		mov		dx, [edx+ecx*2]
+		mov		[esi].m_fire_bone, dx
+		;m_fire_bone_xform	= K->LL_GetTransform(m_fire_bone);
+		movzx	edx, dx
+		lea		edx, [edx+edx*4]
+		shl		edx, 5	; eax=*160	// sizeof CBoneInstance = 160
+		add		edx, [eax+bone_instances]	; CBoneInstance
+		ASSUME	edx:ptr CBoneInstance, ecx:ptr Fmatrix4
+		;m_fire_bone_xform.mulA_43(m_object->XFORM());
+		lea		ecx, [edi].XFORM_
+		Fmatrix4@mul_43	[esi].m_fire_bone_xform, [ecx], [edx].mTransform
+		ASSUME	ecx:nothing, edx:nothing
+		Fvector_set	[esi].m_fire_pos, [esi].m_fire_bone_xform.c_
+		pop		edi
 	.endif
-	mov		[esi].m_num_firebones, ecx
-	mov		dx, [edx+ecx*2]
-	mov		[esi].m_fire_bone, dx
-	;m_fire_bone_xform	= K->LL_GetTransform(m_fire_bone);
-	movzx	edx, dx
-	lea		edx, [edx+edx*4]
-	shl		edx, 5	; eax=*160	// sizeof CBoneInstance = 160
-	add		edx, [eax+bone_instances]	; CBoneInstance
-	ASSUME	edx:ptr CBoneInstance
-	;m_fire_bone_xform.mulA_43(m_object->XFORM());
-	lea		ecx, [edi].XFORM_
-	ASSUME	ecx:ptr Fmatrix4
-	Fmatrix4@mul_43	[esi].m_fire_bone_xform, [ecx], [edx].mTransform
-	ASSUME	ecx:nothing
-	mov		eax, [esi].m_fire_bone_xform.c_.x
-	mov		[esi].m_fire_pos.x, eax
-	mov		ecx, [esi].m_fire_bone_xform.c_.y
-	mov		[esi].m_fire_pos.y, ecx
-	mov		edx, [esi].m_fire_bone_xform.c_.z
-	mov		[esi].m_fire_pos.z, edx
-	ASSUME	esi:nothing, edx:nothing, edi:nothing
-	pop		edi
+	ASSUME	esi:nothing, edi:nothing
 	retn
 CCarWeapon__OnShotExt endp
 

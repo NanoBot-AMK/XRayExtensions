@@ -54,10 +54,9 @@ org 00411308h - shift
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; добавление переменных в шейдера
-org 0048F3B7h - shift
-	jmp shaders_mapping
-org 0048F3BCh - shift
-back_to_shaders_mapping:
+org 0048F3B7h - shift ; 5 bytes
+	jmp		shaders_mapping
+return_shaders_mapping:
 org 0048DD30h - shift	
 CBlender_Compile__r_Constant:
 org 004CC3F4h - shift
@@ -186,3 +185,10 @@ back_from_vsync_fix_2:
 
 org 0048B3C0h - shift
 CHW__selectPresentInterval:
+
+;задать частоту обновления монитора
+org 0048B51Ah - shift	; 9 bytes
+	jmp		CHW@@setRefrash
+	db		4 dup (0CCh)
+org 00509334h - shift
+psDeviceFlags			dd ?	; _flags<unsigned int>

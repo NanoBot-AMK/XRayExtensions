@@ -1,25 +1,25 @@
 include global_ns_reg_macro2.asm
 
-global_space_ext2: ; вставка, дополн€юща€ функцию экспорта глобальных функций
+global_space_ext2 proc ; вставка, дополн€юща€ функцию экспорта глобальных функций
 	; здесь делаем то, что вырезали
-	call    register__gs_sell_condition__fl_fl
-	pop     ecx
-	pop     ecx
+	call	register__gs_sell_condition__fl_fl
+	pop		ecx
+	pop		ecx
 	; добавл€ем свой код
-	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT SetGameTime, "set_game_time"
-	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT SetFloatArgs12, "set_float_args_12"
-	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT SetFloatArgs34, "set_float_args_34"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT		SetGameTime,			"set_game_time"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT		SetFloatArgs12,			"set_float_args_12"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT		SetFloatArgs34,			"set_float_args_34"
 	;
-	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT SetHudInertia, "set_hud_inertia"
-	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT SetHudInertiaParam2, "set_hud_inertia_param2"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT		SetHudInertia,			"set_hud_inertia"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT		SetHudInertiaParam2,	"set_hud_inertia_param2"
 	;
-	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT SetStaticRescalefactor, "set_static_rescale_factor"
-	GLOBAL_NS_PERFORM_EXPORT__FLOAT__VOID GetStaticRescalefactor, "get_static_rescale_factor"
+	GLOBAL_NS_PERFORM_EXPORT__VOID__FLOAT_FLOAT		SetStaticRescalefactor,	"set_static_rescale_factor"
+	GLOBAL_NS_PERFORM_EXPORT__FLOAT__VOID			GetStaticRescalefactor, "get_static_rescale_factor"
 	; идЄм обратно
 	jmp back_from_global_space_ext2
-;
+global_space_ext2 endp
 
-global_space_ext2_additional:
+global_space_ext2_additional proc
 	; здесь делаем то, что вырезали
 	GLOBAL_NS_SCOPE_ADD
 	GLOBAL_NS_SCOPE_ADD
@@ -35,122 +35,86 @@ global_space_ext2_additional:
 	GLOBAL_NS_SCOPE_ADD
 	; идЄм обратно
 	jmp back_from_global_space_ext2_additional
+global_space_ext2_additional endp
 
-
-
-SetGameTime proc
-time        = dword ptr 8
-time_factor = dword ptr 0Ch
-	push    ebp
-	mov     ebp, esp
-	and     esp, 0FFFFFFF8h
-	push    eax
-	push    ecx
-	
-	mov     ecx, ds:g_pGamePersistent
-	mov     ecx, [ecx]
-	mov     ecx, [ecx+46Ch] ; _DWORD
-	
-	mov     eax, [ebp+time]
-	push    eax
-	mov     eax, [ebp+time_factor]
-	push    eax
-	call    ds:CEnvironment__SetGameTime
-	
-	pop     ecx
-	pop     eax
-	mov     esp, ebp
-	pop     ebp
-	retn
+align_proc
+SetGameTime proc C time:dword, time_factor:dword
+	mov		ecx, ds:g_pGamePersistent
+	mov		eax, [ecx]
+	mov		ecx, [eax+46Ch] ; _DWORD
+	push	time
+	push	time_factor
+	call	ds:CEnvironment__SetGameTime
+	ret
 SetGameTime endp
 
-g_float_arg1 dd 0.0
-g_float_arg2 dd 0.0
-g_float_arg3 dd 0.0
-g_float_arg4 dd 0.0
+static_float	g_float_arg1, 0.0
+static_float	g_float_arg2, 0.0
+static_float	g_float_arg3, 0.0
+static_float	g_float_arg4, 0.0
 
-stub_test dd 9 dup(0)
+static_int		stub_test, 9 dup(0)
 
-SetFloatArgs12 proc
-arg1 = dword ptr 4h
-arg2 = dword ptr 8h
-	mov eax, [esp+arg1]
-;PRINT_FLOAT "arg1=%f", eax
-	mov [g_float_arg1], eax
-	mov eax, [esp+arg2]
-;PRINT_FLOAT "arg2=%f", eax
-	mov [g_float_arg2], eax
-	retn
+align_proc
+SetFloatArgs12 proc C arg1:dword, arg2:dword
+	mrm		g_float_arg1, arg1
+	mrm		g_float_arg2, arg2
+	ret
 SetFloatArgs12 endp
 
-SetFloatArgs34 proc
-arg3 = dword ptr 4h
-arg4 = dword ptr 8h
-	mov eax, [esp+arg3]
-;PRINT_FLOAT "arg3=%f", eax
-	mov [g_float_arg3], eax
-	mov eax, [esp+arg4]
-;PRINT_FLOAT "arg4=%f", eax
-	mov [g_float_arg4], eax
-	retn
+align_proc
+SetFloatArgs34 proc C arg1:dword, arg2:dword
+	mrm		g_float_arg3, arg1
+	mrm		g_float_arg4, arg2
+	ret
 SetFloatArgs34 endp
 
 ifdef PZ_BUILD
 	; PZ settings
-	g_hud_inertia_factor dd 5.0
-	g_hud_inertia_param_2 dd 0.07
+static_float		g_hud_inertia_factor, 5.0
+static_float		g_hud_inertia_param_2, 0.07
 else
 	; default settings
-	g_hud_inertia_factor dd 5.0 ; TENDTO_SPEED
-	g_hud_inertia_param_2 dd 0.050000001 ; CHWON_CALL_UP_SHIFT
+static_float		g_hud_inertia_factor, 5.0 ; TENDTO_SPEED
+static_float		g_hud_inertia_param_2, 0.050000001 ; CHWON_CALL_UP_SHIFT
 endif
-
-SetHudInertia proc
-hud_inertia = dword ptr 4h
-arg2        = dword ptr 8h
-	mov eax, [esp+hud_inertia]
-	;PRINT_FLOAT "hud_inertia = %f", eax
-	mov [g_hud_inertia_factor], eax
-	retn
+align_proc
+SetHudInertia proc C hud_inertia:dword, arg2:dword
+	mrm		g_hud_inertia_factor, hud_inertia
+	ret
 SetHudInertia endp
 
-SetHudInertiaParam2 proc
-hud_inertia = dword ptr 4h
-arg2        = dword ptr 8h
-	mov eax, [esp+hud_inertia]
-	;PRINT_FLOAT "hud_inertia = %f", eax
-	mov [g_hud_inertia_param_2], eax
-	retn
+align_proc
+SetHudInertiaParam2 proc C hud_inertia:dword, arg2:dword
+	mrm		g_hud_inertia_param_2, hud_inertia
+	ret
 SetHudInertiaParam2 endp
 
-g_static_rescale_correction dd 0.83333333f
-
-SetStaticRescalefactor proc
-rescale_factor = dword ptr 4h
-arg2           = dword ptr 8h
-	mov eax, [esp+rescale_factor]
-	mov [g_static_rescale_correction], eax
-	retn
+static_float		g_static_rescale_correction, 0.83333333
+align_proc
+SetStaticRescalefactor proc C rescale_factor:dword, arg2:dword
+	mrm		g_static_rescale_correction, rescale_factor
+	ret
 SetStaticRescalefactor endp
 
-
+align_proc
 GetStaticRescalefactor proc
-	fld     dword ptr [g_static_rescale_correction]
+	fld		dword ptr [g_static_rescale_correction]
 	retn
 GetStaticRescalefactor endp
 
 ; ¬ывод стартового адреса xrGame.dll в логе
-first_start_log		db 1
+static_byte		first_start_log, true
+align_proc
 StartAdress_xrGame_log__DllMain proc
-fdwReason	= dword ptr	 8
-	.if		[first_start_log] != 0
+	.if (first_start_log)
 		mov		eax, [esp]
 		sub		eax, 00288645h
-		PRINT_UINT	"xrGame.dll Start adress: %x", eax
-		mov		[first_start_log], 0
+		PRINT_UINT	"xrGame.dll Start adress: %08X", eax
+		mov		first_start_log, false
 	.endif
 	; делаем что вырезали
-	mov		eax, [esp+4+fdwReason]
+	mov		eax, [esp+4+8];fdwReason
 	sub		eax, 1
 	retn
 StartAdress_xrGame_log__DllMain endp

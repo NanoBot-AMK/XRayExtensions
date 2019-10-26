@@ -13,8 +13,8 @@ PERFORM_EXPORT_CTIME_VOID__INT_INT_INT MACRO registering_function:REQ, fun_to_ex
 	call    registering_function
 ENDM
 
-REGISTER_CTIME_VOID__INT_INT_INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_CTIME_VOID__INT_INT_INT MACRO register_fun_name:REQ, fun_name_str:REQ
+align_proc
 register_fun_name proc near
 
 var_4C          = byte ptr -4Ch
@@ -99,7 +99,7 @@ loc_102C55A5:
 	mov     ecx, [ebp+arg_0]
 	lea     eax, [ebp+var_4C]
 	push    eax
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [ebp+var_4C]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
@@ -109,8 +109,6 @@ loc_102C55A5:
 	pop     ebx
 	leave
 	retn    0Ch
-
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -129,8 +127,7 @@ PERFORM_EXPORT_CTIME_VOID__@INT_@INT_@INT_@INT_@INT_@INT_@INT MACRO registering_
 	call    registering_function
 ENDM
 
-REGISTER_CTIME_VOID__@INT_@INT_@INT_@INT_@INT_@INT_@INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_CTIME_VOID__@INT_@INT_@INT_@INT_@INT_@INT_@INT MACRO register_fun_name:REQ, fun_name_str:REQ
 register_fun_name proc near
 var_4C          = byte ptr -4Ch
 var_10          = dword ptr -10h
@@ -214,7 +211,7 @@ loc_102C5845:
 	mov     ecx, [ebp+arg_0]
 	lea     eax, [ebp+var_4C]
 	push    eax
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [ebp+var_4C]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
@@ -224,8 +221,6 @@ loc_102C5845:
 	pop     ebx
 	leave
 	retn    0Ch
-
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 

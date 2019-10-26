@@ -1,9 +1,5 @@
+
 PERFORM_EXPORT_BOOL__STRING MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ebx, eax
 	xor     al, al
 	mov     byte ptr [esp+88h-6Ch], al
@@ -12,24 +8,18 @@ lab1:
 	mov     eax, [esp+88h-64h]
 	push    eax
 	push    ecx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+94h-74h]
 	mov     [esp+94h-74h], offset fun_to_export
 	call    give_info_portion_register
 ENDM
 
 PERFORM_EXPORT_PROPERTY__FLOAT_RW MACRO get_fun:REQ, set_fun:REQ, property_name_str:REQ
-LOCAL lab1
-LOCAL property_name
-	jmp     lab1
-property_name db property_name_str, 0
-lab1:
-
 	mov     byte ptr [esp+88h-74h], bl
 	mov     eax, [esp+88h-74h]
 	push    eax
 	push    offset set_fun
-	push    offset property_name
+	push    static_str$(property_name_str) 
 	mov     edx, offset get_fun
 	mov     edi, ebp
 	call    register__float_rw_property
@@ -38,11 +28,6 @@ ENDM
 
 
 PERFORM_EXPORT_VOID__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	xor     bl, bl
 	mov     byte ptr [esp+88h-64h], bl
 	mov     ecx, [esp+88h-64h]
@@ -50,7 +35,7 @@ lab1:
 	mov     byte ptr [esp+8Ch-6Ch], bl
 	mov     edx, [esp+8Ch-6Ch]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push    eax
 	lea     eax, [esp+98h-74h]
 	mov     [esp+98h-74h], offset fun_to_export
@@ -59,11 +44,6 @@ ENDM
 
 
 PERFORM_EXPORT_BOOL__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	xor     bl, bl
 	mov     byte ptr [esp+88h-64h], bl
 	mov     ecx, [esp+88h-64h]
@@ -71,7 +51,7 @@ lab1:
 	mov     byte ptr [esp+8Ch-6Ch], bl
 	mov     edx, [esp+8Ch-6Ch]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push    eax
 	lea     eax, [esp+98h-74h]
 	mov     [esp+98h-74h], offset fun_to_export
@@ -80,11 +60,6 @@ ENDM
 
 
 PERFORM_EXPORT_VOID__BOOL MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ecx, eax
 	mov     byte ptr [esp+58h-38h], bl
 	mov     eax, [esp+58h-38h]
@@ -92,7 +67,7 @@ lab1:
 	mov     byte ptr [esp+5Ch-40h], bl
 	mov     edx, [esp+5Ch-40h]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+64h-48h]
 	mov     ebx, ecx
 	mov     [esp+64h-48h], offset fun_to_export
@@ -100,18 +75,13 @@ lab1:
 ENDM
 
 PERFORM_EXPORT_STRING__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     byte ptr [esp+88h-64h], bl
 	mov     edx, [esp+88h-64h]
 	push    edx
 	mov     byte ptr [esp+8Ch-6Ch], bl
 	mov     ecx, [esp+8Ch-6Ch]
 	push    ecx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push    eax
 	lea     eax, [esp+98h-74h]
 	mov     [esp+98h-74h], offset fun_to_export
@@ -119,12 +89,6 @@ lab1:
 ENDM
 
 PERFORM_EXPORT_VOID__STRING MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
-
 	mov     ebx, eax
 	xor     al, al
 	mov     byte ptr [esp+88h-6Ch], al
@@ -133,18 +97,13 @@ lab1:
 	mov     eax, [esp+88h-64h]
 	push    eax
 	push    ecx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+94h-74h]
 	mov     [esp+94h-74h], offset fun_to_export
 	call    register__set_tip_text
 ENDM
 
 PERFORM_EXPORT_INT__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ecx, eax
 	mov     byte ptr [esp+58h-38h], bl
 	mov     eax, [esp+58h-38h]
@@ -152,7 +111,7 @@ lab1:
 	mov     byte ptr [esp+5Ch-40h], bl
 	mov     edx, [esp+5Ch-40h]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+64h-48h]
 	mov     ebx, ecx
 	mov     [esp+64h-48h], offset fun_to_export
@@ -160,11 +119,6 @@ lab1:
 ENDM
 
 PERFORM_EXPORT_UINT__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	xor     bl, bl
 	mov     byte ptr [esp+88h-64h], bl
 	mov     ecx, [esp+88h-64h]
@@ -174,18 +128,13 @@ lab1:
 	push    edx
 	lea     ecx, [esp+90h-74h]
 	push    ecx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push    eax
 	mov     [esp+9Ch-74h], offset fun_to_export
 	call    register_object_count
 ENDM
 
 PERFORM_EXPORT_FLOAT__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	xor ebx, ebx
 	mov     byte ptr [esp+88h-74h], bl
 	mov     ecx, [esp+88h-74h]
@@ -195,18 +144,13 @@ lab1:
 	push    edx
 	lea     ecx, [esp+90h-64h]
 	push    ecx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push    eax
 	mov     [esp+9Ch-64h], offset fun_to_export
 	call    register_get_bleeding
 ENDM
 
 PERFORM_EXPORT_VOID__FLOAT MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ebx, eax
 	xor     al, al
 	mov     byte ptr [esp+88h-6Ch], al
@@ -215,7 +159,7 @@ lab1:
 	mov     eax, [esp+88h-64h]
 	push    eax
 	push    ecx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+94h-74h]
 	mov     [esp+94h-74h], offset fun_to_export
 	call    register_set_actor_direction
@@ -236,8 +180,7 @@ PERFORM_EXPORT_BOOL__GO MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 
-REGISTER_BOOL__GO MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_BOOL__GO MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 var_48 = dword ptr -48h
@@ -285,7 +228,7 @@ lab1:
 lab2:
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z
 	lea     ecx, [esp+54h-3Ch]
@@ -295,7 +238,6 @@ lab2:
 	pop     esi
 	add     esp, 4Ch
 	retn    8
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -314,8 +256,7 @@ PERFORM_EXPORT_GO__INT MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 
-REGISTER_GO__INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_GO__INT MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -367,7 +308,7 @@ lab2:
 lab1:
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+54h-3Ch]
@@ -377,7 +318,6 @@ lab1:
 	pop     esi
 	add     esp, 4Ch
 	retn    8
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -395,8 +335,7 @@ PERFORM_EXPORT_FLOAT__INT__WRONG MACRO registering_function:REQ, fun_to_export:R
 	call    registering_function
 ENDM
 
-REGISTER_FLOAT__INT___WRONG MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_FLOAT__INT___WRONG MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -449,7 +388,7 @@ loc_1014E52D:
 loc_1014E55A:
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
 	lea     ecx, [esp+54h-3Ch]
@@ -459,7 +398,6 @@ loc_1014E55A:
 	pop     esi
 	add     esp, 4Ch
 	retn    8
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -478,8 +416,7 @@ PERFORM_EXPORT_FLOAT__INT MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 
-REGISTER_FLOAT__INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_FLOAT__INT MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -531,7 +468,7 @@ loc_1014DEDD:
 loc_1014DF0A: 
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
 	lea     ecx, [esp+54h-3Ch]
@@ -541,7 +478,6 @@ loc_1014DF0A:
 	pop     esi
 	add     esp, 4Ch
 	retn    8
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -558,8 +494,7 @@ PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT MACRO registering_function:REQ, fun_to_exp
 	call    registering_function
 ENDM
 
-REGISTER_VOID__VECTOR_FLOAT_INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_VOID__VECTOR_FLOAT_INT MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -615,7 +550,7 @@ loc_10159751:
 loc_1015977E:
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
 	lea     ecx, [esp+58h-3Ch]
@@ -627,7 +562,6 @@ loc_1015977E:
 	pop     ebx
 	add     esp, 48h
 	retn    0Ch
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -645,8 +579,7 @@ PERFORM_EXPORT_U32__STRING_INT MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 ;REGISTER_INT__STRING_INT
-REGISTER_U32__STRING_INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_U32__STRING_INT MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -701,7 +634,7 @@ loc_101588C1:
 loc_101588EE: 
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
 	lea     ecx, [esp+58h-3Ch]
@@ -713,7 +646,6 @@ loc_101588EE:
 	pop     ebx
 	add     esp, 48h
 	retn    0Ch
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -733,8 +665,7 @@ PERFORM_EXPORT_VOID__INT_INT MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 
-REGISTER_VOID__INT_INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_VOID__INT_INT MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -790,7 +721,7 @@ loc_10157301:
 loc_1015732E:
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
 	lea     ecx, [esp+58h-3Ch]
@@ -802,17 +733,10 @@ loc_1015732E:
 	pop     ebx
 	add     esp, 48h
 	retn    0Ch
-
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
 PERFORM_EXPORT_VOID__GO MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ecx, eax
 	mov     byte ptr [esp+58h-38h], bl
 	mov     eax, [esp+58h-38h]
@@ -820,7 +744,7 @@ lab1:
 	mov     byte ptr [esp+5Ch-40h], bl
 	mov     edx, [esp+5Ch-40h]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+64h-48h]
 	mov     ebx, ecx
 	mov     [esp+64h-48h], offset fun_to_export
@@ -828,11 +752,6 @@ lab1:
 ENDM
 
 PERFORM_EXPORT_VOID__GO_BOOL MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	xor		bl, bl
 	;;;mov     ecx, eax
 	mov     byte ptr [esp+58h-38h], bl
@@ -841,7 +760,7 @@ lab1:
 	mov     byte ptr [esp+5Ch-40h], bl
 	mov     edx, [esp+5Ch-40h]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push	eax
 	lea     eax, [esp+68h-48h]
 	mov     [esp+68h-48h], offset fun_to_export
@@ -849,18 +768,13 @@ lab1:
 ENDM
 
 PERFORM_EXPORT_GO__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     byte ptr [esp+88h-64h], bl
 	mov     ecx, [esp+88h-64h]
 	push    ecx
 	mov     byte ptr [esp+8Ch-6Ch], bl
 	mov     edx, [esp+8Ch-6Ch]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push    eax
 	lea     eax, [esp+98h-74h]
 	mov     [esp+98h-74h], offset fun_to_export
@@ -883,8 +797,7 @@ PERFORM_EXPORT_VECTOR__STRING MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 
-REGISTER_VECTOR__STRING MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_VECTOR__STRING MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 var_48          = dword ptr -48h
@@ -932,7 +845,7 @@ loc_101583FD:
 loc_1015842A:
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+54h-3Ch]
@@ -942,7 +855,6 @@ loc_1015842A:
 	pop     esi
 	add     esp, 4Ch
 	retn    8
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -962,8 +874,7 @@ PERFORM_EXPORT_INIFILE__VOID MACRO registering_function:REQ, fun_to_export:REQ
 ENDM
 
 
-REGISTER_INIFILE__VOID MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_INIFILE__VOID MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -1044,7 +955,7 @@ loc_101579DD:
 	mov     esi, [esp+54h+arg_0]
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, esi
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+54h-3Ch]
@@ -1055,7 +966,6 @@ loc_101579DD:
 	pop     ebp
 	add     esp, 48h
 	retn    10h
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -1076,8 +986,7 @@ PERFORM_EXPORT_VOID__STR_BOOL MACRO registering_function:REQ, fun_to_export:REQ
 ENDM
 
 
-REGISTER_VOID__STR_BOOL MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_VOID__STR_BOOL MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 var_48          = dword ptr -48h
@@ -1131,7 +1040,7 @@ loc_1014C951:
 loc_1014C97E:
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+58h-3Ch]
@@ -1143,16 +1052,10 @@ loc_1014C97E:
 	pop     ebx
 	add     esp, 48h
 	retn    0Ch
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
 PERFORM_EXPORT_VOID__VECTOR MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ecx, eax
 	mov     byte ptr [esp+88h-64h], bl
 	mov     eax, [esp+88h-64h]
@@ -1160,7 +1063,7 @@ lab1:
 	mov     byte ptr [esp+8Ch-6Ch], bl
 	mov     edx, [esp+8Ch-6Ch]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+94h-74h]
 	mov     ebx, ecx
 	mov     [esp+94h-74h], offset fun_to_export
@@ -1168,35 +1071,34 @@ lab1:
 ENDM
 
 
-
-
 PERFORM_EXPORT_VECTOR__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
-	xor     bl, bl
+;	xor     bl, bl
+;	mov     byte ptr [esp+88h-64h], bl
+;	mov     edx, [esp+88h-64h]
+;	push    edx
+;	mov     byte ptr [esp+8Ch-6Ch], bl
+;	mov     ecx, [esp+8Ch-6Ch]
+;	push    ecx
+;	lea     edx, [esp+90h-74h]
+;	push    edx
+;	push    offset fun_name
+;	push    eax
+;	mov     [esp+9Ch-74h], offset fun_to_export
+;	call    register_go_const_vector__void
 	mov     byte ptr [esp+88h-64h], bl
 	mov     edx, [esp+88h-64h]
 	push    edx
 	mov     byte ptr [esp+8Ch-6Ch], bl
 	mov     ecx, [esp+8Ch-6Ch]
 	push    ecx
-	lea     edx, [esp+90h-74h]
-	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)  ; "center"
 	push    eax
-	mov     [esp+9Ch-74h], offset fun_to_export
+	lea     eax, [esp+98h-74h]
+	mov     [esp+98h-74h], offset fun_to_export		;CScriptGameObject__Center
 	call    register_go_vector__void
 ENDM
 
 PERFORM_EXPORT_VOID__INT MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     ebx, eax
 	xor     al, al
 	mov     byte ptr [esp+58h-40h], al
@@ -1205,7 +1107,7 @@ lab1:
 	mov     eax, [esp+58h-38h]
 	push    eax
 	push    ecx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	lea     eax, [esp+64h-48h]
 	mov     [esp+64h-48h], offset fun_to_export
 	call    register__set_character_rank
@@ -1226,8 +1128,7 @@ PERFORM_EXPORT_VOID__INT_INT_INT MACRO registering_function:REQ, fun_to_export:R
 	call    registering_function
 ENDM
 
-REGISTER_VOID__INT_INT_INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_VOID__INT_INT_INT MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc near
 
@@ -1281,7 +1182,7 @@ loc_101573A1:
 loc_101573CE:
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name
+	push    static_str$(fun_name_str)
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z
 	lea     ecx, [esp+58h-3Ch]
@@ -1293,8 +1194,6 @@ loc_101573CE:
 	pop     ebx
 	add     esp, 48h
 	retn    0Ch
-
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -1315,8 +1214,7 @@ var_38          = dword ptr -38h
 	call    registering_function
 ENDM
 
-REGISTER_UINT__VECTOR_PVECTOR MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_UINT__VECTOR_PVECTOR MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc
 var_48          = dword ptr -48h
@@ -1372,7 +1270,7 @@ loc_10158651:
 loc_1015867E:
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name ; "accessible_nearest"
+	push    static_str$(fun_name_str) ; "accessible_nearest"
 	mov     ecx, ebp
 	call    ds:luabind__detail__class_base__add_method
 ;?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
@@ -1387,31 +1285,24 @@ loc_1015867E:
 	pop     ebx
 	add     esp, 48h
 	retn    0Ch
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
 PERFORM_EXPORT_U32__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1
-LOCAL fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     byte ptr [esp+88h+64h], bl
 	mov     ecx, [esp+88h+64h]
 	push    ecx
 	mov     byte ptr [esp+8Ch+6Ch], bl
 	mov     edx, [esp+8Ch+6Ch]
 	push    edx
-	push    offset fun_name ; "get_ammo_in_magazine"
+	push    static_str$(fun_name_str) ; "get_ammo_in_magazine"
 	push    eax
 	lea     eax, [esp+98h+74h]
 	mov     [esp+98h+74h], offset fun_to_export
 	call    register__u32__void
 ENDM
 
-REGISTER_VOID__U32_PVECTOR MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_VOID__U32_PVECTOR MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc
 arg_0           = dword ptr  4
@@ -1458,7 +1349,7 @@ arg_0           = dword ptr  4
 	.endif
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name ; "set_sight"
+	push    static_str$(fun_name_str) ; "set_sight"
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+58h-3Ch]
@@ -1470,8 +1361,6 @@ arg_0           = dword ptr  4
 	pop     ebx
 	add     esp, 48h
 	retn    12
-align	4
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -1489,25 +1378,20 @@ PERFORM_EXPORT_VOID__U32_PVECTOR MACRO registering_function:REQ, fun_to_export:R
 ENDM
 
 PERFORM_EXPORT_VOID__FLOAT_FLOAT MACRO fun_to_export:REQ, fun_name_str:REQ
-LOCAL lab1, fun_name
-	jmp     lab1
-fun_name db fun_name_str, 0
-lab1:
 	mov     byte ptr [esp+58h-38h], bl
 	mov     ecx, [esp+58h-38h]
 	push    ecx
 	mov     byte ptr [esp+5Ch-40h], bl
 	mov     edx, [esp+5Ch-40h]
 	push    edx
-	push    offset fun_name
+	push    static_str$(fun_name_str)
 	push	eax
 	lea     eax, [esp+68h-48h]
 	mov     [esp+68h-48h], offset fun_to_export
 	call    register__void__float_float
 ENDM
 
-REGISTER_BOOL__PVECTOR MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_BOOL__PVECTOR MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc
 	sub     esp, 4Ch
@@ -1550,7 +1434,7 @@ register_fun_name proc
 	.endif
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name ; "accessible"
+	push    static_str$(fun_name_str) ; "accessible"
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+54h-3Ch]
@@ -1560,8 +1444,6 @@ register_fun_name proc
 	pop     esi
 	add     esp, 4Ch
 	retn    8
-align	4
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -1579,8 +1461,7 @@ PERFORM_EXPORT_BOOL__PVECTOR MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 
-REGISTER_BOOL__U32 MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_BOOL__U32 MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc
 	sub     esp, 4Ch
@@ -1623,7 +1504,7 @@ register_fun_name proc
 	.endif
 	lea     edx, [esp+54h-3Ch]
 	push    edx
-	push    offset script_function_name ; "accessible"
+	push    static_str$(fun_name_str) ; "accessible"
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+54h-3Ch]
@@ -1633,8 +1514,6 @@ register_fun_name proc
 	pop     esi
 	add     esp, 4Ch
 	retn    8
-align	4
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
@@ -1652,8 +1531,7 @@ PERFORM_EXPORT_BOOL__U32 MACRO registering_function:REQ, fun_to_export:REQ
 	call    registering_function
 ENDM
 
-REGISTER_U32__STR_INT MACRO register_fun_name:REQ, fun_name:REQ
-LOCAL script_function_name
+REGISTER_U32__STR_INT MACRO register_fun_name:REQ, fun_name_str:REQ
 align_proc
 register_fun_name proc
 	sub     esp, 48h
@@ -1699,7 +1577,7 @@ register_fun_name proc
 	.endif
 	lea     edx, [esp+58h-3Ch]
 	push    edx
-	push    offset script_function_name ; "get_task_state"
+	push    static_str$(fun_name_str) ; "get_task_state"
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
 	lea     ecx, [esp+58h-3Ch]
@@ -1711,9 +1589,20 @@ register_fun_name proc
 	pop     ebx
 	add     esp, 48h
 	retn    12
-align	4
-script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
-; --
+PERFORM_EXPORT_VOID__STR_STR MACRO fun_to_export:REQ, fun_name_str:REQ
+	xor     bl, bl
+	mov     byte ptr [esp+14h+8h], bl
+	mov     ecx, [esp+14h+8h]
+	push    ecx
+	mov     byte ptr [esp+18h+0Ch], bl
+	mov     edx, [esp+18h+0Ch]
+	push    edx
+	push    static_str$(fun_name_str) ; "set_trader_sound"
+	push    eax
+	lea     eax, [esp+24h+10h]
+	mov     [esp+24h+10h], offset fun_to_export
+	call    register_void__str_str
+ENDM

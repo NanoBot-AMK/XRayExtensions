@@ -51,6 +51,10 @@ GameObject__eTraderSoundEnd					= dword ptr 32		; void
 GameObject__eInvBoxItemTake					= dword ptr 33		; GO, GO
 GameObject__eDummy							= dword ptr -1
 
+;NEW
+eDesroyObjectInAnomaly						= dword ptr 34		; Колбек на разрушения объекта в аномалии.
+eAllHitObjects								= dword ptr 35		; Колбек на хит, вызывается для всех объектов, требует включения скриптом.
+eEatObject									= dword ptr 36		; Колбек на поедание.
 eHitToAnomalyFromObject						= dword ptr 128		; хит аномалией объекта
 eOnSwitchTorch								= dword ptr 134		; переключение фонарика
 eSetLevelDestVertex							= dword ptr 135		; Вызов метода set_dest_level_vertex_id для сталкеров, передается левел вертекс
@@ -59,7 +63,6 @@ eUseActorVehicle							= dword ptr 138		; Использование машины
 eDetachActorVehicle							= dword ptr 139		; Высадка из машины
 eOnSaveGame									= dword ptr 140		; сохранение игры
 eHitToActorFromMob							= dword ptr 144		; Хит актора от мобов
-eDesroyObjectInAnomaly						= dword ptr 71		; Колбек на разрушения объекта в аномалии.
 ;	};
 ;};
 
@@ -121,9 +124,10 @@ CTeleWhirlwindObject__destroy_object_callback proc
 ;edi - this		CTeleWhirlwindObject*
 	;Вырезанное
 	call	SPHImpact__push_back
+	;----------
 	ASSUME	edi:ptr CTeleWhirlwindObject, edx:ptr CTeleWhirlwind
 	mov		edx, [edi].m_telekinesis
-	smart_cast	_AVCMincer, _AVCGameObject, [edx].m_owner_object
+	smart_cast	CMincer, CGameObject, [edx].m_owner_object
 	.if (eax)
 		mov		ecx, [edi].object
 		call	CGameObject@@lua_game_object
@@ -139,7 +143,7 @@ CTorch__Switch_Callback proc
 ;esi - this		CTorch*
 ;al - light_on	bool
 	movzx	ebx, al
-	smart_cast	_AVCGameObject, _AVCTorch, esi
+	smart_cast	CGameObject, CTorch, esi
 	CALLBACK__INT_INT	eax, eOnSwitchTorch, ebx, 0
 	mov		eax, ebx
 	;Вырезанное
@@ -192,7 +196,7 @@ CActor__use_Vehicle_callback proc
 ;edi - this		CActor*
 ;esi - object	CHolderCustom*
 	push	edi
-	smart_cast	_AVCGameObject, _AVCHolderCustom, esi
+	smart_cast	CGameObject, CHolderCustom, esi
 	.if (eax)
 		mov		edi, eax
 		call	CGameObject__lua_game_object

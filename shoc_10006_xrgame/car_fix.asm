@@ -4,8 +4,7 @@
 ; (с) Рефакторинг НаноБот
 ;======================================================================
 
-align 4
-float_car_exit_distance dd 5.0
+static_float	float_car_exit_distance, 5.0
 
 ;При вылезании из машины, смотрим туда, куда смотрели.
 align_proc
@@ -17,12 +16,12 @@ CActor__init_camera_holder proc
 	ASSUME	edi:ptr CActor, edx:ptr CCameraBase, ecx:ptr CCameraBase
 	;CCameraBase* actor_cam = cam_Active();
 	mov		eax, [edi].cam_active
-	mov     edx, [edi+eax*4].cameras	; = actor_cam
-	;actor_cam.yaw 		= holder_cam.yaw;
-	;actor_cam.pitch 	= holder_cam.pitch;
+	mov		edx, [edi+eax*4].cameras	; = actor_cam
+	;actor_cam.yaw		= holder_cam.yaw;
+	;actor_cam.pitch	= holder_cam.pitch;
 	mrm		[edx].yaw,	[ecx].yaw
 	mrm		[edx].pitch, [ecx].pitch
-	mov     [edi].m_holder, NULL	;вырезанное
+	mov		[edi].m_holder, NULL	;вырезанное
 	ASSUME	edi:nothing, edx:nothing, ecx:nothing
 	jmp		return_CActor__init_camera_holder
 CActor__init_camera_holder endp
@@ -109,8 +108,8 @@ local shell_mat:Fmatrix4
 	call	edx
 	;CBoneInstance& instance = K->LL_GetTransform(m_fire_bone);
 	movzx	edx, [esi].m_fire_bone
-	lea     ecx, [edx+edx*4]
-	shl     ecx, 5	; =m_fire_bone*160	// sizeof CBoneInstance = 160
+	lea		ecx, [edx+edx*4]
+	shl		ecx, 5	; =m_fire_bone*160	// sizeof CBoneInstance = 160
 	add		ecx, [eax+bone_instances]	; CBoneInstance
 	ASSUME	ecx:ptr CBoneInstance
 	Fmatrix4@mul_43			shell_mat, [edi].XFORM_, [ecx].mTransform

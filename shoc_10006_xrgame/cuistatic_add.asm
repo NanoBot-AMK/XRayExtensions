@@ -1,65 +1,46 @@
+
+align_proc
 cuistatic_xml_add proc
 arg_0= dword ptr  8
 arg_8= dword ptr  10h
-
-
-
 	mov     ecx, [ebp+arg_0]
 	push    0
-	push    offset aAdjustHeightToText ; "AdjustHeightToText"
+	push    static_str$("adjust_height_to_text")
 	push    esi
 	push    edi
 	call    ebx ; CXml::ReadAttribInt(char const *,int,char const *,int) ; CXml::ReadAttribInt(char const *,int,char const *,int)
-	test    eax, eax
-	jz      short skip_height
-	
-	push	edi
-	mov 	edi, [ebp+arg_8]
-	call	CUIStatic__AdjustHeightToText
-	pop		edi
-	
-	skip_height:
-	
+	.if (eax)
+		push	edi
+		mov 	edi, [ebp+arg_8]
+		call	CUIStatic__AdjustHeightToText
+		pop		edi
+	.endif
 	mov     ecx, [ebp+arg_0]
 	push    0
-	push    offset aAdjustWeigthToText ; "AdjustWeigthToText"
+	push    static_str$("adjust_width_to_text")
 	push    esi
 	push    edi
 	call    ebx ; CXml::ReadAttribInt(char const *,int,char const *,int) ; CXml::ReadAttribInt(char const *,int,char const *,int)
-	test    eax, eax
-	jz      short skip_weigth
-	
-	push	esi
-	mov 	esi, [ebp+arg_8]
-	call	CUIStatic__AdjustWeigthToText
-	pop		esi
-	
-	skip_weigth:
-	
+	.if (eax)
+		push	esi
+		mov 	esi, [ebp+arg_8]
+		call	CUIStatic__AdjustWeigthToText
+		pop		esi
+	.endif
 	;Делаем то что вырезали
 	mov     ecx, [ebp+arg_0]
 	push    0
-	
-	
 	jmp back_from_cuistatic_xml_add
 cuistatic_xml_add endp
-
-align 4
-aAdjustHeightToText 		db "adjust_height_to_text", 0
-align 4
-aAdjustWeigthToText 		db "adjust_width_to_text", 0
 
 ;------------------------------------------------------------
 ; Исправление формулы рассчёта статистики убийств в КПК
 ;------------------------------------------------------------
-align 4
-g_select_total_statistic	dd 0	; тип подсчёта: 0 - подсчёт по штукам, 1 - подсчёт по очкам.
+static_int		g_select_total_statistic, 0	; тип подсчёта: 0 - подсчёт по штукам, 1 - подсчёт по очкам.
 
 align_proc
 CActorStatisticMgr__GetSectionPointsSelect proc
-	push	[g_select_total_statistic]
-	call	CActorStatisticMgr__GetSectionPoints
-	add		esp, 4
+	invoke	CActorStatisticMgr__GetSectionPoints, g_select_total_statistic
 	retn
 CActorStatisticMgr__GetSectionPointsSelect endp
 ;------------------------------------------------------------

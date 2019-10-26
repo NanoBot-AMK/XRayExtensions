@@ -235,3 +235,26 @@ GE_FREEZE_OBJECT					= dword ptr 46
 GE_LAUNCH_ROCKET					= dword ptr 47
 GE_FORCEDWORD						= dword ptr -1
 ;};
+
+;enum EMoveCommand
+mcFwd								= dword ptr (1 shl 0)	; 1			вперёд
+mcBack								= dword ptr (1 shl 1)	; 2			назад
+mcLStrafe							= dword ptr (1 shl 2)	; 4			влево
+mcRStrafe							= dword ptr (1 shl 3)	; 8			вправо
+mcCrouch							= dword ptr (1 shl 4)	; 16		в приседе
+mcAccel								= dword ptr (1 shl 5)	; 32		идёт
+mcTurn								= dword ptr (1 shl 6)	; 64		вращаемся
+mcJump								= dword ptr (1 shl 7)	; 128		прыжок
+mcFall								= dword ptr (1 shl 8)	; 256		в прыжке
+mcLanding							= dword ptr (1 shl 9)	; 512		приземлились
+mcLanding2							= dword ptr (1 shl 10)	; 1024		приземлились
+mcClimb								= dword ptr (1 shl 11)	; 2048		на леснице
+mcSprint							= dword ptr (1 shl 12)	; 4096		спринт
+mcLLookout							= dword ptr (1 shl 13)	; 8192		наклон влево
+mcRLookout							= dword ptr (1 shl 14)	; 16384		наклон вправо
+mcAnyMove							= dword ptr (mcFwd or mcBack or mcLStrafe or mcRStrafe)
+mcAnyAction 						= dword ptr (mcAnyMove or mcJump or mcFall or mcLanding or mcLanding2) ;//mcTurn or 
+mcAnyState							= dword ptr (mcCrouch or mcAccel or mcClimb or mcSprint)
+mcLookout							= dword ptr (mcLLookout or mcRLookout)
+;=================================================};
+

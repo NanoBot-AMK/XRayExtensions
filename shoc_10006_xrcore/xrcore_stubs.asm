@@ -5,8 +5,7 @@
 org 10018640h - shift
 Msg:
 
-org 1001CBE6h - shift
+org 1001CBE6h - shift ; 5 bytes
 	jmp		texture_load_fix
-	
-org 1001CBEBh - shift
-back_from_texture_load_fix:
+return_texture_load_fix:
+
