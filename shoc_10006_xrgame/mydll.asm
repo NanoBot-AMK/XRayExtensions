@@ -1,7 +1,7 @@
 .686
 .XMM
 
-.model flat,  C
+.model flat,  stdcall
 
 include addr.inc
 _CODE segment para public 'CODE' use32
@@ -11,79 +11,25 @@ _CODE segment para public 'CODE' use32
 LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD 
     ret
 LibMain ENDP
+
+;;___INSTRUCTION__SSE3	equ <lalala>;;; 
+
+calc_bullet							PROTO :DWORD, :DWORD, :DWORD, :DWORD, :DWORD
+calc_future_position				PROTO :DWORD, :DWORD, :DWORD, :DWORD, :DWORD
+;
+CBulletManager@@CreateExplosive 	PROTO :DWORD, :DWORD
+CBulletManager@@Explode				PROTO :DWORD, :DWORD, :DWORD, :DWORD
+CBulletManager@@DeleteExplosive 	PROTO :DWORD
+CBulletExplosive@@ExplodeParams		PROTO :DWORD, :DWORD
+
+include macroses.asm
 ; вставки из целевой либы
 include xrgame_stubs.asm
-
-ALIGN_8 MACRO
-	;ALIGN 8
-ENDM
-
-PRINT MACRO msg_txt:REQ
-LOCAL lab1_
-LOCAL a_msg
-	jmp     lab1_
-a_msg db msg_txt, 0
-lab1_:
-	pusha
-	push    offset a_msg
-	call    Msg
-	add     esp, 04h
-	popa
-ENDM
-
-PRINT_UINT MACRO fmt_txt:REQ, val:REQ
-LOCAL lab1_
-LOCAL a_msg
-	jmp     lab1_
-a_msg db fmt_txt, 0
-lab1_:
-	pusha
-	push    val
-	push    offset a_msg
-	call    Msg
-	add     esp, 08h
-	popa
-ENDM
-
-PRINT_FLOAT MACRO fmt_txt:REQ, val:REQ
-LOCAL lab1_
-LOCAL a_msg
-LOCAL value1
-	jmp     lab1_
-a_msg db fmt_txt, 0
-value1 dd ?
-lab1_:
-	pusha
-	mov     [value1], val
-	sub     esp, 8
-	fld     [value1]
-	fstp    QWORD ptr [esp]
-	push    offset a_msg
-	call    Msg
-	add     esp, 0Ch
-	
-	popa
-ENDM
-
-FLUSH_LOG MACRO
-	pusha
-	call    [FlushLog]
-	popa
-ENDM
-
-RT_DYNAMIC_CAST MACRO source, dest, reg
-	push    0
-	push    offset dest
-	push    offset source
-	push    0
-	push    reg
-	call    __RTDynamicCast
-	add     esp, 14h
-ENDM
 
 ; позиция в том месте, где в целевой DLL начинается наша секция
 org sec1_sec2_dist
 
+include structures.asm
 include types.asm
 include defines.asm
 include actor_input_fix.asm
@@ -115,7 +61,6 @@ include misc.asm
 include inventory_item_fix.asm
 include projector_fix.asm
 include ammo_on_belt_fix.asm
-include weapon_stat_mgun_fix.asm
 include stalker_fix.asm
 include hanging_lamp_fix.asm
 include CEffectorZoomInertion_fix.asm
@@ -159,6 +104,8 @@ include relations_fix.asm
 include zoom_factor_fix.asm
 include art_activation_fix.asm
 include self_anim_stalker.asm
+include level_explosive.asm
+include turrel.asm
 
 _CODE ENDS
 

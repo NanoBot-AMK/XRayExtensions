@@ -23,7 +23,7 @@ pHDS = dword ptr  8
 	push    eax             ; who_go
 	;PRINT "who is done"
 	
-	lea     eax, [edx].dir_
+	lea     eax, [edx].dir
 	;PRINT_vector "dir", eax
 	mov     ecx, [eax + 8h]
 	push    ecx ; push dir_x

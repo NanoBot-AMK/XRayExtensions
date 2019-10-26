@@ -112,7 +112,7 @@ REGISTER_INT__STRING_INT register_get_hud_animation_length, "get_hud_animation_l
 
 REGISTER_VOID__INT_INT          register_clear_personal_record,      "clear_personal_record"
 
-ALIGN_8
+align_proc
 game_object_fix proc
 ; делаем то, что вырезали 
 	call    enable_vision_register
@@ -476,7 +476,20 @@ game_object_fix proc
 	
 	;PERFORM_EXPORT_VOID__INT		CScriptGameObject__ClearRelations, "clear_relations"
 	PERFORM_EXPORT_VOID__INT_INT	register_clear_personal_record, CScriptGameObject__ClearPersonalRecord
+	; ---===Nanobot===---
+	;включение колбеков
+	PERFORM_EXPORT_VOID__INT			CScriptGameObject__SetFlagCallbackKey,		"set_flag_callback_key"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__GetFlagCallbackKey,		"get_flag_callback_key"
 	
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsExploding, 			"is_exploding"	; взрывной объект взорван? 
+	;тип камеры
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__GetTypeCamera,			"get_type_camera"
+	;включение/выключение перекрестие прицела в машине с оружием
+	PERFORM_EXPORT_VOID__BOOL			CScriptGameObject__GetCarShowCrosshair,		"car_show_crosshair"
+	;разворот башни CCar под заданными углами.
+	PERFORM_EXPORT_VOID__FLOAT_FLOAT	CScriptGameObject__SetCarWpnCurRotation,	"car_weapon_rotation"
+	PERFORM_EXPORT_FLOAT__VOID			CScriptGameObject__GetCarWpnCurDirH,		"car_weapon_dir_h"
+	PERFORM_EXPORT_FLOAT__VOID			CScriptGameObject__GetCarWpnCurDirP,		"car_weapon_dir_p"
 	; идём обратно
 	jmp back_from_game_object_fix
 game_object_fix endp
@@ -6550,3 +6563,147 @@ CScriptGameObject__GetObjectArg1 proc
 exit:
 	retn	4
 CScriptGameObject__GetObjectArg1 endp
+;---------------------------------------------------------------------------
+;rev230.11
+;---===Nanobot===---
+align_proc
+CScriptGameObject__IsExploding proc
+	mov		eax, [ecx+4]	; m_object
+	smart_cast	_AVCExplosive, _AVCGameObject, eax
+	.if (eax)
+		ASSUME	eax:ptr CExplosive
+		test	[eax].m_explosion_flags, flExploding
+		setnz	al
+		ASSUME	eax:nothing
+	.endif
+	retn
+CScriptGameObject__IsExploding endp
+
+align_proc
+CScriptGameObject__SetFlagCallbackKey proc flag_key:byte
+	mov		edx, [ecx+4]
+	ASSUME	edx:ptr CGameObject
+	mov		al, flag_key
+	mov		[edx].m_flCallbackKey, al
+	ret		4
+CScriptGameObject__SetFlagCallbackKey endp
+align_proc
+CScriptGameObject__GetFlagCallbackKey proc
+	mov		edx, [ecx+4]
+	movzx	eax, [edx].m_flCallbackKey
+	ASSUME	edx:nothing
+	retn
+CScriptGameObject__GetFlagCallbackKey endp
+
+;тип камеры
+align_proc
+CScriptGameObject__GetTypeCamera proc
+	push	esi
+	;return (active_camera->tag);
+	mov		esi, [ecx+4]
+	smart_cast	_AVCActor, _AVCGameObject, esi
+	ASSUME	edx:ptr CCameraBase, eax:ptr CActor
+	.if (eax)
+		mov		edx, [eax].cam_active
+		mov		eax, [edx].tag
+		pop		esi
+		retn
+	.endif
+	smart_cast	_AVCCar, _AVCGameObject, esi
+	ASSUME	eax:ptr CCar
+	.if (eax)
+		mov		edx, [eax].active_camera
+		mov		eax, [edx].tag
+		pop		esi
+		retn
+	.endif
+	ASSUME	edx:nothing, eax:nothing
+	mov		eax, -1
+	pop		esi
+	retn
+CScriptGameObject__GetTypeCamera endp
+
+align_proc
+CScriptGameObject__GetCarShowCrosshair proc	 show:byte
+	mov		eax, [ecx+4]
+	smart_cast	_AVCCar, _AVCGameObject, eax
+	.if (eax)
+		ASSUME	ecx:ptr CCarWeapon, eax:ptr CCar
+		; если ли оружия в машине?
+		mov		ecx, [eax].m_car_weapon	; CCarWeapon* = CShootingObject*
+		.if (ecx)
+			mov		al, show
+			mov		[ecx].m_bShowCrosshair, al
+		.endif
+		ASSUME	ecx:nothing, eax:nothing
+	.endif
+	ret		4
+CScriptGameObject__GetCarShowCrosshair endp
+
+align_proc
+CScriptGameObject__SetCarWpnCurRotation proc cur_yaw:dword, cur_pitch:dword
+	push	ebx
+	mov		eax, [ecx+4]
+	smart_cast	_AVCCar, _AVCGameObject, eax
+	.if (eax)
+		mov		edx, eax
+		ASSUME	ecx:ptr CCarWeapon, edx:ptr CCar, ebx:ptr CCameraBase
+		; если ли оружия в машине?
+		mov		ecx, [edx].m_car_weapon	; CCarWeapon* = CShootingObject*
+		.if (ecx)
+			mov		ebx, [edx].active_camera
+			;азимут от севера (рыскание).
+			mov		eax, cur_yaw
+			xor		eax, 80000000h		; = -cur_yaw;
+			mov		[ecx].m_cur_y_rot, eax
+			mov		[ecx].m_tgt_y_rot, eax
+			mov		[ebx].yaw, eax
+			;склонение от горизонтального вектора (тангаж).
+			mov		eax, cur_pitch
+			mov		[ecx].m_cur_x_rot, eax
+			mov		[ecx].m_tgt_x_rot, eax
+			mov		[ebx].pitch, eax
+			;m_fire_dir.setHP(cur_yaw, cur_pitch);
+			Fvector_setHP	[ecx].m_fire_dir, cur_yaw, cur_pitch
+			;lea		eax, [ecx].m_fire_dir
+			;PRINT_VECTOR "m_fire_dir ", eax
+		.endif
+		ASSUME	ecx:nothing, edx:nothing, ebx:nothing
+	.endif
+	pop		ebx
+	ret		8
+CScriptGameObject__SetCarWpnCurRotation endp
+
+align_proc
+CScriptGameObject__GetCarWpnCurDirH proc
+	mov		eax, [ecx+4]
+	smart_cast	_AVCCar, _AVCGameObject, eax
+	.if (eax)
+		ASSUME	ecx:ptr CCarWeapon, eax:ptr CCar
+		; если ли оружия в машине?
+		mov		ecx, [eax].m_car_weapon	; CCarWeapon* = CShootingObject*
+		.if (ecx)
+			fld		[ecx].m_cur_y_rot
+		.endif
+		ASSUME	ecx:nothing, eax:nothing
+	.endif
+	retn
+CScriptGameObject__GetCarWpnCurDirH endp
+
+align_proc
+CScriptGameObject__GetCarWpnCurDirP proc
+	mov		eax, [ecx+4]
+	smart_cast	_AVCCar, _AVCGameObject, eax
+	.if (eax)
+		ASSUME	ecx:ptr CCarWeapon, eax:ptr CCar
+		; если ли оружия в машине?
+		mov		ecx, [eax].m_car_weapon	; CCarWeapon* = CShootingObject*
+		.if (ecx)
+			fld		[ecx].m_cur_x_rot
+		.endif
+		ASSUME	ecx:nothing, eax:nothing
+	.endif
+	retn
+CScriptGameObject__GetCarWpnCurDirP endp
+
+

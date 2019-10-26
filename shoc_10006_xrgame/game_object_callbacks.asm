@@ -1,3 +1,63 @@
+
+
+;namespace GameObject {
+;	enum ECallbackType {
+GameObject__eTradeStart 					= dword ptr 0		; void
+GameObject__eTradeStop 						= dword ptr 1		; void
+GameObject__eTradeSellBuyItem 				= dword ptr 2		; GO, bool, u32
+GameObject__eTradePerformTradeOperation 	= dword ptr 3		; u32, u32
+
+GameObject__eZoneEnter 						= dword ptr 4		; GO, GO
+GameObject__eZoneExit 						= dword ptr 5		; GO, GO
+GameObject__eExitLevelBorder 				= dword ptr 6		; GO
+GameObject__eEnterLevelBorder 				= dword ptr 7		; GO
+GameObject__eDeath 							= dword ptr 8		; GO, GO
+
+GameObject__ePatrolPathInPoint 				= dword ptr 9		; GO, u32, u32
+
+GameObject__eInventoryPda 					= dword ptr 10		; 
+GameObject__eInventoryInfo 					= dword ptr 11		; GO, str
+GameObject__eArticleInfo 					= dword ptr 12		; GO, str, str, int
+GameObject__eTaskStateChange 				= dword ptr 13		; SGameTask, SGameTaskObjective, ETaskState
+GameObject__eMapLocationAdded 				= dword ptr 14		; str, u16
+
+GameObject__eUseObject 						= dword ptr 15		; GO	и GO, GO
+
+GameObject__eHit 							= dword ptr 16		; GO, float, vector, GO, s16 | GO, float, vector, GO, u16
+
+GameObject__eSound 							= dword ptr 17		; GO, GO, int, vector, float
+
+GameObject__eActionTypeMovement 			= dword ptr 18		; GO, u32, -1
+GameObject__eActionTypeWatch 				= dword ptr 19		; GO, u32
+GameObject__eActionTypeAnimation 			= dword ptr 20		; GO, u32
+GameObject__eActionTypeSound 				= dword ptr 21		; GO, u32
+GameObject__eActionTypeParticle 			= dword ptr 22		; GO, u32
+GameObject__eActionTypeObject 				= dword ptr 23		; GO, u32
+
+GameObject__eActorSleep 					= dword ptr 24		; 
+
+GameObject__eHelicopterOnPoint 				= dword ptr 25		; float, vector, int
+GameObject__eHelicopterOnHit 				= dword ptr 26		; float, float, int, u32
+
+GameObject__eOnItemTake 					= dword ptr 27		; GO
+GameObject__eOnItemDrop 					= dword ptr 28		; GO
+
+GameObject__eScriptAnimation 				= dword ptr 29		; void
+
+GameObject__eTraderGlobalAnimationRequest 	= dword ptr 30		; void
+GameObject__eTraderHeadAnimationRequest 	= dword ptr 31		; void
+GameObject__eTraderSoundEnd 				= dword ptr 32		; void
+
+GameObject__eInvBoxItemTake 				= dword ptr 33		; GO, GO
+GameObject__eDummy							= dword ptr -1
+
+eAttachActorVehicle							= dword ptr 137		; Посадка в машину
+eUseActorVehicle							= dword ptr 138		; Использование машины
+eDetachActorVehicle							= dword ptr 139		; Высадка из машины
+;	};
+;};
+
+;бляцкий быдлокод!!!
 CCustomZone__hit_callback:
 	push	eax
 	push	edi

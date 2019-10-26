@@ -1,309 +1,311 @@
+;============================================================================================
+; Колбеки на нажатие клавишь.
+; Вызывается в биндер актора.
+; Так же эти колбеки вызываются в биндере активной вещи, и холдера.
+; Это надо для скриптового оружия и для стрельбы из техники с оружием(БТР, турели, вертолёт?).
+;
+; Рефакторинг (с) НаноБот		3.08.2017	20.11.2017
+;============================================================================================
+
+DIK_LMENU			equ 56
+DIK_RMENU			equ 184
+DIK_F4				equ 62
+DIK_1				equ 2
+DIK_2				equ 3
+DIK_3				equ 4
+DIK_4				equ 5
+DIK_5				equ 6
+DIK_6				equ 7
+DIK_7				equ 8
+DIK_8				equ 9
+DIK_9				equ 10
+DIK_0				equ 11
+
+eOnKeyPress							= dword ptr 123
+eOnKeyRelease				 		= dword ptr 124
+eOnKeyHold					 		= dword ptr 125
+eOnMouseWheel				 		= dword ptr 126
+eOnMouseMove					 	= dword ptr 127
+
+eCallbackKeyPress					equ 00000001b
+eCallbackKeyRelease				 	equ 00000010b
+eCallbackKeyHold					equ 00000100b
+eCallbackMouseWheel				 	equ 00001000b
+eCallbackMouseMove					equ 00010000b
+eCallbackShoot						equ 00100000b
+;						equ 01000000b
+;						equ 10000000b
+
 ; ----------------------- колбек на нажатие ----------------------------
-ALIGN_8
-call_key_press_callback proc
-	cmp     g_bDisableAllInput, 0
-	jnz     input_disabled_exit
+align_proc
+CLevel__IR_OnKeyboardPress_callback proc key:dword
+; ebx - CLevel
+	push	ebx
+	push	edi
+	push	esi
+	mov		ebx, ecx
+	mov		edi, key
+	mov		esi, g_Actor
+	ASSUME	esi:ptr CActor
+	.if (esi && !g_bDisableAllInput && edi!=DIK_LMENU && edi!=DIK_RMENU && edi!=DIK_F4)	; игнорируем клавиши alt и F4
+		.if (extensions_flags & eCallbackKeyPress)
+			; вызываем колбек для актора
+			CALLBACK__INT_INT  esi, eOnKeyPress, edi, 0
+		.endif
+		; блокировка цифр на основной клавиатуре
+		.if (g_bDisableNumBaseInput && edi>=DIK_1 && edi<=DIK_0)
+			; return;
+			pop		esi
+			pop		edi
+			pop		ebx
+			ret		4
+		.endif
+		; колбеки в биндер активных вещей: оружия которое держим в руках, холдер в котором сидим.
+		; определим активное оружие
+		; stalker->inventory().ActiveItem()
+		mov		ecx, esi
+		mov		eax, [ecx]
+		mov		edx, [eax+70h]
+		call	edx			; stalker->inventory()
+		ASSUME	edx:ptr CGameObject
+		.if (eax)
+			mov		ecx, [eax+24h]
+			mov		eax, [ecx+48h]
+			.if (eax!=-1)	; slot
+				shl		eax, 4
+				add		eax, [ecx+38h]
+				mov		eax, [eax+4]
+				mov		edx, [eax+0D4h]		; CGameObject*
+				.if ([edx].m_flCallbackKey & eCallbackKeyPress)
+					CALLBACK__INT_INT  edx, eOnKeyPress, edi, 0
+				.endif
+			.endif
+		.endif
+		; холдер
+		mov		eax, [esi].m_holder
+		.if	(eax)
+			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			mov		edx, eax
+			.if ([edx].m_flCallbackKey & eCallbackKeyPress)
+				CALLBACK__INT_INT  edx, eOnKeyPress, edi, 0
+			.endif
+		.endif
+		ASSUME	edx:nothing
+	.endif
+	ASSUME	esi:nothing
+	; CLevel::IR_OnKeyboardPress(key);
+	mov		ecx, ebx
+	pop		esi
+	pop		edi
+	pop		ebx
+	leave
+	jmp		CLevel__IR_OnKeyboardPress
+CLevel__IR_OnKeyboardPress_callback endp
 
-	push ebp
-	mov ebp, esp
-	;and     esp, 0FFFFFFF8h
-; добавляем своё
-	push eax
-	push ebx
-	push ecx
-	push edx
-	push edi
-	push esi
-	; проверяем глобальную блокировку колбеков
-	mov eax, [extensions_flags]
-	and eax, 1h
-	jz lab_exit1
-	; игнорируем клавиши alt и f4
-	;mov eax, [ebp+8]
-	;cmp eax, 56 ; Левый Alt
-	;jz lab_exit1
-	;cmp eax, 184; Правый Alt
-	;jz lab_exit1
-	;cmp eax, 62 ; F4
-	;jz lab_exit1
-	
-	
-	; вызываем колбек для актора
-	xor     eax, eax
-	push    eax ; заглушка
-	push    [ebp+8] ; код клавиши
-	; получаем актора
-	;call Actor ; eax = client actor
-	; получаем объект колбека
-	push    123 ; type = ???
-	mov     ecx, g_Actor
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	; вызываем
-	call    script_callback_int_int
-	
-lab_exit1:
-	;-------------
-	pop esi
-	pop edi
-	pop edx
-	pop ecx
-	pop ebx
-	pop eax
-	
-	;mov     esp, ebp
-	pop ebp
-input_disabled_exit:
-; делаем то, что вырезали
-	sub     esp, 414h
-; идём обратно
-	jmp back_from_key_press_callback
-call_key_press_callback endp
-
-call_key_press_callback_msg db "call_key_press_callback_problem", 0
 ; ----------------- колбек на отпускание --------------------
-ALIGN_8
-call_key_release_callback proc
-	cmp     g_bDisableAllInput, 0
-	jnz     input_disabled_exit
+align_proc
+CLevel__IR_OnKeyboardRelease_callback proc key:dword
+; ebx - CLevel
+	push	ebx
+	push	edi
+	push	esi
+	mov		ebx, ecx
+	mov		edi, key
+	mov		esi, g_Actor
+	ASSUME	esi:ptr CActor
+	.if (esi && !g_bDisableAllInput && edi!=DIK_LMENU && edi!=DIK_RMENU && edi!=DIK_F4)	; игнорируем клавиши alt и F4
+		.if (extensions_flags & eCallbackKeyRelease)
+			; вызываем колбек для актора
+			CALLBACK__INT_INT  esi, eOnKeyRelease, edi, 0
+		.endif
+		; блокировка цифр на основной клавиатуре
+		.if (g_bDisableNumBaseInput && edi>=DIK_1 && edi<=DIK_0)
+			; return;
+			pop		esi
+			pop		edi
+			pop		ebx
+			ret		4
+		.endif
+		; колбеки в биндер активных вещей: оружия которое держим в руках, холдер в котором сидим.
+		; определим активное оружие
+		; stalker->inventory().ActiveItem()
+		mov		ecx, esi
+		mov		eax, [ecx]
+		mov		edx, [eax+70h]
+		call	edx			; stalker->inventory()
+		ASSUME	edx:ptr CGameObject
+		.if (eax)
+			mov		ecx, [eax+24h]
+			mov		eax, [ecx+48h]
+			.if (eax!=-1)
+				shl		eax, 4
+				add		eax, [ecx+38h]
+				mov		eax, [eax+4]
+				mov		eax, [eax+0D4h]		; CGameObject*
+				.if ([edx].m_flCallbackKey & eCallbackKeyRelease)
+					CALLBACK__INT_INT  edx, eOnKeyRelease, edi, 0
+				.endif
+			.endif
+		.endif
+		; холдер
+		mov		eax, [esi].m_holder
+		.if	(eax)
+			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			mov		edx, eax
+			.if ([edx].m_flCallbackKey & eCallbackKeyRelease)
+				CALLBACK__INT_INT  edx, eOnKeyRelease, edi, 0
+			.endif
+		.endif
+		ASSUME	edx:nothing
+	.endif
+	ASSUME	esi:nothing
+	; CLevel::IR_OnKeyboardRelease(key);
+	mov		ecx, ebx
+	pop		esi
+	pop		edi
+	pop		ebx
+	leave
+	jmp		CLevel__IR_OnKeyboardRelease
+CLevel__IR_OnKeyboardRelease_callback endp
 
-	push ebp
-	mov ebp, esp
-	;and     esp, 0FFFFFFF8h
-; добавляем своё
-	push eax
-	push ebx
-	push ecx
-	push edx
-	push edi
-	push esi
-	; проверяем глобальную блокировку колбеков
-	mov eax, [extensions_flags]
-	and eax, 2h
-	jz lab_exit2
-	; игнорируем клавиши alt и f4
-	mov eax, [ebp+8]
-	cmp eax, 56 ; Левый Alt
-	jz lab_exit2
-	cmp eax, 184; Правый Alt
-	jz lab_exit2
-	cmp eax, 62 ; F4
-	jz lab_exit2
-	
-	; вызываем колбек для актора
-	xor     eax, eax
-	push    eax ; заглушка
-	push    [ebp+8] ; код клавиши
-	; получаем актора
-	;call Actor ; eax = client actor
-	; получаем объект колбека
-	push    124 ; type = ???
-	mov     ecx, g_Actor
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	; вызываем
-	call    script_callback_int_int
-lab_exit2:
-	;-------------
-	pop esi
-	pop edi
-	pop edx
-	pop ecx
-	pop ebx
-	pop eax
-	
-	;mov     esp, ebp
-	pop ebp
-input_disabled_exit:
-; делаем то, что вырезали
-	push    ecx
-	push    ebx
-	push    ebp
-	mov     ebp, ecx
-; идём обратно
-	jmp back_from_key_release_callback
-call_key_release_callback endp
-
-call_key_release_callback_msg db "call_key_release_callback_problem", 0
 ; ----------------- колбек на удержание --------------------
-ALIGN_8
-call_key_hold_callback proc
-	cmp     g_bDisableAllInput, 0
-	jnz     input_disabled_exit
+align_proc
+CLevel__IR_OnKeyboardHold_callback proc key:dword
+; ebx - CLevel
+	push	ebx
+	push	edi
+	push	esi
+	mov		ebx, ecx
+	mov		edi, key
+	mov		esi, g_Actor
+	ASSUME	esi:ptr CActor
+	.if (esi && !g_bDisableAllInput && edi!=DIK_LMENU && edi!=DIK_RMENU && edi!=DIK_F4)	; игнорируем клавиши alt и F4
+		.if (extensions_flags & eCallbackKeyHold)
+			; вызываем колбек для актора
+			CALLBACK__INT_INT  esi, eOnKeyHold, edi, 0
+		.endif
+		; блокировка цифр на основной клавиатуре
+		.if (g_bDisableNumBaseInput && edi>=DIK_1 && edi<=DIK_0)
+			; return;
+			pop		esi
+			pop		edi
+			pop		ebx
+			ret		4
+		.endif
+		; колбеки в биндер активных вещей: оружия которое держим в руках, холдер в котором сидим.
+		; определим активное оружие
+		; stalker->inventory().ActiveItem()
+		mov		ecx, esi
+		mov		eax, [ecx]
+		mov		edx, [eax+70h]
+		call	edx			; stalker->inventory()
+		ASSUME	edx:ptr CGameObject
+		.if (eax)
+			mov		ecx, [eax+24h]
+			mov		eax, [ecx+48h]
+			.if (eax!=-1)
+				shl		eax, 4
+				add		eax, [ecx+38h]
+				mov		eax, [eax+4]
+				mov		edx, [eax+0D4h]		; CGameObject*
+				.if ([edx].m_flCallbackKey & eCallbackKeyHold)
+					CALLBACK__INT_INT  edx, eOnKeyHold, edi, 0
+				.endif
+			.endif
+		.endif
+		; холдер
+		mov		eax, [esi].m_holder
+		.if	(eax)
+			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			mov		edx, eax
+			.if ([edx].m_flCallbackKey & eCallbackKeyHold)
+				CALLBACK__INT_INT  edx, eOnKeyHold, edi, 0
+			.endif
+		.endif
+		ASSUME	edx:nothing
+	.endif
+	ASSUME	esi:nothing
+	; CLevel::IR_OnKeyboardHold(key);
+	mov		ecx, ebx
+	pop		esi
+	pop		edi
+	pop		ebx
+	leave
+	jmp		CLevel__IR_OnKeyboardHold
+CLevel__IR_OnKeyboardHold_callback endp
 
-	push ebp
-	mov ebp, esp
-	;and     esp, 0FFFFFFF8h
-; добавляем своё
-	push eax
-	push ebx
-	push ecx
-	push edx
-	push edi
-	push esi
-	; проверяем глобальную блокировку колбеков
-	mov eax, [extensions_flags]
-	and eax, 4h
-	jz lab_exit3
-	; игнорируем клавиши alt и f4
-	mov eax, [ebp+0Ch]
-	cmp eax, 56 ; Левый Alt
-	jz lab_exit3
-	cmp eax, 184; Правый Alt
-	jz lab_exit3
-	cmp eax, 62 ; F4
-	jz lab_exit3
-	
-	; вызываем колбек для актора
-	xor     eax, eax
-	push    eax ; заглушка
-	push    [ebp+0Ch] ; код клавиши
-	; получаем актора
-	;call Actor ; eax = client actor
-	; получаем объект колбека
-	push    125 ; type = ???
-	mov     ecx, g_Actor
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	; вызываем
-	call    script_callback_int_int
-lab_exit3:
-	;-------------
-	pop esi
-	pop edi
-	pop edx
-	pop ecx
-	pop ebx
-	pop eax
-	
-	;mov     esp, ebp
-	pop ebp
-input_disabled_exit:
-; делаем то, что вырезали
-	cmp     dword ptr [edi+138h], 0
-; идём обратно
-	jmp back_from_key_hold_callback
-call_key_hold_callback endp
-
-call_key_hold_callback_msg db "call_key_hold_callback_problem", 0
 ; ----------------- колбек на кручение колеса --------------------
-ALIGN_8
-call_mouse_wheel_callback proc
-	cmp     g_bDisableAllInput, 0
-	jnz     input_disabled_exit
-
-	push ebp
-	mov ebp, esp
-	;and     esp, 0FFFFFFF8h
-; добавляем своё
-	push eax
-	push ebx
-	push ecx
-	push edx
-	push edi
-	push esi
-	; проверяем глобальную блокировку колбеков
-	mov eax, [extensions_flags]
-	and eax, 8h
-	jz exit
-	; вызываем колбек для актора
-	xor     eax, eax
-	push    eax ; заглушка
-	push    [ebp+0Ch] ; код клавиши
-	pop eax
-	add eax, 100000
-	push eax
-	; получаем актора
-	;call Actor ; eax = client actor
-	; получаем объект колбека
-	push    126 ; type = ???
-	mov     ecx, g_Actor
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	; вызываем
-	call    script_callback_int_int
-exit:
-	;-------------
-	pop esi
-	pop edi
-	pop edx
-	pop ecx
-	pop ebx
-	pop eax
+align_proc
+CLevel__IR_OnMouseWheel_callback proc direction:dword
+; ebx - CLevel
+	push	ebx
+	push	esi
+	mov		ebx, ecx
+	mov		esi, g_Actor
+	ASSUME	esi:ptr CActor
+	.if (esi && !g_bDisableAllInput)
+		.if (extensions_flags & eCallbackMouseWheel)
+			mov		edx, direction
+			add		edx, 100000
+			CALLBACK__INT_INT  esi, eOnMouseWheel, edx, 0
+		.endif
+		; колбеки в биндер активных вещей: оружия которое держим в руках, холдер в котором сидим.
+		; определим активное оружие
+		; stalker->inventory().ActiveItem()
+		mov		ecx, esi
+		mov		eax, [ecx]
+		mov		edx, [eax+70h]
+		call	edx			; stalker->inventory()
+		ASSUME	edx:ptr CGameObject
+		.if (eax)
+			mov		ecx, [eax+24h]
+			mov		eax, [ecx+48h]
+			.if (eax!=-1)
+				shl		eax, 4
+				add		eax, [ecx+38h]
+				mov		eax, [eax+4]
+				mov		edx, [eax+0D4h]		; CGameObject*
+				.if ([edx].m_flCallbackKey & eCallbackMouseWheel)
+					CALLBACK__INT_INT  edx, eOnMouseWheel, direction, 0
+				.endif
+			.endif
+		.endif
+		; холдер
+		mov		eax, [esi].m_holder
+		.if	(eax)
+			smart_cast	_AVCGameObject, _AVCHolderCustom, eax
+			mov		edx, eax
+			.if ([edx].m_flCallbackKey & eCallbackMouseWheel)
+				CALLBACK__INT_INT  edx, eOnMouseWheel, direction, 0
+			.endif
+		.endif
+		ASSUME	edx:nothing
+	.endif
+	ASSUME	esi:nothing
+	;CLevel::IR_OnMouseWheel(direction);
+	mov		ecx, ebx
+	pop		esi
+	pop		ebx
+	leave
+	jmp		CLevel__IR_OnMouseWheel
+CLevel__IR_OnMouseWheel_callback endp
 	
-	;mov     esp, ebp
-	pop ebp
-input_disabled_exit:
-; делаем то, что вырезали
-	mov     ecx, [eax]
-	mov     ecx, [ecx+148h]	
-; идём обратно
-	jmp back_from_mouse_wheel_callback
-call_mouse_wheel_callback endp
-	
-call_mouse_wheel_callback_msg db "call_mouse_wheel_callback_problem", 0
 ; ----------------- колбек на движение мыши --------------------
-ALIGN_8
-call_mouse_move_callback proc
-	cmp     g_bDisableAllInput, 0
-	jnz     input_disabled_exit
+; колбек на движения мыши для биндеров я думаю делать не целесообразно. НаноБот
+align_proc
+CLevel__IR_OnMouseMove_callback proc _dx:dword, _dy:dword
+	.if (!g_bDisableAllInput && extensions_flags & eCallbackMouseMove)
+		push	ecx
+		mov		edx, _dx 
+		mov		eax, _dy
+		add		edx, 100000 ; dx 
+		add		eax, 100000 ; dy
+		CALLBACK__INT_INT  g_Actor, eOnMouseMove, edx, eax
+		pop		ecx
+	.endif
+	;CLevel::IR_OnMouseMove(_dx, _dy);
+	leave
+	jmp		CLevel__IR_OnMouseMove
+CLevel__IR_OnMouseMove_callback endp
 
-	
-	push ebp
-	mov ebp, esp
-	;and     esp, 0FFFFFFF8h
-	
-; добавляем своё
-	push eax
-	push ebx
-	push ecx
-	push edx
-	push edi
-	push esi
-	; проверяем глобальную блокировку колбеков
-	mov eax, [extensions_flags]
-	and eax, 10h
-	jz exit
-	
-	;jmp exit
-	
-	; вызываем колбек для актора
-	mov eax, [ebp+08h] ; dx 
-	add eax, 100000
-	push eax
-	mov eax, [ebp+0Ch] ; dy
-	add eax, 100000
-	push eax
-	; получаем актора
-	;call Actor ; eax = client actor
-	; получаем объект колбека
-	push    127 ; type = ???
-	mov     ecx, g_Actor ; там и так теперь актор
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	; вызываем
-	call    script_callback_int_int
-lab_exit5:
-	;-------------
-exit:
-	pop esi
-	pop edi
-	pop edx
-	pop ecx
-	pop ebx
-	pop eax
-	
-	;mov     esp, ebp
-	pop ebp
-input_disabled_exit:
-; делаем то, что вырезали
-	push    ecx
-	push    esi
-	mov     esi, ecx
-	mov     eax, [esi-194h]
-; идём обратно
-	jmp back_from_mouse_move_callback
-call_mouse_move_callback endp
-	
-call_mouse_move_callback_msg db "call_mouse_move_callback_problem", 0
-	
+

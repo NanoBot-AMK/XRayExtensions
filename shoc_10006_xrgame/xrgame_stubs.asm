@@ -1741,65 +1741,10 @@ back_from_CAI_Stalker__feel_touch_new_fix:
 ;.text:10118C55                 call    __alloca_probe
 ;.text:10118C5A                 push    ebp
 
-
-
-;.text:1023D870 CWeaponStatMgun__cam_Update proc near
-org 1023D870h - shift
-	jmp wpn_stat_mgun__cam_update_fix
-;.text:1023D870                 push    ebp
-;.text:1023D871                 mov     ebp, esp
-;.text:1023D873                 and     esp, 0FFFFFFF8h
-;.text:1023D876                 sub     esp, 38h
-org 1023D879h - shift
-back_from_wpn_stat_mgun__cam_update_fix:
-;.text:1023D879                 xorps   xmm0, xmm0
-;.text:1023D87C                 push    esi
-
-
-
-; попытка фикса станкового оружия
-;.text:1023CBD0 CWeaponStatMgun__UpdateCL proc near
-;.text:1023CBD0                 push    ebx
-;.text:1023CBD1                 push    esi
-;.text:1023CBD2                 mov     ebx, ecx
-;.text:1023CBD4                 call    ds:__imp_?UpdateCL@CObject@@UAEXXZ ; CObject::UpdateCL(void)
-org 1023CBDAh - shift
-	jmp wpn_stat_mgun__upatecl_fix0
-;.text:1023CBDA                 lea     eax, [ebx+168h]
-
-
-;.text:1023CC8D                 pop     edi
-;.text:1023CC8E loc_1023CC8E:                           ; CODE XREF: CWeaponStatMgun__UpdateCL+2Fj
-org 1023CC8Eh - shift
-	jmp wpn_stat_mgun__upatecl_fix
-;.text:1023CC8E                 pop     esi
-;.text:1023CC8F                 pop     ebx
-;.text:1023CC90                 retn
-;back_from_wpn_stat_mgun_fix:
-;.text:1023CC90 CWeaponStatMgun__UpdateCL endp
-
-
-
 ; врезка для управления видимостью панели машины
-;.text:1026938B                 mov     ecx, ds:g_pGameLevel
-org 10269391h - shift
-	jmp car_panel_fix
-;.text:10269391                 mov     edx, [ecx]
-;.text:10269393                 mov     ecx, [edx+148h]
-;.text:10269399                 mov     eax, [ecx]
-;.text:1026939B                 mov     edx, [eax+18h]
-;.text:1026939E                 call    edx
-;.text:102693A0                 mov     eax, [eax+38h]
-;.text:102693A3                 lea     ecx, [eax+0C74h]
-;.text:102693A9                 mov     eax, [ecx]
-;.text:102693AB                 mov     edx, [eax+7Ch]
-;.text:102693AE                 push    1
-;.text:102693B0                 call    edx
-org 102693B2h - shift
-back_from_car_panel_fix:
-;.text:102693B2                 mov     eax, ds:?g_pGameLevel@@3PAVIGame_Level@@A ; IGame_Level * g_pGameLevel
-
-
+org 102693AEh - shift	; 2 bytes
+	push	esi		; m_car_panel_visible	// флаг включения панели
+	nop
 
 
 org 101DF130h - shift
@@ -2368,19 +2313,6 @@ org 101F0DE0h - shift
 script_death_callback:
 
 
-;.text:1026C3F0 CCar__CarExplode proc near
-
-;.text:1026C525 loc_1026C525:
-org 1026C525h - shift
-	jmp car_fix
-;.text:1026C525                 mov     al, [edi+2B2h]
-org 1026C52Bh - shift
-back_from_car_fix:
-;.text:1026C52B                 test    al, 1
-;.text:1026C52D                 lea     esi, [edi+28Ch]
-
-
-
 ; попытка фикса кривого вылезания из машины
 ;.text:10272746                 movss   xmm4, ds:float_1045ADD4__3_0
 org 10272746h - shift
@@ -2857,9 +2789,6 @@ CWeapon__UpdateAddonsVisibility_lab:
 ;org 10458970h - shift
 ;CKinematics__CalculateBones_Invalidate:
 
-org 100F6B60h - shift
-script_callback__void: ; this - в регистре eax. Аргументов нет
-
 org 1006E8E0h - shift
 CALifeUpdateManager__teleport_object: ;(int this<esi>, unsigned __int16 id, int game_vertex_id, int level_vertex_id, int position)
 
@@ -3053,16 +2982,6 @@ back_from_level_space_fix:  ; сюда надо сделать переход назад
 org 101AF9B1h - shift
 game_id_register:
 
-;==============================================================================
-; ищется по ссылке на строку "li_pause_key"
-;.text:101A6E50 CLevel__IR_OnKeyboardPress proc near    ; DATA XREF: .rdata:104811CCo
-org 101A6E50h - shift
-	jmp call_key_press_callback
-;.text:101A6E50                 sub     esp, 414h
-org 101A6E56h - shift
-back_from_key_press_callback:
-;.text:101A6E56                 push    ebx
-
 org 101E5720h - shift
 CGameObject__lua_game_object: ; аргумент this в edi
 
@@ -3223,79 +3142,6 @@ script_callback_int_int: ; this в регистре eax, два аргумента в стеке
 ; mov eax, [g_Actor]
 
 ; -------------------------------------------------------------------------------------------------
-; CLevel__IR_OnKeyboardRelease
-org 101A71F0h - shift
-jmp call_key_release_callback
-;.text:101A71F0                 push    ecx
-;.text:101A71F1                 push    ebx
-;.text:101A71F2                 push    ebp
-;.text:101A71F3                 mov     ebp, ecx
-org 101A71F5h - shift
-back_from_key_release_callback:
-;.text:101A71F5                 cmp     dword ptr [ebp+138h], 0
-;.text:101A71FC                 jz      short loc_101A7213
-
-
-; CLevel__IR_OnKeyboardHold
-;.text:101A7320                 cmp     g_bDisableAllInput, 0
-;.text:101A7327                 push    edi
-;.text:101A7328                 mov     edi, ecx
-;.text:101A732A                 jnz     loc_101A740C
-org 101A7330h - shift
-jmp call_key_hold_callback
-;.text:101A7330                 cmp     dword ptr [edi+138h], 0
-org 101A7337h - shift
-back_from_key_hold_callback:
-;.text:101A7337                 push    esi
-;.text:101A7338                 mov     esi, [esp+8+arg_0]
-;.text:101A733C                 jz      short loc_101A739A
-;.text:101A733E                 mov     ecx, [edi+138h]
-
-
-; CLevel__IR_OnMouseMove
-;.text:101A6DB0                 cmp     g_bDisableAllInput, 0
-;.text:101A6DB7                 push    esi
-;.text:101A6DB8                 mov     esi, ecx
-;.text:101A6DBA                 jnz     loc_101A6E4B
-org 101A6DC0h - shift
-jmp call_mouse_move_callback
-;.text:101A6DC0                 mov     ecx, [esi+138h]
-org 101A6DC6h - shift
-back_from_mouse_move_callback_old:
-;.text:101A6DC6                 mov     eax, [ecx]
-;.text:101A6DC8                 mov     edx, [eax+18h]
-;.text:101A6DCB                 push    ebx
-;.text:101A6DCC                 push    edi
-
-; void __thiscall CActor__IR_OnMouseMove(int a1, int d_x, int d_y)
-org 101DE710h - shift
-jmp call_mouse_move_callback
-;.text:101DE710                 push    ecx
-;.text:101DE711                 push    esi
-;.text:101DE712                 mov     esi, ecx
-;.text:101DE714                 mov     eax, [esi-194h]
-org 101DE71Ah - shift
-back_from_mouse_move_callback:
-;.text:101DE71A                 shr     eax, 1Bh
-
-
-
-
-
-; CLevel__IR_OnMouseWheel
-;.text:101A6C90                 cmp     g_bDisableAllInput, 0
-;.text:101A6C97                 push    esi
-;.text:101A6C98                 mov     esi, ecx
-;.text:101A6C9A                 jnz     loc_101A6D42
-;.text:101A6CA0                 mov     eax, ds:?g_pGameLevel@@3PAVIGame_Level@@A ; IGame_Level * g_pGameLevel
-org 101A6CA5h - shift
-jmp call_mouse_wheel_callback
-;.text:101A6CA5                 mov     ecx, [eax]
-;.text:101A6CA7                 mov     ecx, [ecx+148h]
-org 101A6CADh - shift
-back_from_mouse_wheel_callback:
-;.text:101A6CAD                 mov     edx, [ecx]
-
 
 org 10190698h - shift
 bit_and_register:
@@ -3552,22 +3398,33 @@ luabind__scope__operator_ dword ?
 ;-------------------------------------------------------------
 org 101AF85Dh - shift
 get_snd_volume_register:
+org 101B06FBh - shift
+register_level__void__u16:
 
-org 101AEF0Fh - shift
-	jmp level_ns_extension_1
+org 101AEF0Fh - shift	; 7 bytes
+	jmp		level_script_extension_1
+	nop2
+return_level_script_extension_1:
+;пространство actor_stats
+org 101AF2DDh - shift	; 7 bytes
+	jmp		level_script_extension_2
+	nop2
+return_level_script_extension_2:
 
-org 101AEF14h - shift
-back_to_level_ns_ext_1:
-
-org 101AF1C1h - shift
-	jmp level_ns_extension_2
+org 101AF1C1h - shift	; 8 bytes
+	jmp 	level_ns_extension_2
 	nop
 	nop
 	nop
-	
-org 101AF1C9h - shift
 back_to_level_ns_ext_2:
 
+org 101AF31Bh - shift	; 8 bytes
+	jmp 	level_ns_extension_3
+	nop
+	nop
+	nop
+return_level_ns_extension_3:
+;-------------------------------------------------------------
 org 10458498h - shift
 g_hud    dword ? ; class CCustomHUD * g_hud
 
@@ -3585,7 +3442,7 @@ org 10458AFCh - shift
 xrMemory__mem_free dd ?
 
 org 10458EB4h - shift
-??0registration@detail@luabind@@QAE@XZ	dword	?
+luabind__detail__registration__registration	dword	?
 
 org 101AF65Fh - shift
 loc_101AF65F:
@@ -3727,11 +3584,11 @@ xrDebug__fail dd ?
 
 ; для регистрации глобальных функций
 org 10458EC0h - shift
-??0scope@luabind@@QAE@V?$auto_ptr@Uregistration@detail@luabind@@@std@@@Z dd ?
+luabind__scope__scope@std__auto_ptr@luabind__detail__registration@@ dd ?
 org 10458FB4h - shift
-??0scope@luabind@@QAE@ABU01@@Z dd ?
+luabind__scope__scope dd ?
 org 10458F9Ch - shift
-??1scope@luabind@@QAE@XZ dd ?
+luabind__scope___scope dd ?
 
 ; для регистрации метода game_object с прототипом vector* fun(string*)
 org 1015C7E0h - shift
@@ -4572,18 +4429,41 @@ org 103D0D70h - shift	; 6 bytes
 ;------------------------------------------------------------
 ; Исправление формулы рассчёта статистики убийств в КПК
 ;------------------------------------------------------------
-
-org 101AE902h - shift	; 3 bytes
-	mov [eax+10h], ecx
-
-org 101AE8FDh - shift	; 8 bytes
-	dword	90909090h
+;Ошибка была в том, что два раза перемножали int_points и int_count.
+;Один раз в void CActorStatisticMgr::AddPoints(const shared_str& key, const shared_str& detail_key, s32 cnt, s32 pts)
+;и это правильно! Второй раз в s32 SStatSectionData::GetTotalPoints() const, а это уже лишние!
+;inline SStatSectionData::GetTotalPoints() в CActorStatisticMgr::GetSectionPoints()
+org 102035DDh - shift	; 12 bytes
+	;res	+= (*it).int_count*(*it).int_points;		//оригинал
+	;res	+= (*it).params[g_select_total_statistic];	//заменил
+	ASSUME	eax:ptr SStatDetailBData
+;;;	mov		ecx, [eax].int_points		; 3 bytes	//удаляем
+;;;	imul	ecx, [eax].int_count		; 4 bytes	//удаляем
+	mov		ecx, [esp+24]				; = g_select_total_statistic	0 - int_count, 1 - int_points
+	add		esi, [eax+ecx*4].params
+	add		eax, sizeof SStatDetailBData
 	nop
-	mov [eax+10h], ecx
-
-org 104C5118h - shift	; 4 bytes
-	aXD db "%d",0
-	retn 4
+	ASSUME	eax:nothing
+;SStatSectionData::GetTotalPoints()
+org 1020342Dh - shift	; 12 bytes
+	ASSUME	ecx:ptr SStatDetailBData
+;;;	mov		edx, [ecx].int_points		; 3 bytes	//удаляем
+;;;	imul	edx, [ecx].int_count		; 4 bytes	//удаляем
+	mov		edx, [esp+32]				; = g_select_total_statistic	0 - int_count, 1 - int_points
+	add		eax, [ecx+edx*4].params
+	add		ecx, sizeof SStatDetailBData
+	nop
+	ASSUME	ecx:nothing
+; Перехват CActorStatisticMgr::GetSectionPoints() и загрузка параметра g_select_total_statistic в стек
+org 10203560h - shift
+CActorStatisticMgr__GetSectionPoints:
+;get_actor_points
+org 101AEA22h - shift	; 5 bytes
+	call	CActorStatisticMgr__GetSectionPointsSelect
+;CUIActorInfoWnd::FillPointsInfo(void)
+org 103D590Eh - shift	; 5 bytes
+	call	CActorStatisticMgr__GetSectionPointsSelect
+;------------------------------------------------------------
 
 ; фикс вылета there is no proper graph point neighbour
 org 100563A5h - shift
@@ -4612,12 +4492,6 @@ dword_10560718 dd ?
 org 10207DF1h - shift
 db	0EBh			; this is jmp rel8 opcode
 
-; фикс подсчета суммарных очков статистики
-org 10203430h - shift
-	nop
-	nop
-	nop
-	nop
 
 ; фикс визуала актора
 org 1024C2D2h - shift
@@ -4666,6 +4540,17 @@ org 100FF284h - shift
 	jmp global_critical_hit_anim_fix
 org 100FF28Ah - shift
 back_from_global_critical_hit_anim_fix:
+
+; explosive->SetInitiator(explosive->Initiator());	// устанавливаем инициатор только если он неизвестен.
+org 10250F40h - shift
+CExplosive__Initiator:
+Virtual_CExplosive__Initiator		= dword ptr 4	; виртуальный адресс
+; ebx - explosive	CExplosive*
+org 10141716h - shift	; 10 bytes
+	mov		edx, [ebx]	; virtual_CExplosive
+	mov		ecx, ebx
+	call	[edx+Virtual_CExplosive__Initiator]		; explosive->Initiator()
+	movzx	eax, ax
 
 ; масштабирование scope_zoom_factor в зависимости от текущего fov
 org 1021CA90h - shift
@@ -4753,6 +4638,13 @@ CScriptIniFile__r_string_wb:
 org 10458CE0h - shift
 r_bool			dd ?		; public: int __thiscall CInifile::r_bool(char const *, char const *)
 
+org 10458B08h - shift
+_GetItemCount	dd ?
+org 10458DF4h - shift
+_GetItem		dd ?
+org 104C885Ah - shift
+null_string		dd ?
+;------------------------------------------
 org 105421E0h - shift
 _AVCCustomMonster:
 org 105421C8h - shift
@@ -4761,8 +4653,95 @@ org 1053951Ch - shift
 _AVCEntityAlive:
 org 10536048h - shift
 _AVCObject:
+org 1053A6A0h - shift
+_AVCGameObject:
+org 10556BC8h - shift
+_AVCWeapon:
+org 1054D664h - shift
+_AVCAI_Stalker:
+org 10538CDCh - shift
+_AVCInventoryItem:
+org 105557BCh - shift
+_AVCWeaponMagazined:
+org 1054E910h - shift
+_AVCShootingObject:
+org 1054F080h - shift
+_AVCCar:
+org 1054F02Ch - shift
+_AVCHelicopter:
+org 105461B4h - shift
+_AVCActor:
+org 10556FDCh - shift
+_AVCWeaponMounted:
+org 10557024h - shift
+_AVCWeaponStatMgun:
+org 1054F470h - shift
+_AVCHolderCustom:
+org 1053A66Ch - shift
+_AVCExplosive:
+org 1054F0B0h - shift
+_AVCInventoryBox:
+org 1054F064h - shift
+_AVCScriptZone:
+org 1054F5E8h - shift
+_AVCProjector:
+org 1054D518h - shift
+_AVCAI_CTrader:
+org 10538CFCh - shift
+_AVCTorch:
+org 1054F048h - shift
+_AVCHangingLamp:
+org 10556C20h - shift
+_AVCWeaponPistol:
+org 10556D50h - shift
+_AVCWeaponKnife:
+org 10556EC4h - shift
+_AVCWeaponBinoculars:
+org 10556EF4h - shift
+_AVCWeaponShotgun:
+org 10556CC8h - shift
+_AVCWeaponMagazinedWGrenade:
+org 10557248h - shift
+_AVCMedkit:
+org 10557214h - shift
+_AVCAntirad:
+org 1054F094h - shift
+_AVCCustomOutfit:
+org 10556C58h - shift
+_AVCScope:
+org 10556C70h - shift
+_AVCSilencer:
+org 10556C88h - shift
+_AVCGrenadeLauncher:
+org 1055578Ch - shift
+_AVCFoodItem:
+org 105557A4h - shift
+_AVCGrenade:
+org 1055722Ch - shift
+_AVCBottleItem:
+org 10556404h - shift
+_AVCEatableItem:
+org 1053A688h - shift
+_AVCMissile:
+org 105557DCh - shift
+_AVCHudItem:
+org 10556BE0h - shift
+_AVCWeaponAmmo:
+
+;------------------------------------------
 org 10458110h - shift
 _itoa				dd ?
+org 101576C0h - shift
+register__void__go_bool:
+org 10482240h - shift
+aBullet_manager		dd ?
+org 10482278h - shift
+aGravity_const		dd ?
+org 10458C1Ch - shift
+CInifile__r_fvector2	dd ?
+org 1014D520h - shift
+register__u32__void:
+
 ;---------------------------------------
 
 ; при переходе в онлайн кондишен объекта не устанавливается в 1		CGameObject::spawn_supplies
@@ -4879,3 +4858,651 @@ org 10288640h - shift	; 7 bytes
 	call	StartAdress_xrGame_log__DllMain
 	nop
 	nop
+;===================================================================================
+; TODO надо сгруппировать функции одинакового типа! (с) НаноБот
+org 101AFE91h - shift
+register_level__void__void:
+org 10157930h - shift
+register__CScriptIniFile__void:
+;--------------------------------------------------------------------
+; я использую внятные имена функций, мне так легче (с) НаноБот
+org 10458F78h - shift
+luabind__detail__overload_rep_base__set_match_fun	dd ?
+org 10458F4Ch - shift
+luabind__detail__overload_rep__set_fun				dd ?
+org 10458F48h - shift
+luabind__detail__class_base__add_method				dd ?
+org 10458F54h - shift
+luabind__detail__overload_rep___overload_rep		dd ?
+
+org 1015CC50h - shift
+sub_1015CC50:
+org 1015CD40h - shift
+sub_1015CD40:
+org 1015CDA0h - shift
+sub_1015CDA0:
+org 1015BBC0h - shift
+sub_1015BBC0:
+org 1015BCB0h - shift
+sub_1015BCB0:
+org 1015BD10h - shift
+sub_1015BD10:
+org 101598F0h - shift
+register__void__float_float:
+
+;===================================================================================
+;Рефакторинг функции колбеков нажатий клавиш.
+org 101A6C90h - shift
+CLevel__IR_OnMouseWheel:
+org 101A6DB0h - shift
+CLevel__IR_OnMouseMove:
+org 102C2FF0h - shift
+nullsub_4:
+org 101A6E50h - shift
+CLevel__IR_OnKeyboardPress:
+org 101A71F0h - shift
+CLevel__IR_OnKeyboardRelease:
+org 101A7320h - shift
+CLevel__IR_OnKeyboardHold:
+
+;CGameObject::CGameObject()
+; m_flCallbackKey.zero();
+org 101E4400h - shift	; 10 bytes
+	ASSUME	edi:ptr CGameObject
+	mov		[edi].m_flCallbackKey, bl
+	ASSUME	edi:nothing
+	mov		eax, edi
+	pop		ebx
+	retn
+; Переопределим адреса виртуальных методов.
+org 104811C0h - shift	; 24 bytes
+	dd CLevel__IR_OnMouseWheel_callback
+	dd CLevel__IR_OnMouseMove_callback
+	dd nullsub_4	; CLevel::IR_OnMouseStop	// здесь можно назначить колбек на стоп движении мыши!
+	dd CLevel__IR_OnKeyboardPress_callback
+	dd CLevel__IR_OnKeyboardRelease_callback
+	dd CLevel__IR_OnKeyboardHold_callback
+;====================================================================================================
+;колбек на выстрел из любого стреляющего объекта
+org 1021EEB0h - shift
+random_dir:
+org 10218509h - shift	; 5 bytes
+	jmp		CShootingObject__FireBulletCallback
+return_CShootingObject__FireBulletCallback:
+;===================================================================================
+;Прототипы callback'ов. ВСЕ!
+org 101CA2F0h - shift
+script_callback__GO:
+org 101E27B0h - shift
+script_callback__GO_constGO:
+org 10079860h - shift
+script_callback__GO_GO_int_vector_float:
+org 10255B90h - shift
+script_callback__GO_bool_u32:
+org 10014CF0h - shift
+script_callback__GO_float_vector_GO_s16:
+org 101F0CA0h - shift
+script_callback__GO_float_vector_GO_u16:
+org 101CC1F0h - shift
+script_callback__GO_str:
+org 101CC0D0h - shift
+script_callback__GO_str_str_int:
+org 10026940h - shift
+script_callback__GO_u32_u32:
+org 101F8510h - shift
+script_callback__SGameTask_SGameTaskObjective_ETaskState:
+org 1027EC60h - shift
+script_callback__float_float_int_u32:
+org 10283280h - shift
+script_callback__float_vector_m1:
+org 10283170h - shift
+script_callback__float_vector_int:
+org 101F0DE0h - shift
+script_callback__GO_GO:
+org 10265740h - shift
+script_callback__str_u16:
+org 10255390h - shift
+script_callback__u32_u32:
+org 100F6B60h - shift
+script_callback__void:
+;===================================================================================
+;Взрывной объект в пространстве Level. 
+; Нужен для снарядов, для быстрого спавна большого количества взрывных объектов.
+m_pBulletManager				= dword ptr 17980	; CBulletManager*
+
+org 101D2710h - shift
+CActor@@net_Relcase:
+
+;выделим больше памяти под CBulletManager
+org 101A3678h - shift	; 5 bytes
+	push	sizeof CBulletManager		;  200+
+;конструктор
+org 101B735Bh - shift	; 6 bytes
+	jmp		CBulletManager@@CBulletManager_ext
+	db		0CCh
+;деструктор
+org 101B7390h - shift	; 6 bytes
+	jmp		CBulletManager@@_CBulletManager_ext
+;запускается из CActor::net_Relcase(O);
+org 101D27C1h - shift	; 5 bytes
+	jmp		CBulletManager@@net_Relcase
+;запускается из CBulletManager::CommitEvents();
+org 101B8707h - shift	; 10 bytes
+	jmp		CBulletManager@@UpdateCExplosive
+	db		5 dup (0CCh)
+org 1024EF80h - shift
+CExplosive@@_CExplosive:
+org 104FC638h - shift
+dbs_CExplosive:
+org 102213A0h - shift
+CExplosive@@SetInitiator:
+;org 10250F40h - shift
+;CExplosive@@Initiator:
+org 101C1A10h - shift
+CExplosive@@cast_IDamageSource:		; return this;
+org 1024EEF0h - shift
+CExplosive@@_destructor:
+org 1024F090h - shift
+CExplosive@@Load:
+org 1024F070h - shift
+CExplosive@@Load_char_const_:
+org 1024F3A0h - shift
+CExplosive@@net_Destroy:
+org 10250EB0h - shift
+CExplosive@@net_Relcase:
+org 10250250h - shift
+CExplosive@@UpdateCL:
+org 1024FBF0h - shift
+CExplosive@@Explode:
+org 102505E0h - shift
+CExplosive@@ExplodeParams:
+org 10250530h - shift
+CExplosive@@OnEvent:
+org 10250400h - shift
+CExplosive@@OnAfterExplosion:
+org 102504A0h - shift
+CExplosive@@OnBeforeExplosion:
+org 10221390h - shift
+CExplosive@@SetCurrentParentID:
+org 1029D1F0h - shift
+CExplosive@@UpdateExplosionPos:
+org 10250220h - shift
+CExplosive@@GetExplVelocity:
+org 102501E0h - shift
+CExplosive@@GetExplPosition:
+org 10250200h - shift
+CExplosive@@GetExplDirection:
+org 10250630h - shift
+CExplosive@@GenExplodeEvent:
+org 10250790h - shift
+CExplosive@@FindNormal:
+org 104509B4h - shift
+CExplosive@@cast_game_object:
+org 101C1A10h - shift
+CExplosive@@cast_explosive:
+org 10250930h - shift
+CExplosive@@GetRayExplosionSourcePos:
+org 10250D50h - shift
+CExplosive@@GetExplosionBox:
+org 10250D70h - shift
+CExplosive@@ActivateExplosionBox:
+org 10251040h - shift
+CExplosive@@Useful:
+org 102504C0h - shift
+CExplosive@@HideExplosive:
+org 10250880h - shift
+CExplosive@@StartLight:
+org 10250900h - shift
+CExplosive@@StopLight:
+org 10250F60h - shift
+CExplosive@@UpdateExplosionParticles:
+org 1024EE10h - shift
+CExplosive@@CExplosive:
+;void CExplosive::Load(CInifile *ini,LPCSTR section)	// Инит m_game_object и m_game_object_id
+org 1024F38Bh - shift	; 7 bytes
+	jmp		CExplosive@@Load_ext
+	db		2 dup (0CCh)
+;Заменяем cast_game_object() на m_game_object и проверяем на NULL, если это так, то игнорируем вызывающий метод.
+; типа так:
+; cast_game_object()->processing_activate(); 				//было так
+; if(m_game_object)	m_game_object->processing_activate();	//стало так
+;строка 316
+org 1024FC09h - shift	; 8 bytes
+	ASSUME	ebp:ptr CExplosive
+	mov		eax, [ebp].m_game_object
+	test	eax, eax
+	jz		loc_1024FC19
+	nop
+org 1024FC19h - shift
+loc_1024FC19:
+;строка 337
+org 1024FC65h - shift	; 14 bytes
+	mov		eax, [ebp].m_game_object
+	test	eax, eax
+	jz		CExplosive@@Explode_vector_vel_zero
+	nop2
+	nop
+org 1024FC93h - shift
+return@CExplosive@@Explode_vector_vel_zero:
+;строка 381
+org 1024FF39h - shift	; 7 bytes
+	movzx	eax, [ebp].m_game_object_id
+;строка 385
+org 1024FFBBh - shift	; 10 bytes
+	mov		eax, [ebp].m_game_object
+	test	eax, eax
+	nop2
+	jz		loc_1024FFD9
+	nop
+org 1024FFD9h - shift
+loc_1024FFD9:
+;строка 401
+org 10250087h - shift	; 10 bytes
+	mov		eax, [ebp].m_game_object
+	test	eax, eax
+	nop
+	jz		loc_102500A1
+	nop2
+	ASSUME	ebp:nothing
+org 102500A1h - shift
+loc_102500A1:
+;строка 467
+org 10250266h - shift	; 7 bytes
+	ASSUME	edi:ptr CExplosive
+	mov		eax, [edi].m_game_object
+	test	eax, eax
+	jz		loc_10250275
+org 10250275h - shift
+loc_10250275:
+	ASSUME	edi:nothing
+;строка 520
+org 10250464h - shift	; 9 bytes
+	ASSUME	esi:ptr CExplosive
+	mov		eax, [esi].m_game_object
+	test	eax, eax
+	jz		loc_10250490
+	nop2
+org 10250490h - shift
+loc_10250490:
+;строка 686
+org 10250BA9h - shift	; 16 bytes
+	movss	xmm0, xmm0
+	nop
+	movss	xmm1, xmm1
+	mov		ax, [esi].m_game_object_id
+	ASSUME	esi:nothing
+;===================================================================================
+;===================================================================================
+; Рефакторинг level_ns_reg_macros.asm
+; Указатели на таблицы виртуальных функций.
+; Предназначены для скриптовых прототипов функций пространства имён: level и безымяного.
+org 1045D598h - shift
+virtual_prototype__CEF_Storage__void:
+org 10481E80h - shift
+virtual_prototype__GO__u32:
+org 10481E8Ch - shift
+virtual_prototype__void__str_bool:
+org 10481E98h - shift
+virtual_prototype__CEnvironment__void:
+org 10481EA4h - shift
+virtual_prototype__void__float:
+org 10481EB0h - shift
+virtual_prototype__float__void:
+org 10481ED4h - shift
+virtual_prototype__float__u32_pvector:
+org 10481EE0h - shift
+virtual_prototype__u32__u32_vector_float:
+org 10481EECh - shift
+virtual_prototype__vector__u32:
+org 10481EF8h - shift
+virtual_prototype__CClientSpawnManager__void:
+org 10481F04h - shift
+virtual_prototype__void__u16_str_str:
+org 10481F10h - shift
+virtual_prototype__void__u16_str:
+org 10481F1Ch - shift
+virtual_prototype__u16__u16_str:
+org 10481F28h - shift
+virtual_prototype__void__CUIDialogWnd_bool:
+org 10481F34h - shift
+virtual_prototype__void__CUIDialogWnd:
+org 10481F40h - shift
+virtual_prototype__CUIDialogWnd__void:
+org 10481F70h - shift
+virtual_prototype__void__luabind@@object:
+org 10481F7Ch - shift
+virtual_prototype__void__pvector:
+org 10481F88h - shift
+virtual_prototype__Fbox__void:
+org 10481F94h - shift
+virtual_prototype__void__str_u32_CScriptCallbackEx:
+org 10481FA0h - shift
+virtual_prototype__void__str_u32_luabind@@object_CScriptCallbackEx:
+org 10481FACh - shift
+virtual_prototype__CPHWorld__void:
+org 10481FB8h - shift
+virtual_prototype__float__str_int_bool_str:
+org 10481FC4h - shift
+virtual_prototype__void__int:
+org 10481FD0h - shift
+virtual_prototype__void__str_int_bool:
+org 10481FDCh - shift
+virtual_prototype__void__int_float_float:
+org 10481FE8h - shift
+virtual_prototype__void__int_float:
+org 10481FF4h - shift
+virtual_prototype__void__str_int:
+org 10482000h - shift
+virtual_prototype__void__str_str_int_int:
+org 1048200Ch - shift
+virtual_prototype__void__str_str_str:
+org 10482018h - shift
+virtual_prototype__int__str:
+org 10482024h - shift
+virtual_prototype__void__u16:
+org 10482030h - shift
+virtual_prototype__int__void:
+org 1048203Ch - shift
+virtual_prototype__void__int__str_int:
+org 10482048h - shift
+virtual_prototype__void__str_int_int:
+org 1047F69Ch - shift
+virtual_prototype__int__int_int:
+org 1047F690h - shift
+virtual_prototype__void__void:
+org 1047DA70h - shift
+virtual_prototype__bool__void:
+org 1047F6A8h - shift
+virtual_prototype__str__void:
+org 1047F6B4h - shift
+virtual_prototype__u32__CRenderDevice:
+org 1047F6C0h - shift
+virtual_prototype__CRenderDevice__void:
+org 10460D44h - shift
+virtual_prototype__bool__str:
+org 1047BF7Ch - shift
+virtual_prototype__void__CScriptIniFile_str:
+org 1047BF88h - shift
+virtual_prototype__void__float_float:
+org 1047E6E4h - shift
+virtual_prototype__int__int:
+org 1047E97Ch - shift
+virtual_prototype__CLocatorAPI__void:
+org 1047E9ECh - shift
+virtual_prototype__CConsole__void:
+org 104AF3A4h - shift
+virtual_prototype__str__str:
+org 104AF3B0h - shift
+virtual_prototype__xrTime__void:
+org 104C9B54h - shift
+virtual_prototype__int__u16_u16_u16_u16:
+org 104C9B60h - shift
+virtual_prototype__CGameFont__void:
+org 104C9B6Ch - shift
+virtual_prototype__Frect__void:
+org 104C9B78h - shift
+virtual_prototype__TEX_INFO__str_str:
+org 104CD778h - shift
+virtual_prototype__CUIGameCustom__void:
+org 10481EBCh - shift
+virtual_prototype__void__u32:
+org 10481EC8h - shift
+virtual_prototype__u32__void:
+org 10481F4Ch - shift
+virtual_prototype__void__luabind@@functor@bool@_luabind@@functor@void@:
+org 10481F58h - shift
+virtual_prototype__void__luabind@@object_str_str:
+org 10481F64h - shift
+virtual_prototype__void__luabind@@object_luabind@@functor@bool@_luabind@@functor@void@:
+;===================================================================================
+org 1021F3F0h - shift	; ---===NanoBot===---
+CCartridge__Load:
+org 10458A04h - shift
+CObjectList__net_Find		dd ?
+;------------Задаём ID стрелка на БТРе------------
+org 1027A09Ch - shift	; 13 bytes
+	ASSUME	esi:ptr CCarWeapon, eax:ptr CGameObject
+	movzx   ebp, [eax].ID ; m_object->ID();net_ID
+	mov		ecx, [esi].m_parent_id
+	ASSUME	esi:nothing, eax:nothing
+;-------------------------------------------------
+
+org 10279EBFh - shift	; 4 bytes
+	dd	104D270Ch		; 0.5 град	угол разрешения стрельбы из БТРа
+
+;======================================================================
+; колбек на застревание пули, передаётся в объект(биндер) оружия
+org 1000B9A0h - shift
+CGameMtlLibrary__GetMaterialIt_char_const:
+org 101B85D5h - shift
+return_CBulletManager@@CommitEvents:
+;-------------------------------
+org 101B7C30h - shift
+CBulletManager__CalcBullet:
+;-------------------------------
+org 101B8820h - shift
+CBulletManager@@RegisterEvent:
+org 101B7B9Ch - shift	; 6 bytes
+	jmp		CBulletManager@@UpdateWorkload
+	nop
+return@CBulletManager@@UpdateWorkload:
+;подключаемся в CBulletManager@@RegisterEvent
+org 101B8887h - shift	; 7 bytes
+	jmp		CBulletManager@@RegisterEventCallback
+	nop
+	nop
+return@CBulletManager@@RegisterEventCallback:
+; ;попали по динамическому объекту
+; org 101B86C2h - shift	; 5 bytes
+	; jmp		CBulletManager__DynamicObjectHitCallback
+; ;попали по геометрии
+; org 101B86FDh - shift	; 5 bytes
+	; jmp		CBulletManager__StaticObjectHitCallback
+;загрузка параметров
+org 1021F624h - shift	; 5 bytes	1021F61Ah
+	jmp		CCartridge__Load_callback
+return_CCartridge__Load_callback:
+;колбек на создании пули, передаётся в объект(биндер) оружия
+org 101B72A9h - shift	; 33 bytes
+	add		dx, dx					; 3
+	and		ecx, 0FFDDh				; 6
+	or		dx, cx					; 3
+	mov		[esi+4], dx				; 4
+	mov		word ptr [esi+60h], 0	; 6
+	jmp		SBullet__Init_callback	; 5
+return_SBullet__Init_callback:
+	pop		edi						; 1
+	pop		ebp						; 1
+	pop		ebx						; 1
+	retn	24h						; 3
+;====================================================================================================
+; Турель на основе класса CCar
+org 1026BA90h - shift
+CCar__Use:
+org 101D95B0h - shift
+SVehicleAnimCollection__Create:
+org 1023D870h - shift
+CWeaponStatMgun__cam_Update:
+org 1026F820h - shift
+CCar__cam_Update:
+org 10278AB0h - shift
+CCarWeapon__CCarWeapon:
+org 10497404h - shift
+aMounted_weapon:
+org 1049744Ch - shift
+aCamera_bone:
+org 104A36E8h - shift
+aCar_definition:
+org 104972A0h - shift
+aFire_bone:			; "fire_bone"
+org 10279270h - shift
+CCarWeapon__UpdateBarrelDir:
+
+; в этом методе выберим нужный метод в зависимости от CLS_ID
+org 104A3E50h - shift	; 4 bytes
+	dd CCar__UseSelect
+;Дополнительная анимация актора в CCar
+;выделим больше памяти для m_vehicles_type_collections
+org 101C4665h - shift	; 2 bytes
+	push	24+16
+;переопределим на наш метод
+org 101D2A64h - shift	; 5 bytes
+	call	SVehicleAnimCollection__Create_turrel
+org 101D2A6Fh - shift	; 4 bytes
+	cmp		si, 3
+;переопределим метод CCar::cam_Update
+org 104A3E4Ch - shift	; 4 bytes
+	dd CCar__cam_UpdateSelect
+;определим параметр m_camera_bone, кость камеры
+;конструктор
+org 10278B37h - shift	; 6 bytes
+	jmp		CCarWeapon__CCarWeapon_chunk
+	nop
+return_CCarWeapon__CCarWeapon_chunk:
+org 10216F00h - shift
+CShootingObject___CShootingObject:
+;деструктор
+org 10279069h - shift	; 5 bytes
+	call	CCarWeapon___CCarWeapon_chunk
+;----------------------------------------------------------------------------------------------------
+;Водила приаттачен к указаной кости, если эта кость башни, то актор или НПС будет вращатся с башней.
+;добавим места для новых параметров
+org 1027661Ah - shift	; 5 bytes
+	push	sizeof CCar		;1592+20
+org 10295EF6h - shift	; 5 bytes
+	push	sizeof CCar		;1592+20
+org 10269ABDh - shift
+	db		26 dup (0)
+org 10269ABDh - shift	; 26 bytes
+;edi - CHolderCustom	-24Ch = CCar 
+	lea		ecx, [edi-24Ch]
+	ASSUME	ecx:ptr CCar
+	mov		[ecx].m_bone_driver_place, ax
+	mov		[ecx].m_car_panel_visible, true
+	ASSUME	ecx:nothing
+	jmp		CCar__attach_Actor_qqq
+org 10269AD7h - shift
+CCar__attach_Actor_qqq:
+;//if(m_pPhysicsShell->isEnabled())
+;//{
+;//Owner()->XFORM().mul_43	(XFORM(),m_sits_transforms[0]);	// бывший код
+;//}
+org 10269120h - shift	;10269135h
+	db		578 dup (90h)	;557
+org 10269120h - shift	; 578 bytes
+;edi - CCar
+;esi - this->XFORM()	Fmatrix4
+	ASSUME	edi:ptr CCar
+	;CKinematics* K	= smart_cast<CKinematics*>(Visual());
+	mov		ecx, [edi].Visual_	;6
+	mov		eax, [ecx]			;2
+	mov		edx, [eax+18h]		;3
+	call	edx					;2
+	mov		edx, eax	; K		;2
+	;CBoneInstance& instance = K->LL_GetTransform(m_bone_driver_place);
+	movzx	eax, [edi].m_bone_driver_place	;7
+	lea     eax, [eax+eax*4]	;3
+	shl     eax, 5	; eax=*160	// sizeof CBoneInstance = 160
+	add		eax, [edx+bone_instances]	; CBoneInstance
+	;Owner()->XFORM().mul_43(XFORM(), instance.mTransform);
+	mov     ecx, [edi].m_owner
+	add		ecx, CCar.XFORM_	;m_owner->XFORM()
+	ASSUME	ecx:ptr Fmatrix4, esi:ptr Fmatrix4, eax:ptr CBoneInstance, edx:ptr Fvector
+	Fmatrix4_mul_43	[ecx], [esi], [eax].mTransform
+	;Owner()->XFORM().transform_tiny(XFORM().c, m_offset_driver_place);
+	lea		edx, [edi].m_offset_driver_place
+	transform_tiny	[ecx], [ecx].c_, [edx]
+	ASSUME	ecx:nothing, eax:nothing, esi:nothing, edx:nothing
+	;фикс перекрутки камеры актора в CCar. Теперь башню танка можно крутить сколько угодно, если limit_x_rot = -181, 181.
+	;active_camera.yaw = angle_normalize_signed(active_camera.yaw);
+	mov		esi, [edi].active_camera
+	ASSUME	esi:ptr CCameraBase
+	movss	xmm0, [esi].yaw
+	angle_normalize_signed__xmm0
+	movss	[esi].yaw, xmm0
+	db		10 dup (90h)
+	movzx	esi, [edi].m_car_panel_visible
+	ASSUME	esi:nothing, edi:nothing
+	jmp		CCar__VisualUpdate_ENDIF
+org 1026936Fh - shift	;10269362h	
+CCar__VisualUpdate_ENDIF:
+;перекрестия прицела турели
+org 101C7EFAh - shift	; 6 bytes
+	jmp		CActor__ShowCrosshairTurrel
+	nop
+return_CActor__ShowCrosshairTurrel:
+org 101C7F26h - shift
+endif_CActor__ShowCrosshairTurrel:
+
+org 1044C250h - shift
+CHUDCrosshair__SetDispersion:
+org 104586E0h - shift
+psHUD_Flags			dd ?
+;выделяем больше места для структуры CCarWeapon
+org 10267806h - shift	; 5 bytes
+	push	564+12
+;
+org 10278BA8h - shift	; 7 bytes
+	db		7 dup (90h)
+;стрельба из многоствольной системы типа Шилка ЗСУ-23-4, ЗУ-23-2
+org 1027A090h - shift
+CCarWeapon__OnShot:
+org 102791C2h - shift	; 2 bytes
+	jbe		CCarWeapon__UpdateFire_return
+org 102791CBh - shift	; 35 bytes
+	;while(fTime<=0){
+	ASSUME	esi:ptr CCarWeapon
+CCarWeapon__UpdateFire_cycle:
+	comiss  xmm1, [esi].fTime
+	jb		CCarWeapon__UpdateFire_return
+		mov     ecx, esi
+		call    CCarWeapon__OnShotExt
+		movss   xmm0, [esi].fTimeToFire
+		addss   xmm0, [esi].fTime
+		movss   [esi].fTime, xmm0
+		xorps	xmm1, xmm1
+	jmp		CCarWeapon__UpdateFire_cycle
+CCarWeapon__UpdateFire_return:
+	ASSUME	esi:nothing
+	pop		esi
+	retn
+;----------------------------------------------------------------------------------------------------
+org 104586D4h - shift
+CObject__processing_deactivate	dd ?
+;колбек на уничтожение машины
+org 1026C54Bh - shift	; 8 bytes
+	jmp		CCar__CarExplode_ext
+	db		3 dup (0CCh)
+;колбек на высадку из машины
+org 10269A0Bh - shift	; 5 bytes
+	jmp		CCar__detach_Actor_ext
+;колбек на посадку в машину
+org 10269B37h - shift	; 7 bytes
+	jmp		CCar__attach_Actor_ext
+	nop
+	nop
+;При вылезании из машины, смотрим туда, куда смотрели.
+org 101DF3A6h - shift	; 10 bytes
+	jmp		CActor__init_camera_holder
+	db		5 dup (90h)
+return_CActor__init_camera_holder:
+;====================================================================================================
+; колбек на использования вещи, вызывается в собственом биндере
+org 10482654h - shift
+aInventory:
+;CInventoryItem
+on_eat_this_callback			= byte ptr 134	; bool	булева, если true то вызывается колбек биндер объекта и объект не удаляется. 
+;CEatableItem
+m_iPortionsNum					= dword ptr 244
+m_iStartPortionsNum				= dword ptr 248
+;---------------------
+org 102061EDh - shift	; 7 bytes
+	jmp		CInventory__Eat_callback
+	nop
+	nop
+return_CInventory__Eat_callback:
+; про иницилизируем on_eat_this_callback
+org 10209A65h - shift	; 16 bytes
+	jmp		CInventoryItem__Load_chank
+	db		11 dup (0CCh)
+;====================================================================================================

@@ -44,5 +44,22 @@ arg_8= dword ptr  10h
 	jmp back_from_cuistatic_xml_add
 cuistatic_xml_add endp
 
-aAdjustHeightToText db "adjust_height_to_text", 0
-aAdjustWeigthToText db "adjust_width_to_text", 0
+align 4
+aAdjustHeightToText 		db "adjust_height_to_text", 0
+align 4
+aAdjustWeigthToText 		db "adjust_width_to_text", 0
+
+;------------------------------------------------------------
+; Исправление формулы рассчёта статистики убийств в КПК
+;------------------------------------------------------------
+align 4
+g_select_total_statistic	dd 0	; тип подсчёта: 0 - подсчёт по штукам, 1 - подсчёт по очкам.
+
+align_proc
+CActorStatisticMgr__GetSectionPointsSelect proc
+	push	[g_select_total_statistic]
+	call	CActorStatisticMgr__GetSectionPoints
+	add		esp, 4
+	retn
+CActorStatisticMgr__GetSectionPointsSelect endp
+;------------------------------------------------------------
