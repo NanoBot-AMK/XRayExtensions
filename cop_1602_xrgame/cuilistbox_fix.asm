@@ -1,39 +1,39 @@
 cuilistbox_fix1 proc
 	; делаем своё
-	xor     eax, eax
-	push    eax
-	mov     eax, offset CUIListBox__GetMainInputReceiver
-	push    eax
-	push    offset aGetMainInputReceiver ; "GetMainInputReceiver"
+	xor		eax, eax
+	push	eax
+	mov		eax, offset CUIListBox__GetMainInputReceiver
+	push	eax
+	push	offset aGetMainInputReceiver ; "GetMainInputReceiver"
 	; делаем то, что вырезали
-	xor     eax, eax
-	push    eax
-	mov     eax, offset CUIScrollView__GetItem
+	xor		eax, eax
+	push	eax
+	mov		eax, offset CUIScrollView__GetItem
 	; идём обратно
-	jmp    back_from_cuilistbox_fix1
+	jmp		back_from_cuilistbox_fix1
 cuilistbox_fix1 endp
 
 aGetMainInputReceiver db "GetMainInputReceiver",0
 
 cuilistbox_fix2 proc
 	; делаем то, что вырезали
-	call    register__cuilistbox__CUIWindows__UINT
-	mov     ecx, eax
+	call	register__cuilistbox__CUIWindows__UINT
+	mov		ecx, eax
 	; делаем своё
-	call    register__cuilistbox__CUIWindows__UINT ; для регистрации своей функции, которая вернёт нам input receiver
-	mov     ecx, eax
+	call	register__cuilistbox__CUIWindows__UINT ; для регистрации своей функции, которая вернёт нам input receiver
+	mov		ecx, eax
 	; идём обратно
-	jmp    back_from_cuilistbox_fix2
+	jmp	   back_from_cuilistbox_fix2
 cuilistbox_fix2 endp
 
 
 CUIListBox__GetMainInputReceiver proc near
 stub = dword ptr  4
-	call    CurrentGameUI
+	call	CurrentGameUI
 	.if		eax != 0
-		lea     ecx, [eax+10h]
-		call    CDialogHolder__TopInputReceiver
+		lea		ecx, [eax+10h]
+		call	CDialogHolder__TopInputReceiver
 	.endif
-	retn    4
+	retn	4
 CUIListBox__GetMainInputReceiver endp
 

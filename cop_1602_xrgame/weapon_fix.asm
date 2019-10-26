@@ -136,12 +136,15 @@ Objects_net_Find endp
 
 ; Возможность стрелять картечью из подствольного гранатомёта.
 ; 
+aGrenade_laun_shot			db "grenade_launcher_shotgun", 0	; булева для включения режима шотгана для подствольника
+
 shotgun_gl proc
 rocket_section				= dword ptr	 4
 fShotTimeCounter			= dword ptr	 912
 m_bFireSingleShot			= byte	ptr	 1949
+;----------------------
 	call	CRocketLauncher__getRocketCount
-	.if		eax == 0
+	.if		eax == 0 && [esi+m_bGrnLauncherShotgun]
 ;		CWeaponMagazinedWGrenade::OnShot()
 		mov		ecx, esi
 		call	CWeaponMagazinedWGrenade__OnShot
@@ -165,32 +168,31 @@ m_bFireSingleShot			= byte	ptr	 1949
 shotgun_gl endp
 
 switshGL_params proc
-m_bGrenadeMode				= byte	ptr	 2040
-cNameSect					= dword ptr	 404
+;cNameSect					= dword ptr	 404
 	push	ecx
 	push	edx
 	push	ebx
 ;------------------------
-	mov		edx, [esi+cNameSect]
+	mov		edx, [esi+NameSection]
 	add		edx, 10h
 ;	PRINT_UINT "name section - %s", edx
-	.if		[esi+m_bGrenadeMode] == 0
-		push	edx
-		mov		ecx, esi
-		call	CShootingObject__LoadFireParams
-	.else
-		mov		ecx, ds:pSettings			; CInifile const * const pSettings
-		mov		ecx, [ecx]
-		push	offset aGrenade_laun_0		; "grenade_launcher_name"
-		push	edx
-		call	ds:r_string					; CInifile::r_string(char const *,char const *)
-;		PRINT_UINT "grenade_launcher_name - %s", eax
-		mov		ebx, eax
-		push	ebx
-		mov		ecx, esi
-		call	CShootingObject__LoadFireParams
-;		mov		ecx, esi
-;		call	load_param_GL
+	.if		[esi+m_bGrnLauncherShotgun]
+		.if		[esi+m_bGrenadeMode] == 0
+			push	edx
+			mov		ecx, esi
+			call	CShootingObject__LoadFireParams
+		.else
+			mov		ecx, ds:pSettings			; CInifile const * const pSettings
+			mov		ecx, [ecx]
+			push	offset aGrenade_laun_0		; "grenade_launcher_name"
+			push	edx
+			call	ds:r_string					; CInifile::r_string(char const *,char const *)
+	;		PRINT_UINT "grenade_launcher_name - %s", eax
+			mov		ebx, eax
+			push	ebx
+			mov		ecx, esi
+			call	CShootingObject__LoadFireParams
+		.endif
 	.endif
 ;-------------------------
 	pop		ebx
@@ -204,15 +206,16 @@ switshGL_params endp
 
 load_param_GL	proc
 iMagazineSize2				= dword ptr	 2024
-cNameSect					= dword ptr	 404
+;cNameSect					= dword ptr	 404
 ;-----------------------------
 	push	ecx
 	push	edi
 	push	ebx
 	mov		esi, ecx
 	mov		[esi+m_bCanRocketReload], true
+	mov		[esi+m_bGrnLauncherShotgun], false
 	mov		dword ptr [esi+iMagazineSize2], 1
-	mov		edi, [esi+cNameSect]
+	mov		edi, [esi+NameSection]
 	add		edi, 10h
 ;	PRINT_UINT "name_section - %s", edi
 	push	offset aGrenade_laun_0			; "grenade_launcher_name"
@@ -242,6 +245,20 @@ cNameSect					= dword ptr	 404
 ;			PRINT_UINT "iMagazineSize2 - %d", eax
 			mov		dword ptr [esi+iMagazineSize2], eax
 		.endif
+		push	offset aGrenade_laun_shot		; "grenade_launcher_shotgun"
+		push	edi								; edi <- grenade_launcher_name
+		mov		eax, ds:pSettings				; CInifile const * const pSettings
+		mov		ecx, [eax]
+		call	ds:line_exist					; CInifile::line_exist(char const *,char const *)
+		.if		eax
+			mov		ecx, ds:pSettings			; CInifile const * const pSettings
+			mov		ecx, [ecx]
+			push	offset aGrenade_laun_shot	; "grenade_launcher_shotgun"
+			push	edi
+			call	ds:r_bool					; CInifile::r_bool(char const *,char const *)
+	;		PRINT_UINT "grenade_launcher_name - %s", eax
+			mov		[esi+m_bGrnLauncherShotgun], al
+		.endif
 	.endif
 	pop		ebx
 	pop		edi
@@ -260,8 +277,8 @@ reload_GL proc
 ;----------------------------
 ;	PRINT "CWeaponMagazinedWGrenade::ReloadMagazine()"
 	.if		[esi+m_bGrenadeMode] 
-;		mov     eax, ds:Device
-;		mov     eax, [eax+18h]
+;		mov		eax, ds:Device
+;		mov		eax, [eax+18h]
 ;		PRINT_UINT "reload_GL Device.dwFrame - %d", eax
 		.if		[esi+m_bCanRocketReload] == true
 			mov		[esi+m_bCanRocketReload], false
@@ -274,7 +291,7 @@ reload_GL proc
 		.endif
 		pop		esi
 		pop		ecx
-		retn	; 	выходим из void CWeaponMagazinedWGrenade::ReloadMagazine()
+		retn	;	выходим из void CWeaponMagazinedWGrenade::ReloadMagazine()
 	.endif
 	; делаем что вырезали
 	cmp		dword ptr [esi+iAmmoElapsed], 0
@@ -329,6 +346,12 @@ local fake_grenade_name:dword, ammo_sect:dword, size_mag:dword
 	push	ebx
 ;------------------------------
 	mov		esi, ecx
+	mov		eax, [esi+m_magazine]
+	PRINT_UINT "m_magazine.0 - %x", eax
+	mov		eax, [esi+m_magazine+4]
+	PRINT_UINT "m_magazine.4 - %x", eax
+	mov		eax, [esi+m_magazine+8]
+	PRINT_UINT "m_magazine.8 - %x", eax
 	mov		ecx, [esi+m_magazine+4]
 	sub		ecx, [esi+m_magazine]
 	mov		eax, 88888889h
@@ -393,7 +416,7 @@ local fake_grenade_name:dword, ammo_sect:dword, size_mag:dword
 	ret
 spawn_rockets endp
 
-; Удаляем ракеты при разрядке CWeaponRG6, CWeaponRPG7,  но не CWeaponMagazinedWGrenade.
+; Удаляем ракеты при разрядке CWeaponRG6, CWeaponRPG7,	но не CWeaponMagazinedWGrenade.
 unload_delete_rockets proc
 	; smart_cast__CWeaponMagazinedWGrenade
 	push	0
@@ -524,7 +547,7 @@ LoadBoolAutoload endp
 aUpdateMissileVis	db "callback_update_missile_vis", 0
 
 Callback_UpdateMissileVisibility proc
-	mov		ebx, [edi+cNameSect]
+	mov		ebx, [edi+NameSection]
 	.if		ebx != 0
 		add		ebx, 10h
 		push	offset aUpdateMissileVis		; "callback_update_missile_vis"
@@ -581,8 +604,20 @@ D				= dword ptr	 8
 	push	ecx
 	mov		ecx, esi
 	call	CWeapon__FireTrace
-	lea		ecx, [esi+824]
-	call	CWeaponRG6__RocketLaunch
+	mov		ecx, [esi+m_magazine+4]
+	mov		eax, [ecx+m_ammoSect]	;(CCartridge ptr [ecx]).m_ammoSect		; секция патрона
+	add		eax, 10h
+	PRINT_UINT "m_magazine = %s", eax
+	mov		edx, ds:pSettings			; CInifile const * const pSettings
+	mov		ecx, [edx]
+	push	offset aFake_grenade_n		; "fake_grenade_name"
+	push	eax
+	call	ds:r_string
+	PRINT_UINT "fake_grenade_name = %s", eax
+	.if		eax
+		lea		ecx, [esi+824]
+		call	CWeaponRG6__RocketLaunch
+	.endif
 	pop		esi
 	retn	8
 CWeaponRG6__FireTrace endp
@@ -590,11 +625,11 @@ CWeaponRG6__FireTrace endp
 ; При отсоединении ПГ в основном режиме, разряжаем ПГ.
 CWeaponMagazinedWGrenade__Detach_fix proc
 	; делаем вырезанное
-	mov     [esi+1120], bl
+	mov		[esi+1120], bl
 	.if		[esi+m_bGrenadeMode] == false		; если в основном режиме, то перегодим на ПГ.
 		; переключаемся на гранатомёт
-		mov     ecx, esi
-		call    CWeaponMagazinedWGrenade__PerformSwitchGL
+		mov		ecx, esi
+		call	CWeaponMagazinedWGrenade__PerformSwitchGL
 	.endif
 	jmp		back_from_CWeaponMagazinedWGrenade__Detach_fix
 CWeaponMagazinedWGrenade__Detach_fix endp
@@ -610,3 +645,10 @@ state			= dword ptr 4
 	pop		esi
 	retn	4
 CWeaponRPG7__OnAnimationEnd endp
+; Надо для инициилизации, если fire_modes не установлен
+not_fire_modes proc
+	.if		[ecx+m_bHasDifferentFireModes] == false
+		mov		[ecx+m_iQueueSize], 1		; m_iQueueSize = 1; размер очереди
+	.endif
+	jmp		back_from_not_fire_modes
+not_fire_modes endp

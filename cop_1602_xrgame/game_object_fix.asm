@@ -286,6 +286,7 @@ m_iCurFireMode				= dword ptr	 1964
 m_bHasDifferentFireModes	= byte  ptr	 1950	; bool (sizeof 1 byte)
 fOneShotTime				= dword ptr	 860
 m_bGrenadeMode				= byte  ptr	 2040
+m_bGrnLauncherShotgun		= byte  ptr	 2041	; возможность стрелять пулями из ПГ
 m_magazine2					= dword ptr	 2028
 m_DefaultCartridge2			= dword ptr	 2044
 ; class CCartridge
@@ -349,7 +350,7 @@ CScriptGameObject__GetAmmo proc
 		add		esp, 4
 		.if		eax != 0
 			mov		ecx, [eax+m_magazine+4]
-			sub		ecx, sizeof_CCartridge
+			sub		ecx, sizeof CCartridge
 			mov		eax, [ecx+m_ammoSect]		; секция патрона
 			.if		eax != 0
 				add		eax, 10h
@@ -596,11 +597,11 @@ CScriptGameObject__DetectorClear proc
 		SMARTCAST_CEliteDetector
 		mov		edi, eax
 		xor		eax, eax
-		.if		edi != 0 && [edi+m_bScriptMode] != 0
+		.if		edi != null && [edi+m_bScriptMode] != false
 			mov		esi, [edi+m_items_to_draw]
 			mov		eax, [esi+116]
 			mov		[esi+120], eax
-			mov		eax, 1		; result = true;
+			mov		eax, true		; result = true;
 		.endif
 	.endif
 ;------------------------------
@@ -709,7 +710,6 @@ local	linear:real4, angular:real4
 CScriptGameObject__GetAirResAngular endp
 
 CScriptGameObject__SetGrenadeMode proc mode:byte
-;	push	esi
 	mov		eax, [ecx+4]
 	push	eax
 	call	smart_cast_CWeapon
@@ -724,7 +724,6 @@ CScriptGameObject__SetGrenadeMode proc mode:byte
 			.endif
 		.endif
 	.endif
-;	pop		esi
 	ret		4
 CScriptGameObject__SetGrenadeMode endp
 

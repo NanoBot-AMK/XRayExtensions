@@ -642,6 +642,8 @@ r_u32		dd ?
 org 103483F0h - shift
 smart_cast_CEntityAlive:
 org 10348420h - shift
+smart_cast_const_CWeapon:
+org 10348410h - shift
 smart_cast_CWeapon:
 org 10348450h - shift
 smart_cast_CWeaponMagazined:
@@ -733,7 +735,10 @@ CWeaponMagazined__switch2_Reload:
 org 102CCD80h - shift
 CWeaponMagazined__OnAnimationEnd:
 ;================================================================
+NameSection				= dword ptr 404
 iMagazineSize			= dword ptr 1684
+m_ammoTypes				= dword ptr 1700	; sizeof 12 bytes
+m_ammoType				= byte	ptr 1732
 iMagazineSize2			= dword ptr 2024
 m_bGrenadeMode			= byte	ptr 2040
 m_bLockType				= byte	ptr 1972
@@ -1108,8 +1113,9 @@ org 102CB030h - shift	; 15 bytes
 ;	jz		exit_UpdateParticles
 ;---------------------------------------
 ; Фикс вылета если не указан в классе CWeaponMagazined параметр fire_modes.
-m_aFireModes		= dword ptr 1952	; sizeof 12 bytes
-m_iCurFireMode		= dword ptr 1964
+m_aFireModes				= dword ptr 1952	; sizeof 12 bytes
+m_iCurFireMode				= dword ptr 1964
+m_iQueueSize				= dword ptr 1904
 ;virtual	int		GetCurrentFireMode	() { return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1; };
 org 102CEB30h - shift	; 17+12 = 29 bytes
 CWeaponMagazined__GetCurrentFireMode:
@@ -1121,6 +1127,12 @@ CWeaponMagazined__GetCurrentFireMode:
 		movsx	eax, byte ptr [eax+ecx]
 	.endif
 	retn
+org 102CD579h - shift	; 7 bytes
+	jmp     not_fire_modes
+back_from_not_fire_modes:	
+	jmp		edx
+;org 102CFE35h - shift	; 
+
 ;---------------------------------------
 org 102D0720h - shift
 CWeaponMagazined__switch2_Fire:
@@ -1144,6 +1156,8 @@ org 102C2D30h - shift
 CWeapon__FireEnd:
 org 102D3740h - shift
 CWeaponMagazinedWGrenade__PerformSwitchGL:
+org 102A7740h - shift
+CInventory__ActiveItem:
 
 
 ; возможность стрелять из CWeaponRPG7 очередями.
@@ -1229,4 +1243,12 @@ org 102D40FFh - shift	; 6 bytes
 	nop
 org 102D40C0h - shift	; 6 bytes
 	lea		esi, [ebp+iMagazineSize]
-
+;------------------------------------------------
+; класс CWeaponBM16 стреляет очередями
+org 105648ECh - shift	; 4 bytes
+	dd		CWeaponMagazined__GetCurrentFireMode	; в место CWeaponCustomPistol::GetCurrentFireMode { return 1 }
+org 10564330h - shift	; 4 bytes
+	dd		CWeaponMagazined__FireEnd				; в место CWeaponCustomPistol::FireEnd
+org 10564920h - shift	; 4 bytes
+	dd		CWeaponMagazined__switch2_Fire			; в место CWeaponShotgun::switch2_Fire
+;------------------------------------------------
