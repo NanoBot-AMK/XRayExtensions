@@ -9,9 +9,10 @@ eWeaponOnShoot						= dword ptr 181		; колбек на выстрел
 eWeaponStartBullet					= dword ptr 182		; колбек на старт пули
 eWeaponStopBullet					= dword ptr 183		; колбек на стоп пули
 eWeaponSwitchMode					= dword ptr 184		; колбек на переключения режима огня
+eUpdateMissileVisibility			= dword ptr 185		; апдейт видимости кости ракеты РПГ7
 
-m_dwTotalShots 	dd 0					; для генератора айдишника пуль.		GLOBAL
-aCallback_on 	db "callback_on", 0		; название булевого параметра в конфиге патрона для включения колбеков для старта и стопа пули.
+m_dwTotalShots	dd 0					; для генератора айдишника пуль.		GLOBAL
+aCallback_on	db "callback_on", 0		; название булевого параметра в конфиге патрона для включения колбеков для старта и стопа пули.
 aGrenadeAny		db "missile_0", 0
 
 ; колбек на выстрел, вызывается в объекте оружия
@@ -163,7 +164,7 @@ m_bFireSingleShot			= dword ptr	 1949
 ;	CWeaponMagazined::state_Fire(dt)
 	mov		ecx, esi
 	call	CWeaponMagazined__state_Fire
-	PRINT_UINT	"CWeaponMagazinedWGrenade__OnShot - %d", eax
+;	PRINT_UINT	"CWeaponMagazinedWGrenade__OnShot - %d", eax
 	xor		eax, eax
 exit:
 	retn
@@ -174,15 +175,16 @@ m_bGrenadeMode				= dword ptr	 2040
 cNameSect					= dword ptr	 404
 	push	ecx
 	push	edx
+	push	ebx
 ;------------------------
 	mov		edx, [esi+cNameSect]
 	test	edx, edx
 	jz		lab1
 	add		edx, 10h
 lab1:
-	PRINT_UINT "name section - %s", edx
+;	PRINT_UINT "name section - %s", edx
 	movzx	eax, byte ptr [esi+m_bGrenadeMode]
-	PRINT_UINT "switshGL_params - %d", eax
+;	PRINT_UINT "switshGL_params - %d", eax
 	test	eax, eax
 	jnz		mode_gl
 		push	edx
@@ -195,12 +197,16 @@ mode_gl:
 		push	offset aGrenade_laun_0		; "grenade_launcher_name"
 		push	edx
 		call	ds:r_string					; CInifile::r_string(char const *,char const *)
-		PRINT_UINT "grenade_launcher_name - %s", eax
-		push	eax
+;		PRINT_UINT "grenade_launcher_name - %s", eax
+		mov		ebx, eax
+		push	ebx
 		mov		ecx, esi
 		call	CShootingObject__LoadFireParams
+;		mov		ecx, esi
+;		call	load_param_GL
 exit:
 ;-------------------------
+	pop		ebx
 	pop		edx
 	pop		ecx
 	; делаем что вырезали
@@ -209,40 +215,99 @@ exit:
 	jmp		back_from_switshGL_params
 switshGL_params endp
 
+load_param_GL	proc
+iMagazineSize2				= dword ptr	 2024
+cNameSect					= dword ptr	 404
+;-----------------------------
+	push	ecx
+	push	edi
+	push	ebx
+	mov		esi, ecx
+	mov		dword ptr [esi+iMagazineSize2], 1
+	mov		edi, [esi+cNameSect]
+	test	edi, edi
+	jz		exit
+	add		edi, 10h
+;	PRINT_UINT "name_section - %s", edi
+	push	offset aGrenade_laun_0			; "grenade_launcher_name"
+	push	edi
+	mov		eax, ds:pSettings				; CInifile const * const pSettings
+	mov		ecx, [eax]
+	call	ds:line_exist					; CInifile::line_exist(char const *,char const *)
+	test	eax, eax
+	jz		exit
+		mov		ecx, ds:pSettings			; CInifile const * const pSettings
+		mov		ecx, [ecx]
+		push	offset aGrenade_laun_0		; "grenade_launcher_name"
+		push	edi
+		call	ds:r_string					; CInifile::r_string(char const *,char const *)
+;		PRINT_UINT "grenade_launcher_name - %s", eax
+		mov		edi, eax
+		push	offset aAmmo_mag_size			; "ammo_mag_size"
+		push	edi
+		mov		eax, ds:pSettings				; CInifile const * const pSettings
+		mov		ecx, [eax]
+		call	ds:line_exist					; CInifile::line_exist(char const *,char const *)
+		test	eax, eax
+		jz		exit
+			push	offset aAmmo_mag_size		; "ammo_mag_size"
+			push	edi
+			mov		eax, ds:pSettings			; CInifile const * const pSettings
+			mov		ecx, [eax]
+			call	ds:r_u32
+			PRINT_UINT "iMagazineSize2 - %d", eax
+			mov		dword ptr [esi+iMagazineSize2], eax
+exit:
+	pop		ebx
+	pop		edi
+	pop		ecx
+	retn
+load_param_GL	endp
+
 m_rockets					= dword ptr	 1976
 m_bGrenadeMode				= dword ptr	 2040
 iAmmoElapsed				= dword ptr	 1680
 m_magazine					= dword ptr	 1736	; sizeof 12 bytes
+m_hud_item_state			= dword ptr	 740
+m_ammoType					= dword ptr	 1732
 reload_GL proc
 ;----------------------------
-	push	ecx
-	PRINT "CWeaponMagazinedWGrenade::ReloadMagazine()"
+;	push	ecx
+;	PRINT "CWeaponMagazinedWGrenade::ReloadMagazine()"
 	cmp		byte ptr [esi+m_bGrenadeMode], 0
 	jz		exit
 	mov		ecx, esi
 	call	delete_rockets
-exit:
+	cmp		dword ptr [esi+iAmmoElapsed], 0
+	jz		exit
+	mov		ecx, esi
+	call	spawn_rockets
+;	pop		ecx
+;--------------------------
+	pop		esi
 	pop		ecx
+	retn			; выходим из void CWeaponMagazinedWGrenade::ReloadMagazine()
+exit:
+;	pop		ecx
 	; делаем что вырезали
 	cmp		dword ptr [esi+690h], 0
 	jmp		back_from_reload_GL
 reload_GL endp
 
 delete_rockets proc
-	
 	push	esi
 	push	ebx
 	push	edx
 	xor		ebx, ebx
 	mov		esi, ecx
-	push    0
-	push    offset off_106373E8
-	push    offset off_1061842C
-	push    0
-	push    esi
-	call    __RTDynamicCast
-	add     esp, 14h
-	PRINT_UINT "CRocketLauncher - %x", eax
+	push	0
+	push	offset off_106373E8
+	push	offset off_1061842C
+	push	0
+	push	esi
+	call	__RTDynamicCast
+	add		esp, 14h
+;	PRINT_UINT "CRocketLauncher - %x", eax
 	test	eax, eax
 	jz		exit
 	mov		esi, eax	; esi - CRocketLauncher
@@ -253,7 +318,7 @@ while_:
 ;	if (cur_rock)	
 	test	eax, eax
 	jz		exit
-	PRINT_UINT "rocket CCustomRocket - %x", eax
+;	PRINT_UINT "rocket CCustomRocket - %x", eax
 ;	if (cur_rock->local())	{
 	test	dword ptr [eax+0A4h], 8000000h
 	jz		exit
@@ -308,11 +373,10 @@ for_:
 	mov		edx, [esi+m_magazine]
 	mov		eax, dword ptr [ebx+edx+m_ammoSect]
 	test	eax, eax
-	jz		lab1
+	jz		exit
 	add		eax, 10h
-	PRINT_UINT "Number - %d", edi
-	PRINT_UINT "m_ammoSect - %s", eax
-lab1:
+;	PRINT_UINT "Number - %d", edi
+;	PRINT_UINT "m_ammoSect - %s", eax
 	;------------------------------
 	push	ecx
 	push	edx
@@ -322,17 +386,17 @@ lab1:
 	mov		ecx, [eax]
 	call	ds:r_string						; CInifile::r_string(char const *,char const *)
 ;	PRINT_UINT "fake_grenade_name - %s", eax
-	lea     ecx, [esp+28+fake_grenade_name]
+	lea		ecx, [esp+28+fake_grenade_name]
 ;	PRINT_UINT "ecx - %x", ecx
-	push    eax
-	call    LPCSTR2shared_str
-	lea     eax, [esi+0E8h]
-	lea     ecx, [esp+28+fake_grenade_name]
+	push	eax
+	call	LPCSTR2shared_str
+	lea		eax, [esi+0E8h]
+	lea		ecx, [esp+28+fake_grenade_name]
 ;	PRINT_UINT "ecx - %x", ecx
 	push	eax
 	push	ecx
 	lea		ecx, [esi+1976]
-	call    CRocketLauncher__SpawnRocket
+	call	CRocketLauncher__SpawnRocket
 	pop		edx
 	pop		ecx
 	;------------------------------
@@ -352,10 +416,10 @@ lab1:
 	mov		eax, edi
 	pop		ebx
 exit:						   
-	pop     edi
-	pop     esi
+	pop		edi
+	pop		esi
 	pop		edx
-	pop     ebp
+	pop		ebp
 	add		esp, size_variables
 	retn
 spawn_rockets endp
@@ -367,7 +431,7 @@ unload_delete_rockets proc
 	call	delete_rockets
 	pop		eax
 	; делаем что вырезали
-	mov     ecx, [ebp+6C8h]
+	mov		ecx, [ebp+6C8h]
 	jmp		back_from_unload_delete_rockets
 unload_delete_rockets endp
 
@@ -380,8 +444,8 @@ CWeaponRPG7__RealReloadRockets proc
 	mov		ecx, esi
 	call	spawn_rockets		; спавним новые, которые соотвествуют патронам
 ;	pop		ebx
-	pop     esi
-	pop     ecx
+	pop		esi
+	pop		ecx
 	retn			; выходим из void CWeaponRPG7::ReloadMagazine()
 CWeaponRPG7__RealReloadRockets endp
 CWeaponRPG7__RealReloadRockets2 proc
@@ -389,10 +453,11 @@ CWeaponRPG7__RealReloadRockets2 proc
 ;---------------------------
 	mov		ecx, esi
 	call	spawn_rockets
-	pop     esi
-	mov     eax, ebx
-	pop     ebx
-	retn    4		; выходим из BOOL CWeaponRPG7::net_Spawn
+	mov		byte ptr [esi+m_bBlockRocket], 0	; m_bBlockRocket = false; // Init m_bBlockRocket
+	pop		esi
+	mov		eax, ebx
+	pop		ebx
+	retn	4		; выходим из BOOL CWeaponRPG7::net_Spawn
 CWeaponRPG7__RealReloadRockets2 endp
 
 ; колбек на удар ножа, вызывается в объекте ножа
@@ -477,3 +542,45 @@ BlockedRPG7 proc
 exit:
 	retn
 BlockedRPG7 endp
+
+aUpdateMissileVis	db "callback_update_missile_vis", 0
+
+Callback_UpdateMissileVisibility proc
+	mov		ebx, [edi+cNameSect]
+	test	ebx, ebx
+	jz		exit
+	add		ebx, 10h
+	push	offset aUpdateMissileVis		; "callback_update_missile_vis"
+	push	ebx
+	mov		eax, ds:pSettings				; CInifile const * const pSettings
+	mov		ecx, [eax]
+	call	ds:line_exist					; CInifile::line_exist(char const *,char const *)
+	test	eax, eax
+	jz		exit
+		push	offset aUpdateMissileVis	; "callback_update_missile_vis"
+		push	ebx
+		mov		eax, ds:pSettings			; CInifile const * const pSettings
+		mov		ecx, [eax]
+		call	ds:r_bool
+		test	eax, eax
+		jz		exit
+;			PRINT	"XRay Callback_UpdateMissileVisibility"
+			push	dword ptr [edi+m_hud_item_state]	; номер состояния худа оружия
+			movzx	eax, byte ptr [edi+m_ammoType]		; номер типа текущего боеприпаса (от 1)
+			inc		eax
+			push	eax
+			push	offset eUpdateMissileVisibility		; константа - тип колбека	
+			lea		ecx, [edi+232]				; this
+			call	CGameObject__callback		; eax = callback
+			mov		ecx, eax					; callback
+			call	script_callback_int_int
+			pop		edi
+			pop	 	esi
+			pop	 	ebx
+			add	 	esp, 8
+			retn		; выходим из CWeaponRPG7__UpdateMissileVisibility
+exit:
+	; делаем вырезанное
+	mov		eax, [edi+iAmmoElapsed]
+	jmp		back_from__Callback_UpdateMissileVisibility
+Callback_UpdateMissileVisibility endp

@@ -702,9 +702,7 @@ org 102CC6F9h - shift	; 9 bytes
 	add		eax, 10h
 org 102CC877h - shift
 no_spawn_rocket:
-;org 102D13C7h - shift	; 2 bytes
-;	nop
-;	nop
+
 	
 org 102C3080h - shift
 CWeapon__FireTrace:
@@ -723,26 +721,85 @@ CWeapon__StartFlameParticles2:
 org 102D3E40h - shift
 CWeaponMagazinedWGrenade__Load:
 
-;org 102BEFA0h - shift
-;sub_102BEFA0:
-
-; перезарядка параметров: подствол. - основной ствол.
-org 102D3A52h - shift	; 5 bytes
-	jmp		switshGL_params
-back_from_switshGL_params:
 
 org 105561CCh - shift
 aGrenade_laun_0 dd ?
+org 10556530h - shift
+aAmmo_mag_size	dd ?
 org 102BAE10h - shift
 CShootingObject__LoadFireParams:
+org 102CD470h - shift
+CWeaponMagazined__switch2_Reload:
+org 102CCD80h - shift
+CWeaponMagazined__OnAnimationEnd:
 ;================================================================
-
+iMagazineSize			= dword ptr 1684
+iMagazineSize2			= dword ptr 2024
+m_bGrenadeMode			= dword ptr 7F8h
+; Подствольный гранатомёт: перезарядка параметров: подствол. - основной ствол.
+org 102D3A52h - shift	; 5 bytes
+	jmp		switshGL_params
+back_from_switshGL_params:
 ; Подствольный гранатомёт: смена ракеты при смене типа боеприпаса.
 org 102D1FE9h - shift	; 7 bytes
 	jmp		reload_GL
 	nop
 	nop
 back_from_reload_GL:
+; Подствольный гранатомёт: блокируем перезарядку, если есть ещё патроны.
+org 102D15A0h - shift	; 2 bytes
+jnz     short loc_102D15D4
+org 102D15B7h - shift	; 51 bytes
+	cmp		byte ptr [esi+m_bGrenadeMode-2E0h], 0
+	jz		loc_102D15D4 			; if (m_bGrenadeMode)
+	cmp		byte ptr [esi+iAmmoElapsed-2E0h], 0
+	jnz		loc_102D15D4			; if (iAmmoElapsed==0)
+	mov		eax, [esi-2E0h]
+	mov		edx, [eax+188h]
+	lea		ecx, [esi-2E0h]
+	call	edx				; CWeaponMagazined::Reload
+loc_102D15D4:
+	push	edi
+	mov		ecx, esi
+	call	CWeaponMagazined__OnAnimationEnd
+	pop		edi
+	pop		esi
+	retn	4
+	
+; Подствольный гранатомёт: задаём размер магазина.
+org 102D4063h - shift	; 12 bytes
+	mov		ecx, edi
+	call	load_param_GL
+	nop
+	nop
+	nop
+	nop
+	nop
+org 102D407Ch - shift	; 12 bytes
+	mov		ecx, edi
+	call	load_param_GL
+	nop
+	nop
+	nop
+	nop
+	nop
+; Подствольный гранатомёт: размер магазана.
+org 102D3748h - shift	; 38 bytes
+;	m_bGrenadeMode = !m_bGrenadeMode;
+	xor		byte ptr [esi+m_bGrenadeMode], 1
+	push	edi
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+;	swap(iMagazineSize2, iMagazineSize);
+	mov		ecx, [esi+iMagazineSize]
+	mov		eax, [esi+iMagazineSize2]
+	mov		[esi+iMagazineSize2], ecx
+	mov		[esi+iMagazineSize], eax
+
 
 ; колбек на удар ножа, вызывается в объекте ножа
 org 102D73D2h - shift	; 7 bytes
@@ -885,8 +942,6 @@ off_106373E8:
 org 1063E6A8h - shift
 off_1063E6A8:
 
-org 102D9650h - shift	; 1 bytes
-	retn
 ;org 102D9703h - shift	; 5 bytes
 ;	push	offset aGrenadeAny
 	
@@ -928,3 +983,9 @@ register__bool__go:
 ; Блокировка пуска ракет для класса CWeaponRPG7
 org 102D9948h - shift	; 5 bytes
 	call	BlockedRPG7
+
+; Callback	CWeaponRPG7__UpdateMissileVisibility
+org 102D9658h - shift	; 6 bytes
+	jmp		Callback_UpdateMissileVisibility
+	nop
+back_from__Callback_UpdateMissileVisibility:
