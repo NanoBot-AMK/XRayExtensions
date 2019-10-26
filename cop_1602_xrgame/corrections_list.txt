@@ -21,9 +21,9 @@
 0x100C172E 2 ; возможность использовать скрипты в мультиплеере (включение биндеров)
 101EC1D3h 5 ; jmp game_object_fix2, расширение пространства имён game_object
 101D8A98h 5 ; jmp game_object_fix1, расширение пространства имён game_object
-; 
-0x101D8378 5
-0x101C1887 7 
+; Назначаем инициатор методу explode
+;0x101D8378 5
+;0x101C1887 7 
 ;
 0x102CE2E0 6 ; callback  CWeapon__Callback_SwitchMode (1)
 0x102CE340 6 ; callback  CWeapon__Callback_SwitchMode (2)

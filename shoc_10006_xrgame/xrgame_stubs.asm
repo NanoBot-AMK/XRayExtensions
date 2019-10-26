@@ -2,7 +2,6 @@
 ; S.T.A.L.K.E.R data stubs
 ;*******************************************************************************
 
-;.text:102278F0 CWeaponMagazined__InitAddons proc near	; CODE XREF: CWeaponMagazinedWGrenade__InitAddons+3p
 
 ;.text:10227DA4					call	ds:?r_float@CInifile@@QAEMABVshared_str@@PBD@Z ; CInifile::r_float(shared_str const &,char const *)
 org 10227DAAh - shift
@@ -720,7 +719,8 @@ org 103F9600h - shift
 CUIWindow__BringToTop_:
 
 org 1040E220h - shift
-CUIComboBox__AddItem_:
+CUIComboBox@@AddItem_ proc str_:ptr byte, data:dword
+CUIComboBox@@AddItem_ endp
 
 org 103F1520h - shift
 register_CUI_void__string:
@@ -1222,20 +1222,6 @@ org 102AC460h - shift
 ;.text:102A0940 arg_8			= dword ptr	 0Ch
 org 102A0940h - shift
 	jmp game_GameState__SetGameTimeFactor__INT64_float_dbg_fix
-;.text:102A0940					mov		eax, [esp+arg_0]
-;.text:102A0944					mov		ecx, [esp+arg_4]
-;.text:102A0948					mov		edx, ds:?g_pGameLevel@@3PAVIGame_Level@@A ; IGame_Level * g_pGameLevel
-;.text:102A094E					mov		[esi+74h], ecx
-;.text:102A0951					mov		[esi+70h], eax
-;.text:102A0954					mov		eax, [edx]
-;.text:102A0956					lea		ecx, [eax+160h]
-;.text:102A095C					call	ds:?timeServer_Async@IPureClient@@QAEIXZ ; IPureClient::timeServer_Async(void)
-;.text:102A0962					movss	xmm0, [esp+arg_8]
-;.text:102A0968					mov		[esi+68h], eax
-;.text:102A096B					mov		dword ptr [esi+6Ch], 0
-;.text:102A0972					movss	dword ptr [esi+78h], xmm0
-;.text:102A0977					retn	0Ch
-;.text:102A0977 game_GameState__SetGameTimeFactor__INT64_float endp
 
 
 
@@ -1243,24 +1229,6 @@ org 102A0940h - shift
 ;.text:102A0900 arg_0			= dword ptr	 4
 org 102A0900h - shift
 	jmp game_GameState__SetGameTimeFactor_dbg_fix
-;.text:102A0900					push	esi
-;.text:102A0901					mov		esi, ecx
-;.text:102A0903					mov		eax, [esi]
-;.text:102A0905					mov		edx, [eax+1Ch]
-;.text:102A0908					call	edx
-;.text:102A090A					mov		[esi+70h], eax
-;.text:102A090D					mov		eax, ds:?g_pGameLevel@@3PAVIGame_Level@@A ; IGame_Level * g_pGameLevel
-;.text:102A0912					mov		[esi+74h], edx
-;.text:102A0915					mov		eax, [eax]
-;.text:102A0917					lea		ecx, [eax+160h]
-;.text:102A091D					call	ds:?timeServer_Async@IPureClient@@QAEIXZ ; IPureClient::timeServer_Async(void)
-;.text:102A0923					movss	xmm0, [esp+4+arg_0]
-;.text:102A0929					mov		[esi+68h], eax
-;.text:102A092C					mov		dword ptr [esi+6Ch], 0
-;.text:102A0933					movss	dword ptr [esi+78h], xmm0
-;.text:102A0938					pop		esi
-;.text:102A0939					retn	4
-;.text:102A0939 game_GameState__SetGameTimeFactor endp
 
 
 
@@ -1313,11 +1281,7 @@ org 102D5A00h - shift
 
 org 102A0840h - shift
 game_GameState__GetGameTime:
-;.text:102A0840 game_GameState__GetGameTime proc near
-;.text:102A0840 var_8			= qword ptr -8
-;.text:102A0840
-;.text:102A0840					sub		esp, 8
-;.text:102A0843					mov		eax, ds:g_pGameLevel
+
 org 102A0848h - shift
 	jmp game_GameState__GetGameTime_dbg_fix
 ;.text:102A0848					mov		eax, [eax]
@@ -1380,26 +1344,9 @@ org 102A0848h - shift
 
 
 
-;.text:101E2FC0 CEntityCondition__UpdateConditionTime proc near
-;.text:101E2FC0
-;.text:101E2FC0 var_C			= qword ptr -0Ch
-;.text:101E2FC0
-;.text:101E2FC0					mov		eax, ds:?g_pGameLevel@@3PAVIGame_Level@@A ; IGame_Level * g_pGameLevel
 org 101E2FC5h - shift
 	jmp CEntityCondition__UpdateConditionTime_dbg
-;.text:101E2FC5					mov		eax, [eax]
-;.text:101E2FC7					mov		ecx, [eax+45D0h]
-;.text:101E2FCD					sub		esp, 0Ch
-;.text:101E2FD0					push	ebx
-;.text:101E2FD1					mov		ebx, 1
-;.text:101E2FD6					cmp		[ecx+10h], ebx
-;.text:101E2FD9					push	edi
-;.text:101E2FDA					jnz		short loc_101E2FE7
-;.text:101E2FDC					mov		eax, ecx
-;.text:101E2FDE					mov		edx, [eax]
-;.text:101E2FE0					mov		eax, [edx+1Ch]
-;.text:101E2FE3					call	eax
-;.text:101E2FE5					jmp		short loc_101E2FF5
+
 
 org 10458FBCh - shift
 IPureClient__timeServer dd ?
@@ -1423,16 +1370,7 @@ back_from_CCar__cam_Update_fix0:
 ;...
 org 1026F96Eh - shift
 	jmp CCar__cam_Update_fix
-;.text:1026F96E					mov		ecx, [esi+2DCh]
-;.text:1026F974					mov		edx, ds:?g_pGameLevel@@3PAVIGame_Level@@A ; IGame_Level * g_pGameLevel
-;.text:1026F97A					mov		eax, [edx]
-;.text:1026F97C					push	ecx
-;.text:1026F97D					mov		ecx, [eax+40h]
-;.text:1026F980					call	ds:?Update@CCameraManager@@QAEXPBVCCameraBase@@@Z ; CCameraManager::Update(CCameraBase const *)
-;.text:1026F986					pop		esi
-;.text:1026F987					add		esp, 18h
-;.text:1026F98A					retn	8
-;.text:1026F98A CCar__cam_Update endp
+
 
 
 ; char __userpurge CInventory__Eat<al>(int item<ebx>, CInventory *this)
@@ -1817,24 +1755,13 @@ CALifeStoryRegistry__add: ; аргументы в стеке: this, story_id, object
 ;функция получения серверного объекта по id, аргументы в стеке: 1 - alife_simulator, 2 - id
 ; стек чистит вызывающая функция
 org 1004BD50h - shift
-object_by_id: 
-
-org 1014BE70h - shift
-register__float_rw_property:
-
-;.text:1014A7B0					  mov	  byte ptr [esp+88h+var_74], bl
-;.text:1014A7B4					  mov	  eax, [esp+88h+var_74]
-;.text:1014A7B8					  push	  eax
-;.text:1014A7B9					  push	  offset CScriptGameObject__SetHealth
-;.text:1014A7BE					  push	  offset aHealth_0 ; "health"
-;.text:1014A7C3					  mov	  edx, offset CScriptGameObject__GetHealth
-;.text:1014A7C8					  mov	  edi, ebp
-org 1014A846h - shift	;1014A7CA
-	jmp		game_object_fix2
-back_from_game_object_fix2:
-;.text:1014A7CF					  mov	  byte ptr [esp+88h+var_74], bl
-
-
+object_by_id proc C (dword) self:ptr CALifeSimulator, object_id:word
+object_by_id endp
+;
+org 1014A84Bh - shift	; 9 bytes
+	call	script_register@@game_object_extended2
+	nop2
+	push	0
 
 
 org 101AC95Ah - shift
@@ -2176,9 +2103,6 @@ org 10272746h - shift
 
 org 1021C5D0h - shift
 CWeapon__UpdateHUDAddonsVisibility:
-
-org 1014DD20h - shift
-register__critically_wounded: ; функция регистрации метода game_object с прототипом bool fun(void)
 
 ; активировать слот детекторов (8-й)
 org 102042FDh - shift
@@ -2546,12 +2470,6 @@ org 1024C290h - shift
 
 
 
-org 1014C880h - shift
-register__set_tip_text:
-
-org 1014CCE0h - shift
-register__string_void:
-
 ; вставки для коррекции скриптового изменения FOV
 ;.text:101DE710 ; void __thiscall CActor__IR_OnMouseMove(int a1, int d_x, int d_y)
 ;...
@@ -2664,12 +2582,6 @@ register__create_with_parent: ; функция регистрации в классе alife_simulator мет
 org 1045094Ch - shift
 __RTDynamicCast:
 
-org 1014D690h - shift
-register__remove_sound: ;  ; регистрация метода game_object с прототипом void fun(int)
-
-
-org 10158CD0h - shift
-register_general_goodwill: ; регистрация метода game_object с прототипом int fun(game_object*)
 
 org 10206310h - shift 
 CInventory__InBelt: ; int item<eax>, int this<ecx>
@@ -2728,34 +2640,15 @@ org 10204F13h - shift
 ;.text:10204BC9					call	ds:?processing_activate@CObject@@QAEXXZ ; CObject::processing_activate(void)
 org 10204BCFh - shift
 	jmp on_slot_callback
-;.text:10204BCF					pop		edi
-;.text:10204BD0					pop		esi
-;.text:10204BD1					mov		al, 1
-;.text:10204BD3					pop		ebx
-;.text:10204BD4					retn	4
 
 
-
-
-org 1014C2B0h - shift
-register_object_count: ; функция для регистрации метода game_object с прототипом int fun(void);
-
-
-
-;.text:101C6DC0 ; void __thiscall CActor__HitSignal(int this, float perc, void *dir, int who, unsigned __int16 bone)
+;void __thiscall CActor::HitSignal(CActor* this, float perc, Fvector* dir, CObject* who, u16 bone)
 org 101C6DC0h - shift
-	jmp CActor_HitSignal_ext
-;.text:101C6DC0					sub		esp, 0Ch
-;.text:101C6DC3					push	edi
-;.text:101C6DC4					mov		edi, ecx
-org 101C6DC6h - shift
-back_to_CActor_HitSignal:
-;.text:101C6DC6					mov		eax, [edi+1B8h]
-;.text:101C6DCC					movss	xmm0, dword ptr [eax+4]
-;.text:101C6DD1					comiss	xmm0, ds:float_10459F94
-;.text:101C6DD8					jbe		loc_101C7298
-
-
+CActor@@HitSignal:
+org 1048300Ch - shift	; 4 bytes
+	dd offset CActor@@HitSignal_callback	;CActorMP
+org 10483CFCh - shift	; 4 bytes
+	dd offset CActor@@HitSignal_callback	;CActor
 
 ; void __userpurge CHitMemoryManager__add3(int ebx0<ebx>, int entity)
 org 100138F0h - shift
@@ -2998,39 +2891,15 @@ org 10190698h - shift
 bit_and_register:
 
 ;-------------| Фрагмент script_register_game_object2 |------------------------
-
-;.text:10155D53					mov		[esp+6Ch+var_48], offset sub_101421D0
-;.text:10155D5B					call	sub_1014BF30
-;.text:10155D60					mov		ecx, eax
-;.text:10155D62					mov		byte ptr [esp+58h+var_38], bl
-;.text:10155D66					mov		eax, [esp+58h+var_38]
-;.text:10155D6A					push	eax
-;.text:10155D6B					mov		byte ptr [esp+5Ch+var_40], bl
-;.text:10155D6F					mov		edx, [esp+5Ch+var_40]
-;.text:10155D73					push	edx
-;.text:10155D74					push	offset aEnable_vision ; "enable_vision"
-;.text:10155D79					lea		eax, [esp+64h+var_48]
-;.text:10155D7D					mov		ebx, ecx
-;.text:10155D7F					mov		[esp+64h+var_48], offset sub_10142260
-org 10155D87h - shift
-	jmp game_object_fix
-;.text:10155D87					call	enable_vision_register
-back_from_game_object_fix:
-;.text:10155D8C					xor		bl, bl
-
-
-org 1014DC90h - shift
-enable_vision_register: ; функция для регистрации функции с прототипом void fun(bool)
-
-org 1014C550h - shift
-register_set_actor_direction:
-org 1014BF30h - shift
-register_get_bleeding:
-
+;10155D87h jmp		game_object_fix
+org 10155D8Ch - shift	; 11 bytes
+	call	script_register@@game_object_extended
+	nop2
+	xor		bl, bl
+	push	0
+;------------------------------------------------------------------------------
 org 10142990h - shift
 CScriptGameObject__get_car:
-
-
 
 org 103DF710h - shift
 ch_info_get_from_id:
@@ -3966,11 +3835,6 @@ back_from_CBaseMonster__HitEntity_callback:
 org 1007E730h - shift
 sprintf_s64:
 ; =========================================================================================
-; для регистрации новых методов game_object
-; bool fun(string)
-org 1014CC50h - shift
-give_info_portion_register:
-; =========================================================================================
 ; фикс биографии в ПДА
 org 103E0123h - shift
 	jmp CUICharacterInfo__InitCharacter_fix
@@ -4443,9 +4307,21 @@ alife_spawn_item:
 
 org 10147870h - shift
 CScriptGameObject__DropItemAndTeleport:
+CScriptGameObject@@DropItemAndTeleport MACRO this_:req, pItem:req, position:req
+	@push2mem (position.z)
+	@push2mem (position.y)
+	@push2mem (position.x)
+	@push2mem (pItem)
+	@reg2mem (ecx, this_)
+	call	CScriptGameObject__DropItemAndTeleport
+	EXITM <>
+ENDM
 
 org 10147750h - shift
 CScriptGameObject__DropItem:
+
+org 1022A2E0h - shift
+CWeaponMagazinedWGrenade@@PerformSwitchGL:
 
 org 10458DD8h - shift
 pSettings dd ?
@@ -4491,6 +4367,8 @@ CScriptIniFile__r_string_wb:
 
 org 10458CE0h - shift
 r_bool			dd ?		; public: int __thiscall CInifile::r_bool(char const *, char const *)
+org 10458AF4h - shift
+r_section		dd ?
 
 org 10458B08h - shift
 _GetItemCount	dd ?
@@ -4635,15 +4513,34 @@ org 1055DE9Ch - shift
 _AVCUICellItem:
 org 1054FA5Ch - shift
 _AVCUIStatic:
-
+org 10556CA8h - shift
+_AVCRocketLauncher:
+org 10556DF0h - shift
+_AVCWeaponRPG7:
+org 10556F30h - shift
+_AVCWeaponRG6:
 ;-----??????-----
 org 105507CCh - shift
 _AVIRender_Visual:
 org 105507ECh - shift
 _AVCKinematicsAnimated:
+org 1053F1E0h - shift
+_AVCSE_Abstract:
+org 1055B44Ch - shift
+_AVCSE_ALifeItemWeaponShotGun:
+org 10555A1Ch - shift
+_AVCCustomRocket:
+org 10556CF0h - shift
+_AVCExplosiveRocket:
+org 105421A4h - shift
+_AVCPhysicsShellHolder:
 ;------------------------------------------
 org 10458110h - shift
 _itoa				dd ?
+org 104581D8h - shift
+atoi				dd ?
+org 104581D0h - shift
+atof				dd ?
 org 101576C0h - shift
 register__void__go_bool:
 org 10482240h - shift
@@ -4818,12 +4715,6 @@ org 10288640h - shift	; 7 bytes
 	nop
 	nop
 ;===================================================================================
-; TODO надо сгруппировать функции одинакового типа! (с) НаноБот
-org 101AFE91h - shift
-register_level__void__void:
-org 10157930h - shift
-register__CScriptIniFile__void:
-;--------------------------------------------------------------------
 ; я использую внятные имена функций, мне так легче (с) НаноБот
 org 10458F78h - shift
 luabind__detail__overload_rep_base__set_match_fun	dd ?
@@ -4849,7 +4740,7 @@ sub_1015BD10:
 org 101598F0h - shift
 register__void__float_float:
 org 101584F0h - shift
-register__bool__u32:
+register__const@bool__pvector:	;;register__bool__u32:
 org 1015CAF0h - shift
 sub_1015CAF0:
 org 1015EA30h - shift
@@ -5154,8 +5045,7 @@ org 1024FC65h - shift	; 14 bytes
 	mov		eax, [ebp].m_game_object
 	test	eax, eax
 	jz		CExplosive@@Explode_vector_vel_zero
-	nop2
-	nop
+	nop3
 org 1024FC93h - shift
 return@CExplosive@@Explode_vector_vel_zero:
 ;строка 381
@@ -5205,6 +5095,20 @@ org 10250BA9h - shift	; 16 bytes
 	movss	xmm1, xmm1
 	mov		ax, [esi].m_game_object_id
 	ASSUME	esi:nothing
+;Оптимизация класса CExplosive
+;переносим булеву m_bAlreadyHidden в другое место структуры, чтобы освободить место для нового свойства!
+org 102502E6h - shift	; 7 bytes
+	cmp		[edi].CExplosive.m_bAlreadyHidden, 0
+org 102504A7h - shift	; 7 bytes
+	mov		[ecx].CExplosive.m_bAlreadyHidden, 0
+org 10250517h - shift	; 7 bytes
+	mov		[edi].CExplosive.m_bAlreadyHidden, 1
+;расширения конструктора CExplosive
+;;org 1024EEEBh - shift	; 5 bytes
+;;	jmp		CExplosive@@CExplosive_ext
+;расширения деструктора CExplosive
+;;org 1024F060h - shift	; 5 bytes
+;;	jmp		CExplosive@@_CExplosive_ext
 ;===================================================================================
 ;===================================================================================
 ; Рефакторинг level_ns_reg_macros.asm
@@ -5330,7 +5234,11 @@ org 10481F64h - shift
 virtual_prototype__void__luabind@@object_luabind@@functor@bool@_luabind@@functor@void@:
 ;===================================================================================
 org 1021F3F0h - shift	; ---===NanoBot===---
-CCartridge__Load:
+CCartridge@@Load proc LocalAmmoType:dword
+CCartridge@@Load endp
+org 1021F360h - shift
+CCartridge@@CCartridge proc
+CCartridge@@CCartridge endp
 org 10458A04h - shift
 CObjectList__net_Find		dd ?
 ;------------Задаём ID стрелка на БТРе------------
@@ -5813,21 +5721,740 @@ org 104BE5E8h - shift	; 4 bytes
 ;----------------------------------------------------------------
 ;Колбек на хит, вызывается для всех объектов, требует включения скриптом.
 org 101EC088h - shift	; 18 bytes
-	jmp		CPhysicsShellHolder__Hit_chank
+	jmp		CPhysicsShellHolder@@Hit_chank
 	db		13 dup (0CCh)
 ;----------------------------------------------------------------
+arg_0		= 4
+arg_4		= 8
+arg_8		= 12
+arg_0C		= 16
 ;Дополнительные скриптовые методы в пространстве vector
-org 1013D835h - shift
-scriptprototype__float__void:
-org 1013CB85h - shift
-scriptprototype__this__void:
 org 1013C175h - shift	; 5 bytes
 	jmp		vector_script_fix
 return_vector_script_fix:
+;----------------------
+org 1013D835h - shift
+registervector__float__void:
+org 1013CB85h - shift
+registervector__this__void:
+org 1013D943h - shift
+registervector__float__vector:
+org 1013CB2Fh - shift
+registervector__this__vector_vector:
+org 1013DA65h - shift
+registervector__this__float_float:
+;----------------------
+;оптимизация регистрации скриптовых методов пространства имён vector
+org 10479510h - shift
+aSethp			dd ?		; "setHP"
+;----------------------
+;for registervector__this__float_float
+org 1013C114h - shift	; 7 bytes
+	push	offset aSethp
+	nop2
+org 1013DB79h - shift	; 5 bytes
+	push	[ebp+arg_0C]
+	nop2
+;----------------------------------------------------------------
 ;----------------------------------------------------------------
 ;Фикс пропадания звука дождя при загрузке уровня.
 org 101A793Ch - shift	; 15 bytes
 	jmp		SoundRain_fix
 	db		10 dup (90h)
 return_SoundRain_fix:
-;----------------------------------------------------------------
+;------------------------------------------------------------------
+;------------------------------------------------------------------
+;оптимизация регистрации скриптовых методов в пространстве :
+;для того чтобы меньше писать макросов, немного перепишем код,
+;чтобы одноразовые функции типа register__*, можно было использовать многократно.
+org 101AFE91h - shift
+register_level__void__void:
+org 10157930h - shift
+register__CScriptIniFile__void:
+org 1014CC50h - shift
+register__bool__string:
+org 1014DD20h - shift
+register__bool__void:
+org 1014DC90h - shift
+register__void__bool:
+org 1014C880h - shift
+register__void__string:
+org 1014D690h - shift
+register__void__u32:
+org 10158CD0h - shift
+register__int__go:
+org 1014C2B0h - shift
+register__u32__void@const:
+org 1014BF30h - shift
+register__float__void@const:
+org 1014BE70h - shift
+register__float_rw_property:
+org 1014C550h - shift
+register__void__float:
+org 1014CCE0h - shift
+register__string__void:
+org 101595E0h - shift
+register__bool__pvector_float:
+org 10159680h - shift
+register__bool__pvector:
+org 10158610h - shift
+register__uint__vector_pvector:
+org 10158880h - shift
+register__u32__str_int:
+org 101572C0h - shift
+register__void__u32_u32:
+org 1014DEA0h - shift
+register__float__int:
+org 10159710h - shift
+register__void__vector_float_int:
+org 1014E7E0h - shift
+register__go__int:
+org 10159AD0h - shift
+register__bool__go:
+org 10157360h - shift
+register__void__u32_u32_u32:
+org 101583C0h - shift
+register__vector__string:
+org 1014C910h - shift
+register__void__str_bool:
+org 10157F70h - shift
+register__void__u32_pvector:
+org 10158580h - shift
+register__bool__u32:
+org 1014E4F0h - shift
+register__float__pu32:
+org 10159990h - shift
+register__u32__float_pvector:
+;
+org 10148B90h - shift
+CScriptGameObject@@accessible_nearest:
+org 101431C0h - shift
+CScriptGameObject@@GetCurrentOutfitProtection:
+org 1047CE6Ch - shift
+aInside			dd ?		; "inside"
+org 1047C938h - shift
+aAccessible_nea dd ?		; "accessible_nearest"
+org 1047CA2Ch - shift
+aGet_task_state dd ?		; "get_task_state"
+org 1047C708h - shift
+aPlay_sound		dd ?		; "play_sound"
+org 1047C3F8h - shift
+aGet_current__0 dd ?		; "get_current_outfit_protection"
+org 1047CE84h - shift
+aSet_const_forc	dd ?		; "set_const_force"
+org 1047C6A0h - shift
+aItem_in_slot	dd ?		; "item_in_slot"
+org 1047CF44h - shift
+aMarked_dropped dd ?		; "marked_dropped"
+org 1047C89Ch - shift
+aBone_position	dd ?		; "bone_position"
+org 1047C7D0h - shift
+aSpawn_ini		dd ?		; "spawn_ini"
+org 1047C0DCh - shift
+aPlay_cycle		dd ?		; "play_cycle"
+org 1047C884h - shift
+aSet_sight		dd ?		; "set_sight"
+org 10478A90h - shift
+aAccessible		dd ?		; "accessible"
+org 1047C56Ch - shift
+aLevel_vertex_l	dd ?		; "level_vertex_light"
+org 1047CF00h - shift
+aLocation_on_pa	dd ?		; "location_on_path"
+;for register__bool__pvector_float
+org 10156CE3h - shift	; 5 bytes
+	push    offset aInside
+org 10159653h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__bool__pvector
+org 10156D00h - shift	; 6 bytes
+	push	edx
+	push	offset aInside
+org 101596EFh - shift	; 5 bytes
+	push	[esp+58h+arg_0]
+	nop
+;for register__uint__vector_pvector
+org 101561A1h - shift	; 14 bytes
+	mov		[esp+58h-48h], offset CScriptGameObject@@accessible_nearest
+	push	ecx
+	push	offset aAccessible_nea
+org 10158683h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__u32__str_int
+org 101563C2h - shift	; 5 bytes
+	push	offset aGet_task_state
+org 101588F3h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__void__u32_u32
+org 10155A19h - shift	; 5 bytes
+	push	offset aPlay_sound
+org 10157333h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__float__int
+org 1014B661h - shift	; 14 bytes
+	mov     [esp+88h-74h], offset CScriptGameObject@@GetCurrentOutfitProtection
+	push    edx
+	push    offset aGet_current__0
+org 1014DF0Fh - shift	; 5 bytes
+	push	[esp+58h+arg_0]
+	nop
+;for register__void__vector_float_int
+org 10156D51h - shift	; 5 bytes
+	push	offset aSet_const_forc
+org 10159783h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__go__int
+org 1014BD5Ah - shift	; 6 bytes
+	push	edx
+	push	offset aItem_in_slot
+org 1014E84Fh - shift	; 5 bytes
+	push	[esp+58h+arg_0]
+	nop
+;for register__bool__go
+org 10157064h - shift	; 6 bytes
+	push	ecx
+	push	offset aMarked_dropped
+org 10159B3Fh - shift	; 5 bytes
+	push	[esp+58h+arg_0]
+	nop
+;for register__void__u32_u32_u32
+org 10155A3Dh - shift	; 5 bytes
+	push	offset aPlay_sound
+org 101573D3h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__vector__string
+org 10155FE1h - shift	; 6 bytes
+	push	eax
+	push	offset aBone_position
+org 1015842Fh - shift	; 5 bytes
+	push	[esp+58h+arg_0]
+	nop
+;for register__CScriptIniFile__void
+org 10155C8Ah - shift	; 5 bytes
+	push	offset aSpawn_ini
+org 101579E6h - shift	; 5 bytes
+	push	[esp+58h+arg_8]
+	nop
+;for register__void__str_bool
+org 1014AC72h - shift	; 5 bytes
+	push	offset aPlay_cycle
+org 1014C983h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__void__u32_pvector
+org 10155E88h - shift	; 5 bytes
+	push	offset aSet_sight
+org 10157FE3h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;for register__bool__u32
+org 1015617Ch - shift	; 6 bytes
+	push	ecx
+	push	offset aAccessible
+org 101585EFh - shift	; 5 bytes
+	push	[esp+58h+arg_0]
+	nop
+;for register__float__pu32
+org 1014B9E8h - shift	; 6 bytes
+	push	edx
+	push	offset aLevel_vertex_l
+org 1014E55Fh - shift	; 5 bytes
+	push	[esp+58h+arg_0]
+	nop
+;for register__u32__float_pvector
+org 10156F95h - shift	; 5 bytes
+	push	offset aLocation_on_pa
+org 10159A03h - shift	; 5 bytes
+	push	[esp+5Ch+arg_4]
+	nop
+;------------------------------------------------------------------
+;------------------------------------------------------------------
+org 105602B8h - shift
+ph_world		dd ?	;CPHWorld*
+
+;Проверка броска предмета по указаному вектору(transference) со скоротью(throw_vel) и гравитации(gravity_accel).
+;Сопротивление воздуха равно нулю!
+;Возвращает результат в throw_dir[0]
+;char __usercall TransferenceAndThrowVelToThrowDir@<al>(Fvector *transference@<eax>, Fvector *throw_dir@<edi>, float throw_vel, float gravity_accel)
+org 10229080h - shift
+Func@TransferenceAndThrowVelToThrowDir:	; proc C throw_vel:real4, gravity_accel:real4
+TransferenceAndThrowVelToThrowDir MACRO transference:req, throw_vel:req, gravity_accel:req, throw_dir:req
+	@push2mem	(gravity_accel)
+	@push2mem	(throw_vel)
+	@reg2mem	(edi, throw_dir)
+	@reg2mem	(eax, transference)
+	call	Func@TransferenceAndThrowVelToThrowDir
+	add		esp, 8
+	EXITM	<al>
+ENDM
+;------------------------------------------------------------------
+;возможность выключать у ракеты способность взрываться от контакта с чем либо.
+org 104586C8h - shift
+H_Root			dd ?		; public: class CObject * __thiscall CObject::H_Root(void)
+;Задаём размер класса CExplosiveRocket
+org 10297FF6h - shift	; 5 bytes
+	push	size CExplosiveRocket
+;CExplosiveRocket::CExplosiveRocket()
+org 1022E72Fh - shift	; 5 bytes
+	jmp		CExplosiveRocket@@CExplosiveRocket@ext
+org 1022C8D0h - shift
+CCustomRocket@@_CCustomRocket:
+;CExplosiveRocket::~CExplosiveRocket()
+org 1022E7FDh - shift	; 5 bytes
+	jmp		CExplosiveRocket@@_CExplosiveRocket@ext
+;CExplosiveRocket::Load(LPCSTR section)
+org 1022E887h - shift	; 5 bytes
+	jmp		CExplosiveRocket@@Load@ext
+org 1022CD5Ch - shift	; 5 bytes
+	jmp		CCustomRocket@@SwitchContact
+return_CCustomRocket@@SwitchContact:
+;возможность выключать в ракете способность взрываться от самоликвидатора.
+org 1022DBA1h - shift	; 2 bytes
+	jnz		loc_1022DBD0
+;возможность выключать в ракете способность взрываться от контакта
+org 1022DBB7h - shift	; 27 bytes
+	db		27 dup (0CCh)	;затрём весь кусок!
+;CCustomRocket::UpdateCL()
+org 1022DBB7h - shift	; 35 bytes
+;esi	this	CExplosiveRocket*
+;xmm0	Device.fTimeGlobal	float
+	ASSUME	esi:ptr CCustomRocket
+	jbe		loc_1022DBD0
+		jmp		CCustomRocket@@DeleteOrExplode
+loc_1022DBD0:
+	.if (![esi].m_bOpenParachute && xmm0>[esi].m_fTimeOpenParachute)
+		call	CCustomRocket@@OpenParachute
+	.endif
+	jmp		CExplosiveRocket@@UpdateCL
+	;pop		esi
+	;retn
+org 1022D140h - shift
+CCustomRocket@@ObjectContactCallback: ;;; do_colide:ptr byte, bo1:byte, cc:ptr , material_1:ptr , material_2:ptr 
+org 10224EF0h - shift
+CMissile@@ExitContactCallback:
+;парашют в ракете.
+org 1022CC4Dh - shift	; 9 bytes
+	.if (!zero?)
+		dec		dword ptr [eax]
+	.endif
+	jmp		CCustomRocket@@SetLaunchParams_ext
+;оптимизация, перемещаем m_bEnginePresent в другое место структуры CCustomRocket
+org 1022C790h - shift	; 6 bytes	//CCustomRocket::CCustomRocket
+	mov		[esi].m_bEnginePresent, bl
+org 1022D765h - shift	; 6 bytes	//CCustomRocket::reload(char *this, char *section)
+	mov		[esi-110h].m_bEnginePresent, al
+org 1022DBE3h - shift	; 7 bytes	//CCustomRocket::StartEngine()
+	cmp		[esi].m_bEnginePresent, 0
+	ASSUME	esi:nothing
+;CExplosiveRocket::Explode()
+org 1048F248h - shift	; 4 bytes
+	dd offset CExplosiveRocket@@Explode
+;CExplosiveRocket::OnEvent
+org 1022EA6Dh - shift	; 5 bytes
+	jmp		CExplosiveRocket@@OnEvent@ext
+;
+;------------------------------------------------------------------
+;------------------------------------------------------------------
+;Переделка гранатомётов CWeaponRG6, CWeaponMagazinedWGrenade, CWeaponRPG7
+;Теперь запускается ракете происходит из метода CWeapon::FireTrace
+org 1021F090h - shift
+CWeapon@@FireTrace proc P:ptr Fvector, D:ptr Fvector
+CWeapon@@FireTrace endp
+org 10225FF0h - shift
+CWeaponMagazined@@ReloadMagazine proc
+CWeaponMagazined@@ReloadMagazine endp
+org 10225CE0h - shift
+CWeaponMagazined@@UnloadMagazine proc spawn_ammo:byte
+CWeaponMagazined@@UnloadMagazine endp
+org 102381A0h - shift
+CWeaponRG6@@AddCartridge proc cnt:dword
+CWeaponRG6@@AddCartridge endp
+org 1021AF50h - shift
+CWeapon@@net_Spawn proc DC:ptr CSE_Abstract
+CWeapon@@net_Spawn endp
+org 10225A50h - shift
+CWeaponMagazined@@FireStart:
+org 102200B0h - shift
+CWeaponCustomPistol@@switch2_Fire:
+org 10226AF0h - shift
+CWeaponMagazined@@state_Fire:
+org 1021CB40h - shift
+CWeapon@@SwitchState:
+org 1048D824h - shift
+aFake_grenade_n		dd ?	; "fake_grenade_name"
+org 10492634h - shift
+aRocket_class		dd ?	; "rocket_class"
+org 1022EEF0h - shift
+CRocketLauncher@@SpawnRocket proc rocket_section:ptr, parent_rocket_launcher:ptr 
+CRocketLauncher@@SpawnRocket endp
+org 1022F0E0h - shift
+Func@CRocketLauncher@@AttachRocket:	; void (CObject *parent_rocket_launcher@<eax>, unsigned __int16 rocket_id@<cx>, CRocketLauncher *this)
+CRocketLauncher@@AttachRocket MACRO parent_rocket_launcher:req, rocket_id:req, this_:req
+	@push2mem	(this_)
+	@reg2mem	(cx, rocket_id)
+	@reg2mem	(eax, parent_rocket_launcher)
+	call	Func@CRocketLauncher@@AttachRocket
+	EXITM <>
+ENDM
+org 1022F190h - shift
+Func@CRocketLauncher@@DetachRocket:	;(unsigned __int16 rocket_id@<cx>, CRocketLauncher *this, bool bLaunch)
+CRocketLauncher@@DetachRocket MACRO rocket_id:req, this_:req, bLaunch:req
+	@push2mem	(bLaunch)
+	@push2mem	(this_)
+	@reg2mem	(cx, rocket_id)
+	call	Func@CRocketLauncher@@DetachRocket
+	EXITM <>
+ENDM
+org 1022F2A0h - shift
+Func@CRocketLauncher@@LaunchRocket: 	;(CRocketLauncher *this@<eax>, Fmatrix *xform, Fvector *vel)
+CRocketLauncher@@LaunchRocket MACRO this_:req, xform:req, vel:req
+	@push2mem	(vel)
+	@push2mem	(xform)
+	@reg2mem	(eax, this_)
+	call	Func@CRocketLauncher@@LaunchRocket
+	EXITM <>
+ENDM
+org 1022F350h - shift
+Func@CRocketLauncher@@getCurrentRocket:	; CRocketLauncher* CRocketLauncher::getCurrentRocket@<eax>(CRocketLauncher *this@<eax>)
+CRocketLauncher@@getCurrentRocket MACRO this_:req
+	@reg2mem	(eax, this_)
+	call	Func@CRocketLauncher@@getCurrentRocket
+	EXITM <>
+ENDM
+CRocketLauncher@@dropCurrentRocket MACRO this_:req	;INLINE
+	@reg2mem	(ecx, this_)
+	mov		eax, [ecx].CRocketLauncher.m_rockets._Myfirst
+	.if (eax && eax!=[ecx].CRocketLauncher.m_rockets._Mylast)
+		sub		[ecx].CRocketLauncher.m_rockets._Mylast, 4
+	.endif
+	EXITM <>
+ENDM
+;переделаем метод CWeaponRG6::FireStart в CWeaponRG6::StartRocket
+org 10237C30h - shift
+CWeaponRG6@@StartRocket proc	;было CWeaponRG6@@FireStart:
+CWeaponRG6@@StartRocket endp
+org 10237C46h - shift	; 48 bytes
+	jmp		@F
+	db		15 dup (90h)
+@@:
+	mov     eax, [ebp-2E8h]
+	test    eax, eax
+	jz      loc_1023818C
+	mov     ecx, [ebp-2E4h]
+	sub     ecx, eax
+	sar     ecx, 2
+	jz      loc_1023818C
+org 1023818Ch - shift
+loc_1023818C:
+;переделаем метод CWeaponMagazinedWGrenade::SwitchState в CWeaponMagazinedWGrenade::StartRocket
+org 1022A8E0h - shift
+CWeaponMagazinedWGrenade@@StartRocket proc S:dword	;было CWeaponMagazinedWGrenade@@SwitchState:
+CWeaponMagazinedWGrenade@@StartRocket endp
+org 1022A8F8h - shift	; 42 bytes
+	mov		[esp+0Ch], edi
+	jmp		@F
+	db		36 dup (90h)
+@@:
+;переделаем метод CWeaponRPG7::switch2_Fire в CWeaponRPG7::StartRocket
+org 10232420h - shift
+CWeaponRPG7@@StartRocket proc	;было CWeaponRPG7@@switch2_Fire:
+CWeaponRPG7@@StartRocket endp
+org 10232438h - shift	; 32 bytes
+	jmp		@F
+	db		30 dup (90h)
+@@:
+;переопределим виртуальный метод CWeapon::net_Spawn для CWeaponShotgun
+org 10495BB8h - shift	; 4 bytes
+	dd offset CWeaponShotgun@@net_Spawn		;было CWeapon::net_Spawn
+;переопределим виртуальный метод CWeaponMagazined::ReloadMagazine для CWeaponRG6
+org 10496858h - shift	; 4 bytes
+	dd offset CWeaponRG6@@ReloadMagazine
+;переопределим виртуальный метод CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
+org 10496868h - shift	; 4 bytes
+	dd offset CWeaponRG6@@UnloadMagazine
+;доработка CWeaponRG6::AddCartridge
+org 102381C2h - shift	; 11 bytes
+	add		eax, 12
+	jmp		CWeaponRG6@@AddCartridge_chank
+	nop3
+return_CWeaponRG6@@AddCartridge_chank:
+;
+org 10237ECAh - shift	; 26 bytes
+	cmp		[ebp-CWeapon.CShootingObject@vfptr].CWeaponMagazined.m_bBlockAutoAimRG, 0
+	jnz		loc_10237FE0
+	nop7
+	nop6
+org 10237FE0h - shift
+loc_10237FE0:
+CRocketLauncher@@SpawnRockets		PROTO magazine:ptr xr_vector
+;доработка CWeaponRG6::net_Spawn
+org 10237B2Ch - shift	; 211 bytes
+	db		211 dup (0CCh)
+org 10237B2Ch - shift	; 211 bytes
+;edi	this	CWeapon*
+;ebx	l_res	BOOL
+	ASSUME	edi:ptr CWeapon, ecx:ptr CRocketLauncher
+	call	CWeaponShotgun@@net_Spawn
+	mov		ebx, eax
+	;if (iAmmoElapsed>0 && getRocketCount()==0)
+	.if (ebx && [edi].iAmmoElapsed>0)
+		lea		ecx, [edi-size CRocketLauncher]	;CRocketLauncher*
+		mov		eax, [ecx].m_rockets._Myfirst
+		.if (eax==NULL || [ecx].m_rockets._Mylast==eax)
+			;зарядим ракеты которые соотвествуют патронам в m_magazine
+			CRocketLauncher@@SpawnRockets(&[edi].m_magazine)
+		.endif
+	.endif
+	ASSUME	edi:nothing, ecx:nothing
+	pop		edi
+	mov		eax, ebx
+	pop		ebx
+	add		esp, 8
+	retn	4
+;Перехват метода CWeapon::FireTrace(const Fvector& P, const Fvector& D)
+org 10226D7Eh - shift	; 5 bytes
+	call	CWeapon@@FireTrace@update
+org 10226D92h - shift	; 5 bytes
+	call	CWeapon@@FireTrace@update
+org 10236ADEh - shift	; 5 bytes
+	call	CWeapon@@FireTrace@update
+org 10236AEDh - shift	; 5 bytes
+	call	CWeapon@@FireTrace@update
+;уберём виртуальный метод CWeaponRG6::FireStart
+org 10496BF4h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireStart	;
+;уберём виртуальный метод CWeaponRPG7::switch2_Fire
+org 104927FCh - shift	; 4 bytes
+	dd offset CWeaponCustomPistol@@switch2_Fire
+;уберём виртуальный метод CWeaponMagazinedWGrenade::SwitchState в классе CWeaponMagazinedWGrenade
+org 1048DD4Ch - shift	; 4 bytes
+	dd offset CWeapon@@SwitchState		;было CWeaponMagazinedWGrenade::SwitchState
+;уберём виртуальный метод CWeaponMagazinedWGrenade@@SwitchState в классе CWeaponGroza
+org 10490A6Ch - shift	; 4 bytes
+	dd offset CWeapon@@SwitchState		;было CWeaponMagazinedWGrenade::SwitchState
+;уберём виртуальный метод CWeaponMagazinedWGrenade@@SwitchState в классе CWeaponAK74
+org 10493BD4h - shift	; 4 bytes
+	dd offset CWeapon@@SwitchState		;было CWeaponMagazinedWGrenade::SwitchState
+;------------------------------------------------------------------
+;------------------------------------------------------------------
+;Пиротехника
+;
+org 1008DBB0h - shift
+OnServer proc (byte)
+OnServer endp
+org 101A3300h - shift
+OnClient proc (byte)
+OnClient endp
+org 10458A7Ch - shift
+CObject__Center		dd ?	;void __thiscall CObject::Center(Fvector& )const
+org 104590C4h - shift
+CSound_manager_interface__Sound		dd ?
+org 10451A6Ch - shift
+_CIacos:
+org 1000C1E0h - shift
+ref_sound___ref_sound:
+ref_sound@@_ref_sound MACRO this_:req
+	push	esi
+	@reg2mem(esi, this_)
+	call	ref_sound___ref_sound
+	pop		esi
+	EXITM <>
+ENDM
+org 104512A8h - shift
+dGeomGetClass proc C geom:dword
+dGeomGetClass endp
+org 104512AEh - shift
+dGeomGetData proc C geom:dword
+dGeomGetData endp
+org 104512A2h - shift
+dGeomTransformGetGeom proc C geom:dword
+dGeomTransformGetGeom endp
+org 1003E0E0h - shift
+Fvector__generate_orthonormal_basis:	;(Fvector *dir@<ebx>, Fvector *up@<edi>, Fvector *right@<esi>)
+Fvector@@generate_orthonormal_basis MACRO dir:req, up:req, right:req
+	push	esi
+	push	edi
+	push	ebx
+	@reg2mem(esi, dir)
+	@reg2mem(edi, up)
+	@reg2mem(ebx, right)
+	call	Fvector__generate_orthonormal_basis
+	pop		ebx
+	pop		edi
+	pop		esi
+	EXITM <>
+ENDM
+org 10018440h - shift
+Fvector@@setHP:
+org 1007E640h - shift
+Func@Fvector@@getH:
+org 100967A0h - shift
+Func@Fvector@@getP:
+org 1008AB00h - shift
+Func@Fvector@@random_dir:	; Fvector *__usercall Fvector::random_dir@<eax>(Fvector *this@<esi>)
+org 10140980h - shift
+CScriptGameObject@@bone_position proc res:ptr Fvector, bone_name:ptr byte
+CScriptGameObject@@bone_position endp
+org 1022EE50h - shift
+CRocketLauncher@@CRocketLauncher proc
+CRocketLauncher@@CRocketLauncher endp
+org 1022EE70h - shift
+CRocketLauncher@@_CRocketLauncher proc
+CRocketLauncher@@_CRocketLauncher endp
+;
+org 1022CBA0h - shift
+CCustomRocket@@SetLaunchParams proc xform:ptr Fmatrix, vel:ptr Fvector, angular_vel:ptr Fvector
+CCustomRocket@@SetLaunchParams endp
+;CPyroBattery
+org 102087C0h - shift
+CEatableItem@@UseBy proc entity_alive:dword
+CEatableItem@@UseBy endp
+org 101E94E0h - shift
+CUsableScriptObject@@use proc who_use:dword
+CUsableScriptObject@@use endp
+org 1024B290h - shift
+CEatableItemObject@@Load proc sect:ptr byte
+CEatableItemObject@@Load endp
+org 1024B310h - shift
+CAntirad@@Load proc sect:ptr byte
+CAntirad@@Load endp
+org 10209530h - shift
+CInventoryItem@@Load proc sect:ptr byte
+CInventoryItem@@Load endp
+org 1045890Ch - shift
+CObject__Load		dd ?
+org 1024A940h - shift
+CEatableItemObject@@net_Spawn proc DC:ptr CSE_Abstract
+CEatableItemObject@@net_Spawn endp
+org 1024AA10h - shift
+CAntirad@@net_Spawn proc DC:ptr CSE_Abstract
+CAntirad@@net_Spawn endp
+org 10208CA0h - shift
+CEatableItemObject@@UpdateCL proc
+CEatableItemObject@@UpdateCL endp
+org 10209080h - shift
+CAntirad@@UpdateCL proc
+CAntirad@@UpdateCL endp
+org 10208AA0h - shift
+CEatableItemObject@@_CEatableItemObject proc
+CEatableItemObject@@_CEatableItemObject endp
+org 10208CB0h - shift
+CEatableItemObject@@OnEvent proc P:ptr NET_Packet, type_:dword
+CEatableItemObject@@OnEvent endp
+;увеличим размер CAntirad
+org 10297896h - shift	; 5 bytes
+	push	size CAntirad
+;CAntirad::CAntirad()
+org 1024A88Fh - shift	; 5 bytes
+	jmp		CPyroBattery@@CPyroBattery_ext
+;CAntirad::~CAntirad()
+org 1024A937h - shift	; 5 bytes
+	jmp		CPyroBattery@@_CPyroBattery_ext
+;CAntirad::Load(LPCSTR section)
+org 1049CCCCh - shift	; 4 bytes
+	dd offset CPyroBattery@@Load		;было CAntirad@@Load
+;CAntirad::UseBy(CEntityAlive* entity_alive)
+org 1049CC94h - shift	; 4 bytes
+	dd offset CPyroBattery@@UseBy		;было CEatableItem::UseBy
+;CAntirad::use(CGameObject* who_use)
+org 1049CED4h - shift	; 4 bytes
+	dd offset CPyroBattery@@use			;было CGameObject::use
+;CAntirad::net_Spawn(CSE_Abstract* DC)
+org 1049CCD4h - shift	; 4 bytes
+	dd offset CPyroBattery@@net_Spawn	;было CAntirad::net_Spawn
+;CAntirad::UpdateCL()
+org 1049CCD0h - shift	; 4 bytes
+	dd offset CPyroBattery@@UpdateCL	;было CAntirad::UpdateCL
+org 1049CD78h - shift	; 4 bytes
+	dd offset CPyroBattery@@OnEvent		;было CGameObject::CEatableItemObject::OnEvent
+;--------------
+;Методы класса CScriptParticles
+org 1018E4B4h - shift
+CScriptParticles@@CScriptParticles:
+org 1018D8E0h - shift
+CScriptParticles@@_CScriptParticles proc a2:byte
+CScriptParticles@@_CScriptParticles endp
+org 1018D920h - shift
+CScriptParticles@@Play proc
+CScriptParticles@@Play endp
+org 1018D930h - shift
+CScriptParticles@@PlayAtPos proc pos:ptr Fvector
+CScriptParticles@@PlayAtPos endp
+org 1018D950h - shift
+CScriptParticles@@Stop proc 
+CScriptParticles@@Stop endp
+org 1018D9A0h - shift
+CScriptParticles@@StopDeffered proc
+CScriptParticles@@StopDeffered endp
+org 1018D9F0h - shift
+CScriptParticles@@MoveTo proc pos:ptr Fvector, vel:ptr Fvector
+CScriptParticles@@MoveTo endp
+org 1018DAC0h - shift
+CScriptParticles@@IsPlaying proc (byte)
+CScriptParticles@@IsPlaying endp
+org 1018DB10h - shift
+CScriptParticles@@IsLooped proc (byte)
+CScriptParticles@@IsLooped endp
+org 1018DB20h - shift
+CScriptParticles@@LoadPath proc caPathName:ptr byte
+CScriptParticles@@LoadPath endp
+org 1018DB40h - shift
+CScriptParticles@@StartPath proc looped_:byte
+CScriptParticles@@StartPath endp
+org 1018DB60h - shift
+CScriptParticles@@StopPath proc
+CScriptParticles@@StopPath endp
+org 1018DB70h - shift
+CScriptParticles@@PausePath proc val:byte
+CScriptParticles@@PausePath endp
+org 1047F37Ch - shift
+vfptr_CScriptParticles:
+org 1018D600h - shift
+CScriptParticlesCustom@@CScriptParticlesCustom proc (dword) owner:ptr CScriptParticles, caParticlesName:ptr byte
+CScriptParticlesCustom@@CScriptParticlesCustom endp
+org 10286B20h - shift
+CParticlesObject@@PerformAllTheWork:
+org 101E7250h - shift
+Func@generate_orthonormal_basis:
+generate_orthonormal_basis MACRO dir:req, result:req
+	@push2mem	(dir)
+	@reg2mem	(eax, result)
+	call	Func@generate_orthonormal_basis
+	add		esp, 4
+	EXITM <>
+ENDM
+org 10286C20h - shift
+CParticlesObject@@UpdateParent proc m:ptr Fmatrix, vel:ptr Fvector
+CParticlesObject@@UpdateParent endp
+;--------------
+;Серверная часть. Класс CSE_ALifeItemPyrobattary на базе CSE_ALifeItem
+;CSE_ALifeItem *__thiscall CSE_ALifeItem::CSE_ALifeItem(CSE_ALifeItem *this)
+org 103100EBh - shift	; 5 bytes
+	jmp		CSE_ALifeItem@@CSE_ALifeItem_ext
+;void __thiscall CSE_ALifeItem::STATE_Read(CSE_ALifeItem *this, NET_Packet *tNetPacket, int size)
+org 10310151h - shift	; 6 bytes
+	jmp		CSE_ALifeItem@@STATE_Read_ext
+	db		0CCh
+;void __thiscall CSE_ALifeItem::STATE_Write(CSE_ALifeItem *this, NET_Packet *tNetPacket)
+org 10311736h - shift	; 6 bytes
+	jmp		CSE_ALifeItem@@STATE_Write_ext
+	db		0CCh
+org 102978C6h - shift	; 5 bytes
+	push	size CSE_ALifeItemPyrobattary
+;--------------------------------------------------------
+;Возможность добавлять собственые классы.
+org 102919C0h - shift
+CObjectItemAbstract__CObjectItemAbstract:
+org 10291A20h - shift
+CObjectFactory__add:
+org 104AB5E0h - shift
+vfptr?CAntirad?VCSE_ALifeItem:
+org 102932BDh - shift	; 5 bytes
+	jmp		CObjectFactory@@register_classes_ext
+return_CObjectFactory@@register_classes_ext:
+;--------------------------------------------------------

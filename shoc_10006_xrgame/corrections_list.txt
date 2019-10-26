@@ -1,9 +1,10 @@
 0x10190492 5 ; jmp global_space_ext ; скриптовые методы в глобальное пространство имен (часть 1)
 0x10149CA2 5 ; jmp global_space_ext2 ; скриптовые методы в глобальное пространство имен (часть 2)
 0x10149D24 5 ; jmp global_space_ext2_additional ; скриптовые методы в глобальное пространство имен (часть 3)
-0x10155D87 5 ; jmp game_object_fix ; новые скриптовые методы в CScriptGameObject
-0x1014A846 5 ; jmp game_object_fix2 ; новые скриптовые свойства в CScriptGameObject
-0x101C6DC0 5 ; jmp CActor_HitSignal_ext ; скриптовый колбек на хит актора
+10155D8Ch 11 ; jmp game_object_fix ; новые скриптовые методы в CScriptGameObject
+1014A84Bh 9  ; jmp game_object_fix2 ; новые скриптовые свойства в CScriptGameObject
+1048300Ch 4		;CActor@@HitSignal_callback ; скриптовый колбек на хит актора
+10483CFCh 4		;->>-
 0x10204D75 5 ; jmp on_belt_callback
 0x10204F13 5 ; jmp on_ruck_callback
 0x10204BCF 5 ; jmp on_slot_callback
@@ -549,6 +550,12 @@
 0x10250266 7	;строка 467
 0x10250464 9	;строка 520
 0x10250BA9 16	;строка 686
+;переносим булеву m_bAlreadyHidden в другое место структуры
+102502E6h 7		;строка 487
+102504A7h 7		;строка 525
+10250517h 7		;строка 543
+;;1024EEEBh 5		;расширения конструктора CExplosive
+;;1024F060h 5		;расширения деструктора CExplosive
 ;============================================================
 ; Задаём ID стрелка на БТРе, если он есть. (с) NanoBot
 ; Требуется для нормальной отработки хит колбека.
@@ -602,3 +609,104 @@
 1013C175h 5
 ;-------------------------------
 101A793Ch 15 ; Фикс пропадания звука дождя при загрузке уровня.
+;-------------------------------
+;оптимизация регистрации скриптовых методов пространства имён CGameObject
+10156CE3h 5  ;for register__bool__pvector_float
+10159653h 5
+10156D00h 6  ;for register__bool__pvector
+101596EFh 5
+101561A1h 14 ;for register__uint__vector_pvector
+10158683h 5
+101563C2h 5  ;for register__u32__str_int
+101588F3h 5
+10155A19h 5  ;for register__void__u32_u32
+10157333h 5
+1014B661h 14 ;for register__float__int
+1014DF0Fh 5
+10156D51h 5  ;for register__void__vector_float_int
+10159783h 5
+1014BD5Ah 6  ;for register__go__int
+1014E84Fh 5
+10157064h 6  ;for register__bool__go
+10159B3Fh 5
+10155A3Dh 5  ;for register__void__int_int_int
+101573D3h 5
+10155FE1h 6  ;for register__vector__string
+1015842Fh 5
+10155C8Ah 5  ;for register__CScriptIniFile__void
+101579E6h 5
+1014AC72h 5  ;for register__void__str_bool
+1014C983h 5
+10155E88h 5  ;for register__void__u32_pvector
+10157FE3h 5
+1015617Ch 6  ;for register__bool__u32
+101585EFh 5
+1014B9E8h 6  ;for register__float__pu32
+1014E55Fh 5
+10156F95h 5  ;for register__u32__float_pvector
+10159A03h 5
+;-------------------------------
+;-------------------------------
+;оптимизация регистрации скриптовых методов пространства имён vector
+1013C114h 7  ;for registervector__this__float_float
+1013DB79h 5
+;-------------------------------
+;-------------------------------
+;возможность выключать в ракете способность взрываться от контакта с чем либо.
+10297FF6h 5		;Задаём размер класса CExplosiveRocket
+1022E72Fh 5		;CExplosiveRocket::CExplosiveRocket()
+1022E7FDh 5		;CExplosiveRocket::~CExplosiveRocket()
+1022E887h 5		;CExplosiveRocket::Load(LPCSTR section)
+1022CD5Ch 5
+;возможность выключать в ракете способность взрываться от самоликвидатора.
+1022DBA1h 2
+1022DBB7h 35	;CCustomRocket::UpdateCL()
+;оптимизация, перемещаем m_bEnginePresent в другое место структуры CCustomRocket
+1022C790h 6 	;//CCustomRocket::CCustomRocket
+1022D765h 6 	;//CCustomRocket::reload(char *this, char *section)
+1022DBE3h 7 	;//CCustomRocket::StartEngine()
+;
+1022CC4Dh 9 	;парашют в ракете.
+1048F248h 4		;CExplosiveRocket::Explode()
+1022EA6Dh 5		;CExplosiveRocket::OnEvent(NET_Packet& P, u16 type)
+;--------------------------------------------------------------
+;--------------------------------------------------------------
+;Переделка гранатомётов CWeaponRG6, CWeaponMagazinedWGrenade, CWeaponRPG7
+10237C46h 48  ;
+1022A8F8h 42
+10232438h 32
+10495BB8h 4		;переопределим виртуальный метод CWeapon::net_Spawn для CWeaponShotgun
+10496858h 4		;переопределим виртуальный метод ReloadMagazine для CWeaponRG6
+10496868h 4		;переопределим виртуальный метод CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
+102381C2h 11	;
+10237B2Ch 211	;
+10237ECAh 26	;
+10226D7Eh 5 
+10226D92h 5 
+10236ADEh 5 
+10236AEDh 5 
+10496BF4h 4 
+104927FCh 4 
+1048DD4Ch 4 
+10490A6Ch 4 
+10493BD4h 4 
+;--------------------------------------------------------------
+;--------------------------------------------------------------
+;Пиротехника
+10297896h 5		;size CAntirad
+1024A88Fh 5		;CPyroBattery@@CPyroBattery_ext
+1024A937h 5		;CPyroBattery@@_CPyroBattery_ext
+1049CCCCh 4		;CPyroBattery@@Load
+1049CC94h 4		;CPyroBattery@@UseBy
+1049CED4h 4		;CPyroBattery@@use
+1049CCD4h 4		;CPyroBattery@@net_Spawn
+1049CCD0h 4		;CPyroBattery@@UpdateCL
+1049CD78h 4		;CPyroBattery@@OnEvent
+;Серверная часть. Класс CSE_ALifeItemPyrobattary на базе CSE_ALifeItem
+103100EBh 5		;CSE_ALifeItem@@CSE_ALifeItem_ext
+10310151h 6		;CSE_ALifeItem@@STATE_Read_ext
+10311736h 6		;CSE_ALifeItem@@STATE_Write_ext
+102978C6h 5		;size CSE_ALifeItemPyrobattary
+;--------------------------------------------------------------
+102932BDh 5		;Возможность добавлять собственые классы.
+;--------------------------------------------------------------

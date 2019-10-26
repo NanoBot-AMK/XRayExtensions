@@ -1,445 +1,319 @@
 include game_object_reg_macro.asm
-
-REGISTER_GO__INT				register_get_object_arg_1,				"get_object_arg_1"
-
-REGISTER_GO__INT				register_item_on_belt,					"item_on_belt"
-REGISTER_GO__INT				register_item_in_ruck,					"item_in_ruck"
-
-REGISTER_BOOL__GO				register_is_on_belt,					"is_on_belt"
-REGISTER_BOOL__GO				register_is_in_ruck,					"is_in_ruck" ; ------
-REGISTER_BOOL__GO				register_is_in_slot,					"is_in_slot" ; ------
-
-REGISTER_BOOL__GO				register_move_to_ruck,					"move_to_ruck"
-REGISTER_BOOL__GO				register_move_to_belt,					"move_to_belt" ; --
-REGISTER_BOOL__GO				register_move_to_slot,					"move_to_slot" ; --
-REGISTER_BOOL__GO				register_move_to_slot_and_activate,		"move_to_slot_and_activate" ; --
-
-;REGISTER_BOOL__GO				register_can_move_to_slot,				"can_move_to_slot" ; --
-;REGISTER_BOOL__GO				register_can_move_to_ruck,				"can_move_to_ruck" ;--
-;REGISTER_BOOL__GO				register_can_move_to_belt,				"can_move_to_belt" ; --
-
-REGISTER_FLOAT__INT				register_get_actor_float,				"get_actor_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_actor_float,				"set_actor_float"
-
-REGISTER_FLOAT__INT				register_get_actor_condition_float,		"get_actor_condition_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_actor_condition_float,		"set_actor_condition_float"
-
-REGISTER_U32__STRING_INT		register_get_actor_condition_int,		"get_actor_condition_int"
-;---
-REGISTER_FLOAT__INT				register_get_game_object_float,			"get_go_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_game_object_float,			"set_go_float"
-REGISTER_U32__STRING_INT		register_get_game_object_int,			"get_go_int"
-REGISTER_VOID__INT_INT			register_set_game_object_int,			"set_go_int"
-REGISTER_U32__STRING_INT		register_get_game_object_int16,			"get_go_int16"
-REGISTER_VOID__INT_INT			register_set_game_object_int16,			"set_go_int16"
-REGISTER_U32__STRING_INT		register_get_game_object_int8,			"get_go_int8"
-REGISTER_VOID__INT_INT			register_set_game_object_int8,			"set_go_int8"
-REGISTER_U32__STRING_INT		register_set_game_object_shared_str,	"set_go_shared_str"
-
-REGISTER_FLOAT__INT				register_get_car_float,					"get_car_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_car_float,					"set_car_float"
-REGISTER_U32__STRING_INT		register_get_car_int,					"get_car_int"
-REGISTER_VOID__INT_INT			register_set_car_int,					"set_car_int"
-REGISTER_U32__STRING_INT		register_get_car_int16,					"get_car_int16"
-REGISTER_VOID__INT_INT			register_set_car_int16,					"set_car_int16"
-
-REGISTER_FLOAT__INT				register_get_memory_float,				"get_memory_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_memory_float,				"set_memory_float"
-REGISTER_U32__STRING_INT		register_get_memory_int,				"get_memory_int"
-REGISTER_VOID__INT_INT			register_set_memory_int,				"set_memory_int"
-REGISTER_U32__STRING_INT		register_get_memory_int16,				"get_memory_int16"
-REGISTER_VOID__INT_INT			register_set_memory_int16,				"set_memory_int16"
-REGISTER_U32__STRING_INT		register_get_memory_int8,				"get_memory_int8"
-REGISTER_VOID__INT_INT			register_set_memory_int8,				"set_memory_int8"
-
-REGISTER_U32__STRING_INT		register_save_hud_bone_float,			"save_hud_bone_float"
-REGISTER_FLOAT__INT				register_get_hud_float,					"get_hud_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_hud_float,					"set_hud_float"
-;--
-REGISTER_FLOAT__INT				register_get_inventory_item_float,		"get_inventory_item_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_inventory_item_float,		"set_inventory_item_float"
-REGISTER_U32__STRING_INT		register_get_inventory_item_int,		"get_inventory_item_int"
-REGISTER_VOID__INT_INT			register_set_inventory_item_int,		"set_inventory_item_int"
-REGISTER_U32__STRING_INT		register_get_inventory_item_int16,		"get_inventory_item_int16"
-REGISTER_VOID__INT_INT			register_set_inventory_item_int16,		"set_inventory_item_int16"
-REGISTER_U32__STRING_INT		register_set_inventory_item_shared_str, "set_inventory_item_shared_str"
-REGISTER_U32__STRING_INT		register_get_inventory_item_int8,		"get_inventory_item_int8"
-REGISTER_VOID__INT_INT			register_set_inventory_item_int8,		"set_inventory_item_int8"
-
-;--
-REGISTER_U32__STRING_INT		register_get_actor_int,					"get_actor_int"
-REGISTER_U32__STRING_INT		register_get_actor_int16,				"get_actor_int16"
-REGISTER_VOID__INT_INT			register_set_actor_int,					"set_actor_int"
-
-REGISTER_U32__STRING_INT		register_get_wpn_gl_int,				"get_wpn_gl_int"
-REGISTER_U32__STRING_INT		register_get_wpn_int,					"get_wpn_int"
-REGISTER_U32__STRING_INT		register_get_wpn_int16,					"get_wpn_int16"	;-- Nanobot
-REGISTER_U32__STRING_INT		register_get_wpn_int8,					"get_wpn_int8"	;-- Nanobot
-;
-REGISTER_VOID__INT_INT			register_set_wpn_int,					"set_wpn_int"
-REGISTER_VOID__INT_INT			register_set_wpn_int16,					"set_wpn_int16"	;-- Nanobot
-REGISTER_VOID__INT_INT			register_set_wpn_int8,					"set_wpn_int8"	;-- Nanobot
-
-;REGISTER_U32__STRING_INT		register_get_wpn_bone_id,				"get_wpn_bone_id"
-REGISTER_U32__STRING_INT		register_get_bone_id,					"get_bone_id"
-;REGISTER_U32__STRING_INT		register_get_wpn_hud_bone_id,			"get_wpn_hud_bone_id"
-
-REGISTER_U32__STRING_INT		register_get_hud_bone_id,				"get_hud_bone_id"
-REGISTER_U32__STRING_INT		register_set_wpn_bone_visible,			"set_wpn_bone_visible"
-REGISTER_U32__STRING_INT		register_set_hud_bone_visible,			"set_hud_bone_visible"
-REGISTER_U32__STRING_INT		register_get_hud_bone_visible,			"get_hud_bone_visible"
-REGISTER_U32__STRING_INT		register_get_wpn_bone_visible,			"get_wpn_bone_visible"
-REGISTER_U32__STRING_INT		register_get_bone_visible,				"get_bone_visible"
-REGISTER_U32__STRING_INT		register_set_bone_visible,				"set_bone_visible"
-
-REGISTER_FLOAT__INT				register_get_wpn_float,					"get_wpn_float"
-REGISTER_VOID__VECTOR_FLOAT_INT	register_set_wpn_float,					"set_wpn_float"
-
-REGISTER_FLOAT__INT				register_get_custom_monster_float,		"get_custom_monster_float"
-REGISTER_U32__STRING_INT		register_get_custom_monster_int,		"get_custom_monster_int"
-
-REGISTER_U32__STRING_INT		register_set_actor_shared_str,			"set_actor_shared_str"
-REGISTER_U32__STRING_INT		register_set_wpn_shared_str,			"set_wpn_shared_str"
-REGISTER_U32__STRING_INT		register_set_hud_shared_str,			"set_hud_shared_str"
-
-REGISTER_GO__INT				register_item_in_inv_box,				"object_from_inv_box"
-
-REGISTER_VECTOR__STRING			register_get_hud_bone_pos,				"get_hud_bone_pos"
-
-REGISTER_INIFILE__VOID			register_get_visual_ini,				"get_visual_ini"
-REGISTER_VOID__STR_BOOL			register_play_hud_anim,					"play_hud_animation"
-
-REGISTER_VOID__INT_INT_INT		register_set_goodwill_by_id,			"set_goodwill_ex"
-REGISTER_VOID__INT_INT_INT		register_change_goodwill_by_id,			"change_goodwill_ex"
-
-REGISTER_U32__STRING_INT		register_get_hud_animation_length,		"get_hud_animation_length"
-
-REGISTER_VOID__INT_INT			register_clear_personal_record,			"clear_personal_record"
-
-REGISTER_UINT__VECTOR_PVECTOR	register_calc_future_position,			"calc_future_position"
-
-REGISTER_VOID__U32_PVECTOR		register_get_game_object_vector,		"get_go_vector"
-REGISTER_BOOL__U32				register_get_key_state,					"get_key_state"
-
-REGISTER_U32__STRING_INT		register_spawn_artefact,				"spawn_artefact"
-
+;;;,				"can_move_to_slot" ; --
+;;;,				"can_move_to_ruck" ;--
+;;;,				"can_move_to_belt" ; --
 align_proc
-game_object_fix proc
-; делаем то, что вырезали 
-call	enable_vision_register
-; добавляем своё
+script_register@@game_object_extended proc
+local ppFuncExport:dword
 ; регистрируем функцию разрешения колбеков на нажатия и мышь
 ;PERFORM_EXPORT_VOID__BOOL enable_input_extensions, "enable_input_extensions"
 ; регистрируем функцию получения топлива у машины
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetFuel,					"get_fuel"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetFuel,						"get_fuel"
 ; регистрируем функцию получения потребления топлива у машины
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetFuelConsumption,		"get_fuel_consumption"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetFuelConsumption,			"get_fuel_consumption"
 ; регистрируем функцию получения объёма бака у машины
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetFuelTank,				"get_fuel_tank"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetFuelTank,					"get_fuel_tank"
 ; регистрируем функцию установки топлива у машины
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetFuel,					"set_fuel"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetFuel,						"set_fuel"
 ; регистрируем функцию установки потребления топлива у машины
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetFuelConsumption,		"set_fuel_consumption"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetFuelConsumption,			"set_fuel_consumption"
 ; регистрируем функцию получения предмета с пояса по номеру
-PERFORM_EXPORT_GO__INT					register_item_on_belt,						CScriptGameObject@@item_on_belt
+PERFORM_EXPORT_GO__INT					CScriptGameObject@@item_on_belt,				"item_on_belt"
 ; регистрируем функцию получения предмета из рюкзака по номеру
-PERFORM_EXPORT_GO__INT					register_item_in_ruck,						CScriptGameObject@@item_in_ruck
+PERFORM_EXPORT_GO__INT					CScriptGameObject@@item_in_ruck,				"item_in_ruck"
 ; регистрируем функцию получения количества предметов на поясе
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@BeltCount,				"belt_count"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@BeltCount,					"belt_count"
 ; регистрируем функцию получения количества предметов в рюкзаке
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@RuckCount,				"ruck_count"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@RuckCount,					"ruck_count"
 ; регистрируем функцию получения количества слотов
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@SlotCount,				"slot_number"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@SlotCount,					"slot_number"
 ; регистрируем функцию перемещения предмета предмета в рюкзак
-PERFORM_EXPORT_BOOL__GO					register_move_to_ruck,						CScriptGameObject@@MoveToRuck
+PERFORM_EXPORT_BOOL__GO					CScriptGameObject@@MoveToRuck,					"move_to_ruck"
 ; регистрируем функцию перемещения предмета предмета на пояс
-PERFORM_EXPORT_BOOL__GO					register_move_to_belt,						CScriptGameObject@@MoveToBelt
+PERFORM_EXPORT_BOOL__GO					CScriptGameObject@@MoveToBelt,					"move_to_belt"
 ; регистрируем функцию перемещения предмета предмета в слот без активациии
-PERFORM_EXPORT_BOOL__GO					register_move_to_slot,						CScriptGameObject@@MoveToSlotNotActivate
+PERFORM_EXPORT_BOOL__GO					CScriptGameObject@@MoveToSlotNotActivate,		"move_to_slot"
 ; регистрируем функцию перемещения предмета предмета в слот с одновременной активацией
-PERFORM_EXPORT_BOOL__GO					register_move_to_slot_and_activate,			CScriptGameObject@@MoveToSlotAndActivate
+PERFORM_EXPORT_BOOL__GO					CScriptGameObject@@MoveToSlotAndActivate,		"move_to_slot_and_activate"
 ; регистрируем функцию определения того, что предмет находится на поясе
-PERFORM_EXPORT_BOOL__GO					register_is_on_belt,						CScriptGameObject@@IsOnBelt
+PERFORM_EXPORT_BOOL__GO					CScriptGameObject@@IsOnBelt,					"is_on_belt"
 ; регистрируем функцию определения того, что предмет находится в рюкзаке
-PERFORM_EXPORT_BOOL__GO					register_is_in_ruck,						CScriptGameObject@@IsInRuck
+PERFORM_EXPORT_BOOL__GO					CScriptGameObject@@IsInRuck,					"is_in_ruck"
 ; регистрируем функцию определения того, что предмет находится в слоте
-PERFORM_EXPORT_BOOL__GO					register_is_in_slot,						CScriptGameObject@@IsInSlot
+PERFORM_EXPORT_BOOL__GO					CScriptGameObject@@IsInSlot,					"is_in_slot"
 ; регистрируем функцию получения общего веса инвентаря
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetInventoryWeight,		"get_inventory_weight"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetInventoryWeight,			"get_inventory_weight"
 ; регистрируем функцию получения предмета из инвентарного ящика по номеру
-PERFORM_EXPORT_GO__INT					register_item_in_inv_box,					CScriptGameObject@@item_in_inv_box
+PERFORM_EXPORT_GO__INT					CScriptGameObject@@item_in_inv_box,				"object_from_inv_box"
 ; test get_id
 ;PERFORM_EXPORT_INT__VOID CScriptGameObject@@GetID, "get_id"
 ; регистрируем функцию установки коэффициента спринта для актора
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetSprintFactor,			"set_sprint_factor"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetSprintFactor,				"set_sprint_factor"
 ; регистрируем функцию получения коэффициента спринта для актора
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetSprintFactor,			"get_sprint_factor"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetSprintFactor,				"get_sprint_factor"
 ; регистрируем функцию получения состояния актора
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@ActorBodyState,			"actor_body_state"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@ActorBodyState,				"actor_body_state"
 ; регистрируем функцию получения видимости актора
 ;PERFORM_EXPORT_UINT__VOID CScriptGameObject@@GetActorVisible, "get_actor_visible"
 
 ; регистрируем функцию получения max weight
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetActorMaxWeight,		"get_actor_max_weight"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetActorMaxWeight,			"get_actor_max_weight"
 ; регистрируем функцию получения max walk weight
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetActorMaxWalkWeight,	"get_actor_max_walk_weight"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetActorMaxWalkWeight,		"get_actor_max_walk_weight"
 ; регистрируем функцию установки max weight
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetActorMaxWeight,		"set_actor_max_weight"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetActorMaxWeight,			"set_actor_max_weight"
 ; регистрируем функцию установки max walk weight
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetActorMaxWalkWeight,	"set_actor_max_walk_weight"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetActorMaxWalkWeight,		"set_actor_max_walk_weight"
 ; регистрируем функцию получения take distance
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetActorTakeDist,		"get_actor_take_dist"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetActorTakeDist,			"get_actor_take_dist"
 ; регистрируем функцию установки take distance
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetActorTakeDist,		"set_actor_take_dist"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetActorTakeDist,			"set_actor_take_dist"
 ; регистрируем функцию для получения specific_character
-PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetSpecificProfile,		"specific_character"
+PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetSpecificProfile,			"specific_character"
 ;--
-PERFORM_EXPORT_FLOAT__INT				register_get_game_object_float,				CScriptGameObject@@GetGameObjectFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_game_object_float,				CScriptGameObject@@SetGameObjectFloat
-PERFORM_EXPORT_U32__STRING_INT			register_get_game_object_int,				CScriptGameObject@@GetGameObjectInt
-PERFORM_EXPORT_VOID__INT_INT			register_set_game_object_int,				CScriptGameObject@@SetGameObjectInt
-PERFORM_EXPORT_U32__STRING_INT			register_get_game_object_int16,				CScriptGameObject@@GetGameObjectInt16
-PERFORM_EXPORT_VOID__INT_INT			register_set_game_object_int16,				CScriptGameObject@@SetGameObjectInt16
-PERFORM_EXPORT_U32__STRING_INT			register_get_game_object_int8,				CScriptGameObject@@GetGameObjectInt8
-PERFORM_EXPORT_VOID__INT_INT			register_set_game_object_int8,				CScriptGameObject@@SetGameObjectInt8
-PERFORM_EXPORT_U32__STRING_INT			register_set_game_object_shared_str,		CScriptGameObject@@SetGameObjectSharedStr
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetGameObjectFloat,			"get_go_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetGameObjectFloat,			"set_go_float"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt,			"get_go_int"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetGameObjectInt,			"set_go_int"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt16,			"get_go_int16"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetGameObjectInt16,			"set_go_int16"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt8,			"get_go_int8"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetGameObjectInt8,			"set_go_int8"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@SetGameObjectSharedStr,		"set_go_shared_str"
 
-PERFORM_EXPORT_VOID__U32_PVECTOR		register_get_game_object_vector,			CScriptGameObject@@SetGameObjectVector
+PERFORM_EXPORT_VOID__U32_PVECTOR		CScriptGameObject@@SetGameObjectVector,			"set_go_vector"
 
-PERFORM_EXPORT_U32__STRING_INT			register_get_actor_condition_int,			CScriptGameObject@@GetActorConditionInt
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetActorConditionInt,		"get_actor_condition_int"
 
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetGameObjectFloat,			"get_car_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetGameObjectFloat,			"set_car_float"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt,			"get_car_int"	
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetGameObjectInt,			"set_car_int"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt16,			"get_car_int16"			
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetGameObjectInt16,			"set_car_int16"
 
-PERFORM_EXPORT_FLOAT__INT				register_get_car_float,						CScriptGameObject@@GetGameObjectFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_car_float,						CScriptGameObject@@SetGameObjectFloat
-PERFORM_EXPORT_U32__STRING_INT			register_get_car_int,						CScriptGameObject@@GetGameObjectInt
-PERFORM_EXPORT_VOID__INT_INT			register_set_car_int,						CScriptGameObject@@SetGameObjectInt
-PERFORM_EXPORT_U32__STRING_INT			register_get_car_int16,						CScriptGameObject@@GetGameObjectInt16
-PERFORM_EXPORT_VOID__INT_INT			register_set_car_int16,						CScriptGameObject@@SetGameObjectInt16
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetMemoryFloat,				"get_memory_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetMemoryFloat,				"set_memory_float"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetMemoryInt,				"get_memory_int"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetMemoryInt,				"set_memory_int"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetMemoryInt16,				"get_memory_int16"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetMemoryInt16,				"set_memory_int16"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetMemoryInt8,				"get_memory_int8"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetMemoryInt8,				"set_memory_int8"
 
-PERFORM_EXPORT_FLOAT__INT				register_get_memory_float,					CScriptGameObject@@GetMemoryFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_memory_float,					CScriptGameObject@@SetMemoryFloat
-PERFORM_EXPORT_U32__STRING_INT			register_get_memory_int,					CScriptGameObject@@GetMemoryInt
-PERFORM_EXPORT_VOID__INT_INT			register_set_memory_int,					CScriptGameObject@@SetMemoryInt
-PERFORM_EXPORT_U32__STRING_INT			register_get_memory_int16,					CScriptGameObject@@GetMemoryInt16
-PERFORM_EXPORT_VOID__INT_INT			register_set_memory_int16,					CScriptGameObject@@SetMemoryInt16
-PERFORM_EXPORT_U32__STRING_INT			register_get_memory_int8,					CScriptGameObject@@GetMemoryInt8
-PERFORM_EXPORT_VOID__INT_INT			register_set_memory_int8,					CScriptGameObject@@SetMemoryInt8
-
-PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetGameObjectSharedStr,	"get_go_shared_str"
+PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetGameObjectSharedStr,		"get_go_shared_str"
 ;--
-PERFORM_EXPORT_FLOAT__INT				register_get_inventory_item_float,			CScriptGameObject@@GetInventoryItemFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_inventory_item_float,			CScriptGameObject@@SetInventoryItemFloat
-PERFORM_EXPORT_U32__STRING_INT			register_get_inventory_item_int,			CScriptGameObject@@GetInventoryItemInt
-PERFORM_EXPORT_VOID__INT_INT			register_set_inventory_item_int,			CScriptGameObject@@SetInventoryItemInt
-PERFORM_EXPORT_U32__STRING_INT			register_get_inventory_item_int16,			CScriptGameObject@@GetInventoryItemInt16
-PERFORM_EXPORT_VOID__INT_INT			register_set_inventory_item_int16,			CScriptGameObject@@SetInventoryItemInt16
-PERFORM_EXPORT_U32__STRING_INT			register_set_inventory_item_shared_str,		CScriptGameObject@@SetInventoryItemSharedStr
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetInventoryItemFloat,		"get_inventory_item_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetInventoryItemFloat,		"set_inventory_item_float"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetInventoryItemInt,			"get_inventory_item_int"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetInventoryItemInt,			"set_inventory_item_int"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetInventoryItemInt16,		"get_inventory_item_int16"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetInventoryItemInt16,		"set_inventory_item_int16"
+PERFORM_EXPORT_U32__STRING_INT		CScriptGameObject@@SetInventoryItemSharedStr,		"set_inventory_item_shared_str"
 
-PERFORM_EXPORT_STRING__VOID			CScriptGameObject@@GetInventoryItemSharedStr,	"get_inventory_item_shared_str"
+PERFORM_EXPORT_STRING__VOID			CScriptGameObject@@GetInventoryItemSharedStr,		"get_inventory_item_shared_str"
 ;--
-PERFORM_EXPORT_FLOAT__INT				register_get_actor_float,					CScriptGameObject@@GetGameObjectFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_actor_float,					CScriptGameObject@@SetGameObjectFloat
-PERFORM_EXPORT_FLOAT__INT				register_get_actor_condition_float,			CScriptGameObject@@GetActorConditionFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_actor_condition_float,			CScriptGameObject@@SetActorConditionFloat
-PERFORM_EXPORT_U32__STRING_INT			register_get_actor_int,						CScriptGameObject@@GetGameObjectInt
-PERFORM_EXPORT_U32__STRING_INT			register_get_actor_int16,					CScriptGameObject@@GetGameObjectInt16
-PERFORM_EXPORT_VOID__INT_INT			register_set_actor_int,						CScriptGameObject@@SetGameObjectInt
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetGameObjectFloat,			"get_actor_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetGameObjectFloat,			"set_actor_float"
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetActorConditionFloat,		"get_actor_condition_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetActorConditionFloat,		"set_actor_condition_float"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt,			"get_actor_int"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt16,			"get_actor_int16"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetGameObjectInt,			"set_actor_int"
 
-PERFORM_EXPORT_U32__STRING_INT			register_get_wpn_gl_int,					CScriptGameObject@@GetInventoryItemInt
-PERFORM_EXPORT_U32__STRING_INT			register_get_wpn_int,						CScriptGameObject@@GetInventoryItemInt
-PERFORM_EXPORT_U32__STRING_INT			register_get_wpn_int16,						CScriptGameObject@@GetInventoryItemInt16 ;-- Nanobot
-PERFORM_EXPORT_U32__STRING_INT			register_get_wpn_int8,						CScriptGameObject@@GetInventoryItemInt8 ;-- Nanobot
-PERFORM_EXPORT_VOID__INT_INT			register_set_wpn_int,						CScriptGameObject@@SetInventoryItemInt
-PERFORM_EXPORT_VOID__INT_INT			register_set_wpn_int16,						CScriptGameObject@@SetInventoryItemInt16 ;-- Nanobot
-PERFORM_EXPORT_VOID__INT_INT			register_set_wpn_int8,						CScriptGameObject@@SetInventoryItemInt8 ;-- Nanobot
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetInventoryItemInt,			"get_wpn_gl_int"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetInventoryItemInt,			"get_wpn_int"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetInventoryItemInt16,		"get_wpn_int16"			;-- Nanobot
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetInventoryItemInt8,		"get_wpn_int8"			;-- Nanobot
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetInventoryItemInt,			"set_wpn_int"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetInventoryItemInt16,		"set_wpn_int16"			;-- Nanobot
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetInventoryItemInt8,		"set_wpn_int8"		 	;-- Nanobot
 
 ;PERFORM_EXPORT_U32__STRING_INT			register_get_wpn_bone_id, CScriptGameObject@@GetWeaponBoneID
-PERFORM_EXPORT_U32__STRING_INT			register_get_bone_id,						CScriptGameObject@@GetBoneID
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetBoneID,					"get_bone_id"
 
 ;PERFORM_EXPORT_U32__STRING_INT			register_get_wpn_hud_bone_id, CScriptGameObject@@GetWeaponHudBoneID
 
-PERFORM_EXPORT_U32__STRING_INT			register_get_hud_bone_id,					CScriptGameObject@@GetHudBoneID
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetHudBoneID,				"get_hud_bone_id"
 
-PERFORM_EXPORT_U32__STRING_INT			register_set_wpn_bone_visible,				CScriptGameObject@@SetWeaponBoneVisible
-PERFORM_EXPORT_U32__STRING_INT			register_set_hud_bone_visible,				CScriptGameObject@@SetHudBoneVisible
-PERFORM_EXPORT_U32__STRING_INT			register_get_hud_bone_visible,				CScriptGameObject@@GetHudBoneVisible
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@SetWeaponBoneVisible,		"set_wpn_bone_visible"
+PERFORM_EXPORT_VOID__STR_BOOL			CScriptGameObject@@SetHudBoneVisible,			"set_hud_bone_visible"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetHudBoneVisible,			"get_hud_bone_visible"
 
-PERFORM_EXPORT_U32__STRING_INT			register_get_wpn_bone_visible,				CScriptGameObject@@GetWeaponBoneVisible
-PERFORM_EXPORT_U32__STRING_INT			register_get_bone_visible,					CScriptGameObject@@GetBoneVisible
-PERFORM_EXPORT_U32__STRING_INT			register_set_bone_visible,					CScriptGameObject@@SetBoneVisible
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetWeaponBoneVisible,		"get_wpn_bone_visible"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetBoneVisible,				"get_bone_visible"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@SetBoneVisible,				"set_bone_visible"
 
-PERFORM_EXPORT_FLOAT__INT				register_get_wpn_float,						CScriptGameObject@@GetInventoryItemFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_wpn_float,						CScriptGameObject@@SetInventoryItemFloat
-
-
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetInventoryItemFloat,		"get_wpn_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetInventoryItemFloat,		"set_wpn_float"
 
 ; регистрируем функцию получения FOV актора
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetCameraFOV,			"get_camera_fov"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetCameraFOV,				"get_camera_fov"
 ; регистрируем функцию установки FOV актора
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetCameraFOV,			"set_camera_fov"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetCameraFOV,				"set_camera_fov"
 ; регистрируем функцию получения FOV худа
 ;PERFORM_EXPORT_FLOAT__VOID CScriptGameObject@@GetHudFOV, "get_hud_fov"
 ; регистрируем функцию установки FOV худа
 ;PERFORM_EXPORT_VOID__FLOAT CScriptGameObject@@SetHudFOV, "set_hud_fov"
 ;
-PERFORM_EXPORT_FLOAT__INT				register_get_custom_monster_float,			CScriptGameObject@@GetGameObjectFloat	;;CScriptGameObject@@GetCustomMonsterFloat
-PERFORM_EXPORT_U32__STRING_INT			register_get_custom_monster_int,			CScriptGameObject@@GetGameObjectInt		;;CScriptGameObject@@GetCustomMonsterInt
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetGameObjectFloat,			"get_custom_monster_float"	;;CScriptGameObject@@GetCustomMonsterFloat
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetGameObjectInt,			"get_custom_monster_int"	;;CScriptGameObject@@GetCustomMonsterInt
 
-PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetGameObjectSharedStr,	"get_actor_shared_str"
-PERFORM_EXPORT_U32__STRING_INT			register_set_actor_shared_str,				CScriptGameObject@@SetGameObjectSharedStr
+PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetGameObjectSharedStr,		"get_actor_shared_str"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@SetGameObjectSharedStr,		"set_actor_shared_str"
 
-PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetInventoryItemSharedStr, "get_wpn_shared_str"
-PERFORM_EXPORT_U32__STRING_INT			register_set_wpn_shared_str,				CScriptGameObject@@SetInventoryItemSharedStr
+PERFORM_EXPORT_STRING__VOID			CScriptGameObject@@GetInventoryItemSharedStr,		"get_wpn_shared_str"
+PERFORM_EXPORT_U32__STRING_INT		CScriptGameObject@@SetInventoryItemSharedStr,		"set_wpn_shared_str"	
 
-PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetHudSharedStr,			"get_hud_shared_str"
-PERFORM_EXPORT_U32__STRING_INT			register_set_hud_shared_str,				CScriptGameObject@@SetHudSharedStr
+PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetHudSharedStr,				"get_hud_shared_str"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@SetHudSharedStr,				"set_hud_shared_str"
 
-PERFORM_EXPORT_VOID__STRING				CScriptGameObject@@SetActorVisual,			"set_actor_visual"
+PERFORM_EXPORT_VOID__STRING				CScriptGameObject@@SetActorVisual,				"set_actor_visual"
 
-PERFORM_EXPORT_VOID__GO					CScriptGameObject@@OpenInventoryBox,		"open_inventory_box"
+PERFORM_EXPORT_VOID__GO					CScriptGameObject@@OpenInventoryBox,			"open_inventory_box"
 ; регистрируем функцию получения количества предметов в ящике
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@InvBoxCount,				"inv_box_count"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@InvBoxCount,					"inv_box_count"
 ; получение инвентарного веса
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetWeght,				"get_weight"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetWeght,					"get_weight"
 ; получение владельца машины, как game_object
-PERFORM_EXPORT_GO__VOID					CScriptGameObject@@GetHolderOwner,			"get_holder_owner"
+PERFORM_EXPORT_GO__VOID					CScriptGameObject@@GetHolderOwner,				"get_holder_owner"
 ; получение скорости кровотечения
 ;PERFORM_EXPORT_FLOAT__VOID CScriptGameObject@@GetBleedingSpeed, "get_bleeding_speed"
 ; изменение скорости кровотечения
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@ChangeBleedingSpeed,		"heal_wounds"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@ChangeBleedingSpeed,			"heal_wounds"
 
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsGameObject,			"is_game_object"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCar,					"is_car"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHelicopter,			"is_helicopter"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHolder,				"is_holder"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsEntityAlive,			"is_entity_alive"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsInventoryItem,			"is_inventory_item"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsInventoryOwner,		"is_inventory_owner"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActor,					"is_actor"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCustomMonster,			"is_custom_monster"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeapon,				"is_weapon"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponGL,				"is_weapon_gl"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsInventoryBox,			"is_inventory_box"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsMedkit,				"is_medkit"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsEatableItem,			"is_eatable_item"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsAntirad,				"is_antirad"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsOutfit,				"is_outfit"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsScope,					"is_scope"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsSilencer,				"is_silencer"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsGrenadeLauncher,		"is_grenade_launcher"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponMagazined,		"is_weapon_magazined"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsSpaceRestrictor,		"is_space_restrictor"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsStalker,				"is_stalker"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCustomZone,			"is_anomaly"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBaseMonster,			"is_monster"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsExplosive,				"is_explosive"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsScriptZone,			"is_script_zone"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsProjector,				"is_projector"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTrader,				"is_trader"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHudItem,				"is_hud_item"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsFoodItem,				"is_food_item"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsArtefact,				"is_artefact"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsAmmo,					"is_ammo"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsMissile,				"is_missile"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPhysicsShellHolder,	"is_physics_shell_holder"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsGrenade,				"is_grenade"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBottleItem,			"is_bottle_item"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCrow,					"is_crow"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBloodsucker,			"is_bloodsucker"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBoar,					"is_boar"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsFlesh,					"is_flesh"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPseudoDog,				"is_pseudodog"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBurer,					"is_burer"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsChimera,				"is_chimera"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPseudoGigant,			"is_pseudogigant"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPoltergeist,			"is_poltergeist"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsZombie,				"is_zombie"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsFracture,				"is_fracture"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsSnork,					"is_snork"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsController,			"is_controller"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCat,					"is_cat"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTushkano,				"is_tushkano"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsDog,					"is_dog"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsGameObject,				"is_game_object"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCar,						"is_car"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHelicopter,				"is_helicopter"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHolder,					"is_holder"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsEntityAlive,				"is_entity_alive"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsInventoryItem,				"is_inventory_item"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsInventoryOwner,			"is_inventory_owner"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActor,						"is_actor"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCustomMonster,				"is_custom_monster"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeapon,					"is_weapon"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponGL,					"is_weapon_gl"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsInventoryBox,				"is_inventory_box"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsMedkit,					"is_medkit"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsEatableItem,				"is_eatable_item"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsAntirad,					"is_antirad"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsOutfit,					"is_outfit"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsScope,						"is_scope"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsSilencer,					"is_silencer"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsGrenadeLauncher,			"is_grenade_launcher"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponMagazined,			"is_weapon_magazined"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsSpaceRestrictor,			"is_space_restrictor"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsStalker,					"is_stalker"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCustomZone,				"is_anomaly"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBaseMonster,				"is_monster"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsExplosive,					"is_explosive"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsScriptZone,				"is_script_zone"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsProjector,					"is_projector"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTrader,					"is_trader"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHudItem,					"is_hud_item"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsFoodItem,					"is_food_item"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsArtefact,					"is_artefact"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsAmmo,						"is_ammo"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsMissile,					"is_missile"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPhysicsShellHolder,		"is_physics_shell_holder"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsGrenade,					"is_grenade"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBottleItem,				"is_bottle_item"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCrow,						"is_crow"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBloodsucker,				"is_bloodsucker"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBoar,						"is_boar"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsFlesh,						"is_flesh"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPseudoDog,					"is_pseudodog"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsBurer,						"is_burer"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsChimera,					"is_chimera"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPseudoGigant,				"is_pseudogigant"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsPoltergeist,				"is_poltergeist"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsZombie,					"is_zombie"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsFracture,					"is_fracture"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsSnork,						"is_snork"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsController,				"is_controller"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCat,						"is_cat"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTushkano,					"is_tushkano"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsDog,						"is_dog"
 
-PERFORM_EXPORT_VECTOR__STRING			register_get_hud_bone_pos,					CScriptGameObject@@hud_bone_position
+PERFORM_EXPORT_VECTOR__STRING			CScriptGameObject@@hud_bone_position,			"get_hud_bone_pos"
 
-PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@ProjectorOn,				"projector_on"
-PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@ProjectorOff,			"projector_off"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@ProjectorIsOn,			"projector_is_on"
-PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SwitchProjector,			"switch_projector"
+PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@ProjectorOn,					"projector_on"
+PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@ProjectorOff,				"projector_off"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@ProjectorIsOn,				"projector_is_on"
+PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SwitchProjector,				"switch_projector"
 
-PERFORM_EXPORT_INIFILE__VOID			register_get_visual_ini,					CScriptGameObject@@GetVisualIni
+PERFORM_EXPORT_INIFILE__VOID			CScriptGameObject@@GetVisualIni,				"get_visual_ini"
 
-PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@UpdateCondition,			"update_condition"
+PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@UpdateCondition,				"update_condition"
 
-PERFORM_EXPORT_VOID__STR_BOOL			register_play_hud_anim,						CScriptGameObject@@PlayHudAnimation
-PERFORM_EXPORT_VOID__INT				CScriptGameObject@@SetHudAnimationChannel,	"set_hud_animation_channel"
-PERFORM_EXPORT_VOID__INT		CScriptGameObject@@SetHudAnimationCallbackParam,	"set_hud_animation_callback_param"
-PERFORM_EXPORT_VOID__BOOL		CScriptGameObject@@SetUseHudAnimationCallback,		"set_use_hud_animation_callback"
+PERFORM_EXPORT_VOID__STR_BOOL			CScriptGameObject@@PlayHudAnimation,			"play_hud_animation"
+PERFORM_EXPORT_VOID__INT				CScriptGameObject@@SetHudAnimationChannel,		"set_hud_animation_channel"
+PERFORM_EXPORT_VOID__INT		CScriptGameObject@@SetHudAnimationCallbackParam,		"set_hud_animation_callback_param"
+PERFORM_EXPORT_VOID__BOOL		CScriptGameObject@@SetUseHudAnimationCallback,			"set_use_hud_animation_callback"
 
 
-PERFORM_EXPORT_U32__STRING_INT			register_save_hud_bone_float,				CScriptGameObject@@SaveHudBoneFloat
-PERFORM_EXPORT_FLOAT__INT				register_get_hud_float,						CScriptGameObject@@GetHudFloat
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_hud_float,						CScriptGameObject@@SetHudFloat
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@SaveHudBoneFloat,			"save_hud_bone_float"
+PERFORM_EXPORT_FLOAT__INT				CScriptGameObject@@GetHudFloat,					"get_hud_float"
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	CScriptGameObject@@SetHudFloat,					"set_hud_float"
 
 ;;;PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetCalibratingVector,	"set_calibrating_vector"
 
-PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@InvalidateInventory,		"invalidate_inventory"
+PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@InvalidateInventory,			"invalidate_inventory"
 ;PERFORM_EXPORT_VECTOR__VOID
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@NonscriptUsable,			"nonscript_usable"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@NonscriptUsable,				"nonscript_usable"
 ;
-PERFORM_EXPORT_VOID__INT_INT_INT		register_set_goodwill_by_id,				CScriptGameObject@@SetGoodwillByID
-PERFORM_EXPORT_VOID__INT_INT_INT		register_change_goodwill_by_id,				CScriptGameObject@@ChangeGoodwillByID
+PERFORM_EXPORT_VOID__U32_U32_U32		CScriptGameObject@@SetGoodwillByID,				"set_goodwill_ex"
+PERFORM_EXPORT_VOID__U32_U32_U32		CScriptGameObject@@ChangeGoodwillByID,			"change_goodwill_ex"
 
-PERFORM_EXPORT_VOID__GO					CScriptGameObject@@AttachVehicle,			"attach_vehicle"
+PERFORM_EXPORT_VOID__GO					CScriptGameObject@@AttachVehicle,				"attach_vehicle"
 
-PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@EnableCarPanel,			"enable_car_panel"
+PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@EnableCarPanel,				"enable_car_panel"
 
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg1,		"set_vector_global_arg_1"
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg2,		"set_vector_global_arg_2"
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg3,		"set_vector_global_arg_3"
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg4,		"set_vector_global_arg_4"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg1,			"set_vector_global_arg_1"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg2,			"set_vector_global_arg_2"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg3,			"set_vector_global_arg_3"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetVectorGlobalArg4,			"set_vector_global_arg_4"
 
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetActorDirectionEx,		"set_camera_direction"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetActorDirectionEx,			"set_camera_direction"
 
-PERFORM_EXPORT_VOID__GO					CScriptGameObject@@SetGOArg1,				"set_object_arg_1"
+PERFORM_EXPORT_VOID__GO					CScriptGameObject@@SetGOArg1,					"set_object_arg_1"
 
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@GetHudItemState,			"get_hud_item_state"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@GetHudItemState,				"get_hud_item_state"
 
 
 ; by Real Wolf
-PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SwitchTorch,				"switch_torch"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTorchEnabled,			"is_torch_enabled"
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchRange,			"set_torch_range"
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetTorchColor,			"set_torch_color"
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchOmniRange,		"set_torch_omni_range"
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetTorchOmniColor,		"set_torch_omni_color"
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchGlowRadius,		"set_torch_glow_radius"
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchSpotAngle,		"set_torch_spot_angle"
-PERFORM_EXPORT_VOID__STRING				CScriptGameObject@@SetTorchColorAnimator,	"set_torch_color_animator"
+PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SwitchTorch,					"switch_torch"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTorchEnabled,				"is_torch_enabled"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchRange,				"set_torch_range"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetTorchColor,				"set_torch_color"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchOmniRange,			"set_torch_omni_range"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetTorchOmniColor,			"set_torch_omni_color"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchGlowRadius,			"set_torch_glow_radius"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetTorchSpotAngle,			"set_torch_spot_angle"
+PERFORM_EXPORT_VOID__STRING				CScriptGameObject@@SetTorchColorAnimator,		"set_torch_color_animator"
 
-PERFORM_EXPORT_U32__STRING_INT			register_get_inventory_item_int8,			CScriptGameObject@@GetInventoryItemInt8
-PERFORM_EXPORT_VOID__INT_INT			register_set_inventory_item_int8,			CScriptGameObject@@SetInventoryItemInt8
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetInventoryItemInt8,		"get_inventory_item_int8"
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@SetInventoryItemInt8,		"set_inventory_item_int8"
 
-PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetVisualName,			"get_visual_name"
-PERFORM_EXPORT_VOID__STRING				CScriptGameObject@@SetVisualName,			"set_visual_name"
+PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetVisualName,				"get_visual_name"
+PERFORM_EXPORT_VOID__STRING				CScriptGameObject@@SetVisualName,				"set_visual_name"
 
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetShapeRadius,			"get_shape_radius"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTorch,					"is_torch"
-PERFORM_EXPORT_GO__INT					register_get_object_arg_1,					CScriptGameObject@@GetObjectArg1
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetShapeRadius,				"get_shape_radius"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsTorch,						"is_torch"
+PERFORM_EXPORT_GO__INT					CScriptGameObject@@GetObjectArg1,				"get_object_arg_1"
 ; end
 
 ; регистрируем функции установки lsf_params для ламп
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetLSFSpeed,				"set_lsf_speed"
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetLSFAmount,			"set_lsf_amount"
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetLSFSMAPJitter,		"set_lsf_smap_jitter"
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetLSFSpeed,				"get_lsf_speed"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetLSFSpeed,					"set_lsf_speed"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetLSFAmount,				"set_lsf_amount"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetLSFSMAPJitter,			"set_lsf_smap_jitter"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetLSFSpeed,					"get_lsf_speed"
 ; регистрируем функцию получения радиуса объекта
-PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetRadius,				"radius"
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetRadius,					"radius"
 ; получение имени кости по индексу
-PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetBoneName,				"get_bone_name"
+PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetBoneName,					"get_bone_name"
 ; наличие визуала (с костями)
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@HasVisual,				"has_visual"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@HasVisual,					"has_visual"
 
 ; =========================================================================================
 ; ========================= added by Ray Twitty (aka Shadows) =============================
@@ -448,59 +322,59 @@ PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@HasVisual,				"has_visual"
 ; =========================================================================================
 ; ACTOR STATES
 ; методы для оценки состояния актора
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorNormal,			"is_actor_normal"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCrouch,			"is_actor_crouch"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCreep,			"is_actor_creep"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorClimb,			"is_actor_climb"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorWalking,			"is_actor_walking"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorRunning,			"is_actor_running"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorSprinting,		"is_actor_sprinting"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCrouching,		"is_actor_crouching"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCreeping,			"is_actor_creeping"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorClimbing,			"is_actor_climbing"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorNormal,				"is_actor_normal"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCrouch,				"is_actor_crouch"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCreep,				"is_actor_creep"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorClimb,				"is_actor_climb"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorWalking,				"is_actor_walking"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorRunning,				"is_actor_running"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorSprinting,			"is_actor_sprinting"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCrouching,			"is_actor_crouching"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorCreeping,				"is_actor_creeping"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsActorClimbing,				"is_actor_climbing"
 ; метод для вкл\выкл ПНВ
-PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SwitchNightVision,		"switch_night_vision"
+PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SwitchNightVision,			"switch_night_vision"
 ; методы для проверки на тип объекта
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHangingLamp,			"is_hanging_lamp"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponKnife,			"is_knife"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponBinoculars,		"is_binoculars"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponPistol,			"is_weapon_pistol"
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponShotgun,			"is_weapon_shotgun"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsHangingLamp,				"is_hanging_lamp"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponKnife,				"is_knife"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponBinoculars,			"is_binoculars"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponPistol,				"is_weapon_pistol"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponShotgun,				"is_weapon_shotgun"
 ; метод для высадки актора из машины
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@DetachVehicle,			"detach_vehicle"
+PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@DetachVehicle,				"detach_vehicle"
 ; разворот камеры на геймобъект
-PERFORM_EXPORT_VOID__GO					CScriptGameObject@@UpdateCameraDirection,	"update_camera_direction"
+PERFORM_EXPORT_VOID__GO					CScriptGameObject@@UpdateCameraDirection,		"update_camera_direction"
 ; восстановление прошлого значения FOV актора
-PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@RestoreCameraFOV,		"restore_camera_fov"
+PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@RestoreCameraFOV,			"restore_camera_fov"
 ; HUD CONTROL
 ; получить оставшиеся время текущей анимации
-PERFORM_EXPORT_UINT__VOID		CScriptGameObject@@GetHudAnimationRemainingTime,	"get_hud_animation_remaining_time"
+PERFORM_EXPORT_UINT__VOID		CScriptGameObject@@GetHudAnimationRemainingTime,		"get_hud_animation_remaining_time"
 ; проверить является ли текущая анимация цикличной
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCyclicHudAnimation,	"is_cyclic_hud_animation"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsCyclicHudAnimation,		"is_cyclic_hud_animation"
 ; проверить есть ли заданная анимация в модели
-PERFORM_EXPORT_BOOL__STRING				CScriptGameObject@@HasHudAnimation,			"has_hud_animation"
+PERFORM_EXPORT_BOOL__STRING				CScriptGameObject@@HasHudAnimation,				"has_hud_animation"
 ; получить длину текущей анимации
-PERFORM_EXPORT_U32__STRING_INT			register_get_hud_animation_length,			CScriptGameObject@@GetHudAnimationLength
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@GetHudAnimationLength,		"get_hud_animation_length"
 ; =========================================================================================
 ; ======================================= END =============================================
 ; =========================================================================================
 
 ;PERFORM_EXPORT_VOID__INT		CScriptGameObject@@ClearRelations, "clear_relations"
-PERFORM_EXPORT_VOID__INT_INT			register_clear_personal_record,				CScriptGameObject@@ClearPersonalRecord
+PERFORM_EXPORT_VOID__INT_INT			CScriptGameObject@@ClearPersonalRecord,			"clear_personal_record"
 ; ---===Nanobot===---
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsExploding,				"is_exploding"	; взрывной объект взорван? 
-PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@setDynamicScales,		"set_air_resistance"
-PERFORM_EXPORT_BOOL__STRING				CScriptGameObject@@LoadAmmoCar,				"load_ammo_car"
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@SizeAmmoBox,				"get_ammo_box_size"
-PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@CurrAmmoBox,				"set_ammo_box_curr"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsExploding,					"is_exploding"	; взрывной объект взорван? 
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@setDynamicScales,			"set_air_resistance"
+PERFORM_EXPORT_BOOL__STRING				CScriptGameObject@@LoadAmmoCar,					"load_ammo_car"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@SizeAmmoBox,					"get_ammo_box_size"
+PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@CurrAmmoBox,					"set_ammo_box_curr"
 ; задать лучшие оружие сталкеру.
-PERFORM_EXPORT_GO__VOID					CScriptGameObject@@GetScriptBestWeapon,		"get_script_best_weapon"
-PERFORM_EXPORT_VOID__GO_BOOL			CScriptGameObject@@SetScriptBestWeapon,		"set_script_best_weapon"
+PERFORM_EXPORT_GO__VOID					CScriptGameObject@@GetScriptBestWeapon,			"get_script_best_weapon"
+PERFORM_EXPORT_VOID__GO_BOOL			CScriptGameObject@@SetScriptBestWeapon,			"set_script_best_weapon"
 ; Можно ли выронить оружие при смерти сталкера.
-PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@GetNotDropWeaponDeath,	"get_not_drop_weapon_die"
-PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SetNotDropWeaponDeath,	"set_not_drop_weapon_die"
-
-PERFORM_REGISTER_UINT__VECTOR_PVECTOR	register_calc_future_position,					CScriptGameObject@@calc_future_position
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@GetNotDropWeaponDeath,		"get_not_drop_weapon_die"
+PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SetNotDropWeaponDeath,		"set_not_drop_weapon_die"
+;вычислить точку упреждения для НПС, актора, вертолёта, БТРа
+PERFORM_EXPORT_UINT__VECTOR_PVECTOR		CScriptGameObject@@calc_future_position,		"calc_future_position"				
 ;включение колбеков
 PERFORM_EXPORT_VOID__INT				CScriptGameObject@@SetFlagCallbackKey,			"set_flag_callback_key"
 PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@GetFlagCallbackKey,			"get_flag_callback_key"
@@ -513,8 +387,8 @@ PERFORM_EXPORT_VOID__FLOAT_FLOAT		CScriptGameObject@@SetCarWpnCurRotation,		"car
 PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetCarWpnCurDirH,			"car_weapon_dir_h"
 PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetCarWpnCurDirP,			"car_weapon_dir_p"
 ;Нажата ли указаная клавиша.
-PERFORM_EXPORT_BOOL__U32				register_get_key_state,							CScriptGameObject@@GetKeyState
-PERFORM_EXPORT_U32__STRING_INT			register_spawn_artefact,						CScriptGameObject@@SpawnArtefact
+PERFORM_EXPORT_BOOL__U32				CScriptGameObject@@GetKeyState,					"get_key_state"
+PERFORM_EXPORT_U32__STRING_INT			CScriptGameObject@@SpawnArtefact,				"spawn_artefact"
 ;разрешить спавн артефактов аномалии скриптом.
 PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@AllowScriptSpawnArtefact,	"allow_script_spawn_artefact"
 ;перезагрузить оружия машины, надо для спареного оружия на бронетехнике.
@@ -525,16 +399,20 @@ PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SetWeaponNPCBlocked,			"set_weap
 ; задать инициатор для физической оболочки, т.е. кто кинул камень?
 PERFORM_EXPORT_VOID__INT				CScriptGameObject@@SetInitiator,				"set_initiator_id"
 PERFORM_EXPORT_UINT__VOID				CScriptGameObject@@GetInitiator,				"get_initiator_id"
-;-----end------
-; идём обратно
-jmp		back_from_game_object_fix
-game_object_fix endp
+;переключить режим подствольного гранатомёта для НПС
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@GetGrenadeModeGL,			"get_grenade_mode_gl"
+PERFORM_EXPORT_VOID__BOOL				CScriptGameObject@@SetGrenadeModeGL,			"set_grenade_mode_gl"
+PERFORM_EXPORT_BOOL__PVECTOR_FLOAT		CScriptGameObject@@TestGrenadeFire,				"test_grenade_fire"
+;для РПГ7 можно менять скорость вылета гранаты, сделано для класса граната_для_нпс
+PERFORM_EXPORT_FLOAT__VOID				CScriptGameObject@@GetLaunchSpeedRPG7,			"get_speed_rpg7"
+PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetLaunchSpeedRPG7,			"set_speed_rpg7"
+
+ret
+script_register@@game_object_extended endp
 
 align_proc
-game_object_fix2 proc
-; делаем то, что вырезали
-call	register__float_rw_property
-; делаем своё
+script_register@@game_object_extended2 proc
+local ppFuncExport:dword
 PERFORM_EXPORT_PROPERTY__FLOAT_RW		CScriptGameObject@@GetSatiety,		CScriptGameObject@@ChangeSatiety,	"satiety"
 PERFORM_EXPORT_PROPERTY__FLOAT_RW		CScriptGameObject@@GetAlcohol,		CScriptGameObject@@ChangeAlcohol,	"alcohol"
 PERFORM_EXPORT_PROPERTY__FLOAT_RW		CScriptGameObject@@GetMaxPower,		CScriptGameObject@@ChangeMaxPower,	"max_power"
@@ -544,9 +422,8 @@ PERFORM_EXPORT_VECTOR__VOID				CScriptGameObject@@get_LastFP2,					"get_LastFP2"
 PERFORM_EXPORT_VECTOR__VOID				CScriptGameObject@@get_LastFD,					"get_LastFD"
 PERFORM_EXPORT_VECTOR__VOID				CScriptGameObject@@get_LastSP,					"get_LastSP"
 
-;идём обратно
-jmp		back_from_game_object_fix2
-game_object_fix2 endp
+ret
+script_register@@game_object_extended2 endp
 
 align_proc
 set_shared_str proc ; ebx = (shared_str*)	eax = (char*)
@@ -573,6 +450,27 @@ set_shared_str proc ; ebx = (shared_str*)	eax = (char*)
 	pop		ecx
 	ret
 set_shared_str endp
+
+align_proc
+set_shared@@_set proc (dword) uses ebx str_name:ptr byte
+;ecx	this	set_shared*
+	mov		ebx, ecx
+	push	str_name
+	mov		eax, ds:g_pStringContainer
+	mov		ecx, [eax]
+	call	str_container__dock
+	ASSUME	eax:ptr str_value, ecx:ptr str_value, ebx:ptr shared_str
+	.if (eax)
+		inc		[eax].dwReference
+	.endif
+	mov		ecx, [ebx].p_	; str_value
+	.if (ecx)
+		dec		[ecx].dwReference
+	.endif
+	mov		[ebx].p_, eax
+	ASSUME	eax:nothing, ecx:nothing, ebx:nothing
+	ret
+set_shared@@_set endp
 
 align_proc
 CScriptGameObject@@GetHudFloat proc param_offset:dword
@@ -621,8 +519,7 @@ align_proc
 CScriptGameObject@@GetGameObjectInt16 proc string_param:dword, param_offset:dword
 	mov		edx, [ecx+4]	; CGameObject
 	mov		ecx, param_offset
-	mov		ax, [edx+ecx]
-	movzx	eax, ax
+	movzx	eax, word ptr [edx+ecx]
 	ret
 CScriptGameObject@@GetGameObjectInt16 endp
 
@@ -630,8 +527,7 @@ align_proc
 CScriptGameObject@@GetGameObjectInt8 proc string_param:dword, param_offset:dword
 	mov		edx, [ecx+4]	; CGameObject
 	mov		ecx, param_offset
-	mov		al, [edx+ecx]
-	movzx	eax, al
+	movzx	eax, byte ptr [edx+ecx]
 	ret
 CScriptGameObject@@GetGameObjectInt8 endp
 
@@ -663,7 +559,6 @@ CScriptGameObject@@GetGameObjectLPCSTR proc
 	.endif
 	ret
 CScriptGameObject@@GetGameObjectLPCSTR endp
-
 
 ;==============================Запись===============================
 align_proc
@@ -1291,9 +1186,7 @@ CScriptGameObject@@IsOnBelt proc uses ebx esi item:dword
 			mov		esi, eax
 			smart_cast	CInventoryOwner, ebx
 			.if (eax)
-				ASSUME	eax:ptr CInventoryOwner
-				mov		ecx, [eax].m_inventory
-				ASSUME	eax:nothing
+				mov		ecx, [eax].CInventoryOwner.m_inventory
 				; здесь имеем ecx == inventory, esi == item
 				mov		eax, esi
 				call	CInventory__InBelt ; int item<eax>, int this<ecx>
@@ -1588,7 +1481,6 @@ CScriptGameObject@@SetHudBoneVisible proc uses esi bone_name:dword, visible:dwor
 			.endif
 		.endif
 	.endif
-	mov		eax, -2
 	ret
 CScriptGameObject@@SetHudBoneVisible endp
 
@@ -2096,6 +1988,7 @@ CScriptGameObject@@SetBoneVisible proc uses esi bone_name:dword, visible:dword
 	mov		edx, [ecx+4]
 	ASSUME	edx:ptr CGameObject
 	mov		ecx, [edx].Visual_
+	xor		eax, eax
 	.if (ecx)
 		smart_castV	CKinematics, IRender_Visual, ecx
 		mov		esi, eax ; esi = visual
@@ -2116,8 +2009,6 @@ CScriptGameObject@@SetBoneVisible proc uses esi bone_name:dword, visible:dword
 		push	0
 		call	edx
 		mov		eax, 1 ; success
-	.else
-		xor		eax, eax ; fail
 	.endif
 	ASSUME	edx:nothing
 	ret
@@ -2128,6 +2019,7 @@ CScriptGameObject@@GetBoneVisible proc uses esi bone_name:dword, visible:dword
 	mov		edx, [ecx+4]
 	ASSUME	edx:ptr CGameObject
 	mov		ecx, [edx].Visual_
+	xor		eax, eax
 	.if (ecx)
 		smart_castV	CKinematics, IRender_Visual, ecx
 		mov		esi, eax ; esi = visual
@@ -2138,8 +2030,6 @@ CScriptGameObject@@GetBoneVisible proc uses esi bone_name:dword, visible:dword
 		push	eax ; bone_id
 		mov		ecx, esi
 		call	ds:CKinematics__LL_GetBoneVisible
-	.else
-		xor		eax, eax
 	.endif
 	ASSUME	edx:nothing
 	ret
@@ -2202,7 +2092,7 @@ CScriptGameObject@@ChangeAlcohol proc add_alcohol:dword
 	smart_cast	CActor, [ecx+4]
 	.if (eax)
 		ASSUME	eax:ptr CActor, ecx:ptr CActorCondition
-		mov		eax, [eax].CActor@m_entity_condition	; CActorCondition
+		mov		ecx, [eax].CActor@m_entity_condition	; CActorCondition
 		movss	xmm0, [ecx].m_fAlcohol
 		addss	xmm0, add_alcohol
 		float@clamp	xmm0, 0.0, 1.0
@@ -2230,7 +2120,7 @@ CScriptGameObject@@ChangeSatiety proc add_satiety:dword
 	smart_cast	CActor, [ecx+4]
 	.if (eax)
 		ASSUME	eax:ptr CActor, ecx:ptr CActorCondition
-		mov		eax, [eax].CActor@m_entity_condition	; CActorCondition
+		mov		ecx, [eax].CActor@m_entity_condition	; CActorCondition
 		movss	xmm0, [ecx].m_fSatiety
 		addss	xmm0, add_satiety
 		float@clamp	xmm0, 0.0, 1.0
@@ -2558,8 +2448,9 @@ local visual_name:shared_str
 ;	lea		eax, [ebx].value
 ;	PRINT_UINT "visual_name.value[%s]", eax
 	mov		ecx, [edx].dwCRC
+	mov		eax, [edx].dwLength
 	ASSUME	edx:nothing
-	.if (ebx && [ebx].dwLength>0 && [ebx].dwCRC!=ecx)
+	.if (ebx && ([ebx].dwLength!=eax || [ebx].dwCRC!=ecx))
 		smart_cast	CActor, esi
 		.if (eax)
 			mov		ecx, eax
@@ -3232,12 +3123,12 @@ CScriptGameObject@@ClearPersonalRecord proc id_from:dword, id_to:dword
 CScriptGameObject@@ClearPersonalRecord endp
 
 align_proc
-CScriptGameObject@@GetObjectArg1 proc
+CScriptGameObject@@GetObjectArg1 proc param:dword
 	mov		eax, g_object_arg_1
 	.if (eax && dword ptr[eax+4]==0)
 		xor		eax, eax
 	.endif
-	retn	4
+	ret
 CScriptGameObject@@GetObjectArg1 endp
 
 ;---===Nanobot===---
@@ -3288,8 +3179,7 @@ CScriptGameObject@@LoadAmmoCar proc uses esi	sect_ammo:dword
 		.if (edx)
 			mov		esi, [edx].m_Ammo	; CCartridge*
 			mov		eax, sect_ammo
-			push	0
-			call	CCartridge__Load
+			CCartridge@@Load(0)
 			mov		eax, 1
 		.endif
 		ASSUME	eax:nothing, edx:nothing
@@ -3800,4 +3690,110 @@ CScriptGameObject@@GetInitiator proc
 	ASSUME	ecx:nothing, edx:nothing
 	ret
 CScriptGameObject@@GetInitiator endp
+
+align_proc
+CScriptGameObject@@GetGrenadeModeGL proc
+	smart_cast	CWeaponMagazinedWGrenade, CGameObject, [ecx+4]
+	mov		edx, eax
+	xor		eax, eax
+	.if (edx)
+		movzx	eax, [edx].CWeaponMagazinedWGrenade.m_bGrenadeMode
+	.endif
+	ret
+CScriptGameObject@@GetGrenadeModeGL endp
+
+align_proc
+CScriptGameObject@@SetGrenadeModeGL proc mode:byte
+	smart_cast	CWeaponMagazinedWGrenade, CGameObject, [ecx+4]
+	.if (eax)
+		mov		dl, mode
+		.if ([eax].CWeaponMagazinedWGrenade.m_bGrenadeMode != dl)
+			call    CWeaponMagazinedWGrenade@@PerformSwitchGL
+		.endif
+	.endif
+	ret
+CScriptGameObject@@SetGrenadeModeGL endp
+
+align_proc
+CScriptGameObject@@GetLaunchSpeedRPG7 proc
+	smart_cast	CWeaponRPG7, CGameObject, [ecx+4]
+	fldz
+	.if (eax)
+		fld		[eax].CWeaponRPG7.m_fLaunchSpeed
+	.endif
+	ret
+CScriptGameObject@@GetLaunchSpeedRPG7 endp
+
+align_proc
+CScriptGameObject@@SetLaunchSpeedRPG7 proc launch_speed:real4
+	smart_cast	CWeaponRPG7, CGameObject, [ecx+4]
+	.if (eax)
+		fld		launch_speed
+		fstp	[eax].CWeaponRPG7.m_fLaunchSpeed
+	.endif
+	ret
+CScriptGameObject@@SetLaunchSpeedRPG7 endp
+
+static_float	flt_max, 3.4e38
+
+include trajectories.asm
+
+;вызывается для оружия, которое может стрелять гранатами, должно быть в инвентаре живого и не раненого сталкера.
+;проверяется, достижимость цели в указаной точки и в пределах указаного радиуса.
+align_proc
+CScriptGameObject@@TestGrenadeFire proc uses esi edi ebx pTargetPos:ptr Fvector, radius:real4
+local throw_vel:Fvector4, throw_target_pos:Fvector4, throw_pos:Fvector4, throw_dir:Fvector4
+local time:real4, grenade_vel:real4
+;	mov		edx, pTargetPos
+;	PRINT_VECTOR "pTargetPos", edx
+;	PRINT_FLOAT "radius = %.6f", radius
+	ASSUME	esi:ptr CGameObject, edi:ptr CAI_Stalker
+	mov		esi, [ecx+4]
+	smart_cast CRocketLauncher, CGameObject, esi
+	.if (eax)
+		mrm		grenade_vel, [eax].CRocketLauncher.m_fLaunchSpeed
+		mov		eax, [esi].Parent
+		.if (eax)
+			smart_cast CAI_Stalker, eax
+			.if (eax)
+				mov		edi, eax
+				mov		edx, [edi].CEntityAlive@m_entity_condition
+				xor		eax, eax
+				xorps	xmm0, xmm0
+				.if (xmm0<[edx].CEntityCondition.m_fHealth && ![edi].m_wounded)	;сталкер жив и не ранен
+					;если оружие: подствольный гранатомёт или РГ-6, то скорость гранаты фиксированая.
+					Fvector4_set	throw_pos, [edi].eye_matrix.c_.x, [edi].eye_matrix.c_.y, [edi].eye_matrix.c_.z, 0
+					ASSUME	edx:ptr Fvector
+					mov		edx, pTargetPos
+					Fvector4_set	throw_target_pos, [edx].x, [edx].y, [edx].z, 0
+					;throw_vel:sub(throw_target_pos, throw_pos);
+					movups	xmm0, throw_target_pos
+					movups	xmm1, throw_pos
+					subps	xmm0, xmm1
+					movups	throw_vel, xmm0
+					mov		eax, ph_world
+					mov		ebx, [eax].CPHWorld.m_gravity
+					xorps	xmm0, xmm0
+					.if (xmm0==grenade_vel)
+						ThrowMinVelTime(&throw_vel, ebx)
+						movss	time, xmm0
+						TransferenceToThrowVel(&throw_vel, time, ebx)
+					.else
+						push	edi
+						.if (TransferenceAndThrowVelToThrowDir(&throw_vel, grenade_vel, ebx, &throw_dir))
+							Fvector_set	throw_vel, throw_dir
+						.endif
+						pop		edi
+					.endif
+					.if (al)
+						trajectory_intersects_geometry(time, &throw_pos, &throw_target_pos, &throw_vel, ebx, edi, NULL)
+						Fvector_set	[edi].m_throw_direction, throw_dir
+					.endif
+				.endif
+			.endif
+		.endif
+	.endif
+	ASSUME	esi:nothing, edi:nothing, edx:nothing
+	ret
+CScriptGameObject@@TestGrenadeFire endp
 

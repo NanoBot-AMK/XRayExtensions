@@ -900,6 +900,32 @@ org 102C4180h - shift
 CCartridge__Load:
 org 1024EF70h - shift
 CBulletManager__AddBullet:
+;---------------------------------------
+org 102D0720h - shift
+CWeaponMagazined__switch2_Fire:
+org 102CFF90h - shift
+CWeaponMagazined__FireEnd:
+;org 102D9910h - shift
+;CWeaponRPG7__RocketLaunch:
+;org 102DF6D0h - shift
+;CWeaponRG6__FireStart:
+org 10509E10h - shift
+__alloca_probe:
+org 10331EA0h - shift
+CParticlesObject__play_at_pos:
+org 10331DE0h - shift
+CParticlesObject__UpdateParent:
+org 102BC130h - shift
+CWeapon__Reload:
+org 102D0000h - shift
+CWeaponMagazined__TryReload:
+org 102C2D30h - shift
+CWeapon__FireEnd:
+org 102D3740h - shift
+CWeaponMagazinedWGrenade__PerformSwitchGL:
+org 102A7740h - shift
+CInventory__ActiveItem:
+
 
 ; стабилизированная ракета (ракета разворачивается по курсу)
 org 102CA953h - shift	; 2 bytes
@@ -1146,32 +1172,6 @@ org 102CD579h - shift	; 7 bytes
 back_from_not_fire_modes:	
 	jmp		edx
 ;org 102CFE35h - shift	; 
-
-;---------------------------------------
-org 102D0720h - shift
-CWeaponMagazined__switch2_Fire:
-org 102CFF90h - shift
-CWeaponMagazined__FireEnd:
-;org 102D9910h - shift
-;CWeaponRPG7__RocketLaunch:
-;org 102DF6D0h - shift
-;CWeaponRG6__FireStart:
-org 10509E10h - shift
-__alloca_probe:
-org 10331EA0h - shift
-CParticlesObject__play_at_pos:
-org 10331DE0h - shift
-CParticlesObject__UpdateParent:
-org 102BC130h - shift
-CWeapon__Reload:
-org 102D0000h - shift
-CWeaponMagazined__TryReload:
-org 102C2D30h - shift
-CWeapon__FireEnd:
-org 102D3740h - shift
-CWeaponMagazinedWGrenade__PerformSwitchGL:
-org 102A7740h - shift
-CInventory__ActiveItem:
 
 
 ; возможность стрелять из CWeaponRPG7 очередями.

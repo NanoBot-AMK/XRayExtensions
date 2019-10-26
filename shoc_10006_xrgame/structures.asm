@@ -39,7 +39,7 @@ Fvector4 struct
 	w					real4 ?
 Fvector4 ends
 
-Fcolor struct
+Fcolor struct ; (sizeof=16, align=4)
 	r					real4 ?
 	g					real4 ?
 	b					real4 ?
@@ -109,6 +109,16 @@ Frect ends									; 16
 _RECT struct ; (sizeof=16, align=4)
 	Frect <>
 _RECT ends
+
+_QWORD struct ; (sizeof=8, align=4)
+	union
+	struct
+		lo			dword ?			; 0
+		hi			dword ?			; 4
+	ends
+					qword ?			; 0
+	ends
+_QWORD ends								; 8
 
 Fbox struct ; (sizeof=24, align=4)
 	union
@@ -228,7 +238,7 @@ collide__rq_results ends
 collide@@ray_defs struct ; (sizeof=36, align=4)
 	start				Fvector <>			; 0
 	dir					Fvector <>			; 12
-	range				dword ?				; 24
+	range				real4 ?				; 24
 	flags				dword ?				; 28
 	tgt					dword ?				; 32
 collide@@ray_defs ends						; 36
@@ -270,7 +280,11 @@ string16 struct
 								byte 16 dup(?)
 string16 ends
 
-NET_PacketSizeLimit				equ 8192	; макс. рамер пакета 8 килобайт
+CRandom struct ; (sizeof=4, align=4)
+	holdrand					dword ?				; 
+CRandom ends
+
+NET_PacketSizeLimit				equ 8192	; макс. размер пакета 8 килобайт
 
 NET_Buffer struct ; (sizeof=8196, align=4)
 	data						byte NET_PacketSizeLimit dup(?)	; 0
@@ -287,6 +301,50 @@ ISE_Abstract	struct ; (sizeof=8, align=4)
 	ISE_Abstract@vfptr			dword ?				; 0		offset
 	m_editor_flags				dword ?				; 4		flags32
 ISE_Abstract	ends								; 8
+
+SPHNetState struct ; (sizeof=108, align=4)
+	linear_vel					Fvector <>				; 0
+	angular_vel					Fvector <>				; 12
+	force						Fvector <>				; 24
+	torque						Fvector <>				; 36
+	position					Fvector <>				; 48
+	previous_position			Fvector <>				; 60
+	union
+		struct
+			accel				Fvector <>				; 72
+			max_velocity		real4 ?					; 84
+		ends
+		quaternion				Fquaternion <>			; 72
+	ends
+	previous_quaternion			Fquaternion <>			; 88
+	enabled						byte ?					; 104
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+SPHNetState ends										; 108
+
+CObjectFactory struct ; (sizeof=24, align=4)
+	vfptr						dword ?					; 0		offset
+	m_clsids					xr_vector <>			; 4		xr_vector<CObjectItemAbstract *,xalloc<CObjectItemAbstract *> > ?
+	m_actual					byte ?					; 20
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+CObjectFactory ends										; 24
+
+CObjectItemAbstract struct ; (sizeof=24, align=8)
+	vfptr						dword ?					; 0		offset
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+	m_clsid						qword ?					; 8
+	m_script_clsid				shared_str <>			; 16
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+CObjectItemAbstract ends								; 24
 
 CScriptValueContainer struct ; (sizeof=20, align=4)
 	CScriptValueContainer@vfptr	dword ?				; 0		offset
@@ -319,17 +377,138 @@ CSE_Abstract struct ; (sizeof=160, align=8)	__cppobj __declspec(align(8))  : ISE
 	children					xr_vector <>		; 72	xr_vector<u16,xalloc<u16> > 
 	o_Position					Fvector <>			; 88
 	o_Angle						Fvector <>			; 100
-	m_tClassID					qword ?				; 112	unsigned __int64 
+	m_tClassID					_QWORD <>			; 112	unsigned __int64 
 	m_script_clsid				dword ?				; 120	int 
 	m_ini_string				shared_str <>		; 124
 	m_ini_file					dword ?				; 128	CInifile *
 	m_bALifeControl				byte ?				; 132	bool 
-								byte ?	
+								byte ? ; undefined
 	m_tSpawnID					word ?				; 134	u16 
 	m_spawn_flags				dword ?				; 136	Flags32 
 	client_data					xr_vector <>		; 140	xr_vector<unsigned char,xalloc<unsigned char> > 
 								dword ?	; 156
 CSE_Abstract ends									; 160
+
+CSE_Temporary struct ; (sizeof=164, align=4)
+	CSE_Abstract <>
+	m_tNodeID						dword ?					; 160
+CSE_Temporary ends
+
+CSE_ALifeInventoryItem struct ; (sizeof=148, align=4)
+	CSE_ALifeInventoryItem@vfptr	dword ?					; 0		offset
+	m_fCondition					real4 ?					; 4
+	m_fMass							real4 ?					; 8
+	m_dwCost						dword ?					; 12
+	m_iHealthValue					dword ?					; 16
+	m_iFoodValue					dword ?					; 20
+	m_fDeteriorationValue			real4 ?					; 24
+	m_self							dword ?					; 28	offset
+	m_last_update_time				dword ?					; 32
+	m_u8NumItems					byte ?					; 36
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+	State							SPHNetState <>			; 40
+CSE_ALifeInventoryItem ends									; 148
+
+CSE_ALifeObject struct ;(sizeof=200, align=8)__cppobj __declspec(align(8)) CSE_ALifeObject : CSE_Abstract, CRandom
+	CSE_Abstract <>									; 0
+	CRandom <>										; 160
+	m_tGraphID					word ?				; 164
+								byte ? ; undefined
+								byte ? ; undefined
+	m_fDistance					real4 ?				; 168
+	m_bOnline					byte ?				; 172
+	m_bDirectControl			byte ?				; 173
+								byte ? ; undefined
+								byte ? ; undefined
+	m_tNodeID					dword ?				; 176
+	m_flags						dword ?				; 180	Flags32
+	m_story_id					dword ?				; 184
+	m_spawn_story_id			dword ?				; 188
+	m_alife_simulator			dword ?				; 192	CALifeSimulator *
+								dword ? ; undefined
+CSE_ALifeObject ends								; 200
+
+CSE_ALifeDynamicObject struct ;(sizeof=216, align=4) __cppobj CSE_ALifeDynamicObject : CSE_ALifeObject
+	CSE_ALifeObject <>								; 0
+	m_tTimeID					qword ?				; 200
+	m_switch_counter			qword ?				; 208
+CSE_ALifeDynamicObject ends							; 216
+
+CSE_Visual struct ; (sizeof=16, align=4)
+	CSE_Visual@vfptr			dword ?				; 0		offset
+	visual_name					shared_str <>		; 4
+	startup_animation			shared_str <>		; 8
+	flags						byte ?				; 12	Flags8
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+CSE_Visual ends										; 16
+
+CSE_ALifeDynamicObjectVisual struct ;(sizeof=232, align=4)
+	CSE_ALifeDynamicObject <>						; 0
+	CSE_Visual <>									; 216
+CSE_ALifeDynamicObjectVisual ends					; 232
+
+CSE_ALifeItem struct ;(sizeof=384, align=4)__cppobj __declspec(align(4)) CSE_ALifeItem : CSE_ALifeDynamicObjectVisual, CSE_ALifeInventoryItem
+	CSE_ALifeDynamicObjectVisual <>					; 0
+	CSE_ALifeInventoryItem <>						; 232
+	m_physics_disabled			byte ?				; 380
+	m_StateBattery				byte ?				; 381	NEW
+	m_bEmpty					byte ?				; 382	NEW
+								byte ? ; undefined
+CSE_ALifeItem ends									; 384
+
+CSE_ALifeItemPyrobattary struct ;(sizeof=400, align=4)
+	CSE_ALifeItem <>								; 0
+	m_dwNumberPyro				dword ?				; 384
+	m_dwFuseTime				dword ?				; 388
+	m_dwTimeEmpty				dword ?				; 392
+								dword ? ; undefined
+CSE_ALifeItemPyrobattary ends						; 400
+
+CSE_ALifeItemWeapon struct ;(sizeof=440, align=8) __cppobj __declspec(align(8)) CSE_ALifeItemWeapon : CSE_ALifeItem
+	CSE_ALifeItem <>								; 0
+	m_scope_status				dword ?				; 384	::EWeaponAddonStatus
+	m_silencer_status			dword ?				; 388	::EWeaponAddonStatus
+	m_grenade_launcher_status	dword ?				; 392	::EWeaponAddonStatus
+	timestamp					dword ?				; 396
+	wpn_flags					byte ?				; 400
+	wpn_state					byte ?				; 401
+	ammo_type					byte ?				; 402
+								byte ? ;undefined
+	a_current					word ?				; 404
+	a_elapsed					word ?				; 406
+	m_fHitPower					real4 ?				; 408
+	m_tHitType					dword ?				; 412	ALife::EHitType
+	m_caAmmoSections			byte ?				; 416
+								byte ? ;undefined
+								byte ? ;undefined
+								byte ? ;undefined
+	m_dwAmmoAvailable			dword ?				; 420
+	m_addon_flags				byte ?				; 424	Flags8
+	m_bZoom						byte ?				; 425
+								byte ? ;undefined
+								byte ? ;undefined
+	m_ef_main_weapon_type		dword ?				; 428
+	m_ef_weapon_type			dword ?				; 432
+								dword ? ;undefined
+CSE_ALifeItemWeapon ends							; 440
+
+CSE_ALifeItemWeaponMagazined struct ;(sizeof=448, align=8)
+	CSE_ALifeItemWeapon <>							; 0
+	m_u8CurFireMode				byte ?				; 440
+								byte ? ;undefined
+								byte ? ;undefined
+								byte ? ;undefined
+								dword ? ;undefined
+CSE_ALifeItemWeaponMagazined ends					; 448
+
+CSE_ALifeItemWeaponShotGun struct ;(sizeof=464, align=8)
+	CSE_ALifeItemWeaponMagazined <>					; 0
+	m_AmmoIDs					xr_vector <>		; 448	xr_vector<u8>
+CSE_ALifeItemWeaponShotGun ends						; 464
 
 MotionID struct; (sizeof=2, align=2)
 	union
@@ -505,6 +684,8 @@ cfCanBeUnlimited			= byte ptr (1 shl 2)
 cfExplosive					= byte ptr (1 shl 3)
 cfCallbackOn				= byte ptr (1 shl 4)
 cfShellExplosive			= byte ptr (1 shl 5)
+cfFakeGrenade				= byte ptr (1 shl 6)	;патрон дл€ ракеты
+;				= byte ptr (1 shl 7)
 
 CCartridge struct ; (sizeof=56, align=4)		// патрон
 	m_ammoSect				shared_str <>	; 0		
@@ -710,13 +891,10 @@ CExplosive struct ; (sizeof=232, align=4)
 	m_fExplodeDurationMax		dword ?					; 152
 	m_fExplodeHideDurationMax	dword ?					; 156
 	m_explosion_flags			byte ?					; 160	Flags8
-								byte ?					; 161
+	m_bAlreadyHidden			byte ?					; 161	bool	перемещено!!! было по смещению 168
 	m_game_object_id			word ?					; 162	u16		NEW	ID собственого объекта или оружи€ из которого выпустили снар€д
 	m_bHideInExplosion			dword ?					; 164
-	m_bAlreadyHidden			byte ?					; 168
-								byte ? ; undefined 169
-								byte ? ; undefined 170
-								byte ? ; undefined 171
+								dword ?					; 168	 undefined
 	m_fFragmentSpeed			dword ?					; 172
 	sndExplode					dword ?					; 176	ref_sound
 	m_eSoundExplode				dword ?					; 180	enum ESoundTypes
@@ -777,16 +955,6 @@ ICollisionForm	struct ; (sizeof=56, align=4)
 	m_type								dword ?					; 52	enum ECollisionFormType
 ICollisionForm	ends											; 56
 
-_QWORD struct ; (sizeof=8, align=4)
-	union
-	struct
-		lo			dword ?			; 0
-		hi			dword ?			; 4
-	ends
-					qword ?			; 0
-	ends
-_QWORD ends								; 8
-
 ;===================================================================================
 ;==============================	  CGameObject  =====================================
 ;===================================================================================
@@ -794,6 +962,18 @@ _QWORD ends								; 8
 ref_sound struct ; (sizeof=4, align=4)
 _p										dword ?			; 0		resptr_core<ref_sound_data,resptr_base<ref_sound_data> > ?
 ref_sound ends
+
+ref_sound_data struct ; (sizeof=36, align=4)
+	vfptr								dword ?				; 0		offset
+	xr_resource <>											; 4
+	nm									shared_str <>		; 8
+	handle								dword ?				; 12	offset
+	feedback							dword ?				; 16	offset
+	s_type								dword ?				; 20	enum esound_type
+	g_type								dword ?				; 24
+	g_object							dword ?				; 28	offset
+	g_userdata							resptr_core <>		; 32	resptr_core<CSound_UserData,resptr_base<CSound_UserData> > ?
+ref_sound_data ends											; 36
 
 CObject__SavedPosition struct ; (sizeof=16, align=4)
 	dwTime						dword ?					; 0
@@ -882,7 +1062,7 @@ CObject struct ; (sizeof=260, align=8)
 	NameObject					shared_str <>			; 168	
 	NameSection					shared_str <>			; 172	shared_str
 	NameVisual					shared_str <>			; 176	shared_str
-	Parent						dword ?					; 180	offset
+	Parent						dword ?					; 180	CObject*
 	struct PositionStack
 		array			CObject__SavedPosition 4 dup (<>); 184
 		count					dword ?					; 248
@@ -893,7 +1073,7 @@ CObject ends											; 260
 
 CUsableScriptObject struct ; (sizeof=12, align=4)
 	CUsableScriptObject@vfptr	dword ?					; 0		offset
-	m_sTipText					dword ?					; 4		shared_str
+	m_sTipText					dword ?					; 4		shared_str*
 	m_bNonscriptUsable			byte ?					; 8	
 								byte ? ; undefined
 								byte ? ; undefined
@@ -1103,6 +1283,29 @@ CObject__ObjectProperties struct ; (sizeof=4, align=4)
 	storage						dword ?
 CObject__ObjectProperties ends
 
+CPS_Instance struct ; (sizeof=156, align=4)
+	ISpatial <>											; 0
+	ISheduled <>										; 52
+	IRenderable <>										; 60
+	m_destroy_on_game_load		byte ?					; 140
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+	m_iLifeTime					dword ?					; 144
+	m_bAutoRemove				dword ?					; 148
+	m_bDead						dword ?					; 152
+CPS_Instance ends										; 156
+
+CParticlesObject struct ; (sizeof=168, align=4)
+	CPS_Instance <>										; 0
+	dwLastTime					dword ?					; 156
+	m_bLooped					byte ?					; 160
+	m_bStopping					byte ?					; 161
+								byte ? ; undefined
+								byte ? ; undefined
+	mt_dt						dword ?					; 164
+CParticlesObject ends									; 168
+
 CParticlesPlayer struct ; (sizeof=56, align=8)
 	CParticlesPlayer@vfptr		dword ?					; 0 offset
 								dword ? ; undefined
@@ -1116,6 +1319,39 @@ CParticlesPlayer struct ; (sizeof=56, align=8)
 								byte ? ; undefined
 								dword ? ; undefined
 CParticlesPlayer ends									; 56
+
+CScriptParticlesCustom struct ; (sizeof=176, align=4)
+	CParticlesObject <>									; 0
+	m_animator					dword ?					; 168	CObjectAnimator*
+	m_owner						dword ?					; 172	CScriptParticles*
+CScriptParticlesCustom ends
+
+CScriptParticles struct ; (sizeof=8, align=4)
+	vfptr						dword ?					; 0
+	m_particles					dword ?					; 4		CScriptParticlesCustom*
+CScriptParticles ends
+
+SAnimParams struct ; (sizeof=20, align=4)
+	t							dword ?					; 0
+	min_t						dword ?					; 4
+	max_t						dword ?					; 8
+	bPlay						dword ?					; 12
+	bWrapped					dword ?					; 16
+SAnimParams ends										; 20
+
+CObjectAnimator struct ; (sizeof=120, align=4)
+	vfptr						dword ?					; 0	offset
+	bLoop						byte ?					; 4
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
+	m_Name						shared_str <>			; 8
+	m_XFORM						Fmatrix <>				; 12
+	m_MParam					SAnimParams <>			; 76
+	m_Motions					xr_vector <>			; 96	xr_vector<COMotion *,xalloc<COMotion *> > ?
+	m_Speed						dword ?					; 112
+	m_Current					dword ?					; 116	COMotion*
+CObjectAnimator ends									; 120
 
 dMass struct ; (sizeof=68, align=4)
 	mass						dword ?					; 0
@@ -1177,7 +1413,7 @@ CPHDisablingFull ends									; 148
 
 CPhysicsBase struct ; (sizeof=68, align=4)
 	CPhysicsBase@vfptr			dword ?					; 0		offset
-	mXFORM						Fmatrix <>				; 4
+	mXFORM						Fmatrix4 <>				; 4
 CPhysicsBase ends										; 68
 
 CPhysicsElement struct ; (sizeof=0x48, align=4)
@@ -1208,7 +1444,33 @@ CPHElement struct ; (sizeof=460, align=4)
 	gap1B5						byte 23 dup(?)			; 437
 CPHElement ends											; 460
 
-; ---------------------------------------------------------------------------
+CALifeSwitchManager struct ; (sizeof=152, align=8)
+	CRandom <>											; 0
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	m_switch_distance					dword ?			; 8
+	m_switch_factor						dword ?			; 12
+	m_online_distance					dword ?			; 16
+	m_offline_distance					dword ?			; 20
+	m_saved_chidren						xr_vector <>	; 24	xr_vector<unsigned short,xalloc<unsigned short> > ?
+	gap28								byte 112 dup(?)	; 40
+CALifeSwitchManager ends								; 
+
+CALifeUpdateManager struct ; (sizeof=756, align=4)
+	ISheduled <>										; 0
+	CALifeSwitchManager <>								; 8
+	anonymous_0							byte 36 dup(?)	; 160
+	anonymous_1							byte 528 dup(?)	; 196
+	gap2D4								byte 32 dup(?)	; 724
+CALifeUpdateManager ends								; 756
+
+CALifeSimulator struct ; (sizeof=772, align=4)
+	CALifeUpdateManager <>								; 0
+	CALifeSimulator@anonymous_0			byte 8 dup(?)	; 756
+	gap2FC								byte 8 dup(?)	; 764
+CALifeSimulator ends									; 772
 
 dxWorld struct ; (sizeof=16, align=4)
 	firstbody					dword ?					; 0
@@ -1584,8 +1846,8 @@ CEntityCondition@@SConditionChangeV ends						; 32
 
 CEntityConditionSimple struct ; (sizeof=12, align=4)
 	CEntityConditionSimple@vfptr		dword ?					; 0		offset
-	m_fHealth							dword ?					; 4
-	m_fHealthMax						dword ?					; 8
+	m_fHealth							real4 ?					; 4
+	m_fHealthMax						real4 ?					; 8
 CEntityConditionSimple ends										; 12
 
 CEntityCondition struct ; (sizeof=240, align=8)
@@ -1597,38 +1859,38 @@ CEntityCondition struct ; (sizeof=240, align=8)
 										byte ? ; undefined
 	CEntityCondition@m_object			dword ?					; 68	offset
 	m_WoundVector						xr_vector <>			; 72	xr_vector<CWound *,xalloc<CWound *> > ?
-	m_fPower							dword ?					; 88
-	m_fRadiation						dword ?					; 92
-	m_fPsyHealth						dword ?					; 96
-	m_fEntityMorale						dword ?					; 100
-	m_fPowerMax							dword ?					; 104
-	m_fRadiationMax						dword ?					; 108
-	m_fPsyHealthMax						dword ?					; 112
-	m_fEntityMoraleMax					dword ?					; 116
-	m_fDeltaHealth						dword ?					; 120
-	m_fDeltaPower						dword ?					; 124
-	m_fDeltaRadiation					dword ?					; 128
-	m_fDeltaPsyHealth					dword ?					; 132
-	m_fDeltaCircumspection				dword ?					; 136
-	m_fDeltaEntityMorale				dword ?					; 140
+	m_fPower							real4 ?					; 88
+	m_fRadiation						real4 ?					; 92
+	m_fPsyHealth						real4 ?					; 96
+	m_fEntityMorale						real4 ?					; 100
+	m_fPowerMax							real4 ?					; 104
+	m_fRadiationMax						real4 ?					; 108
+	m_fPsyHealthMax						real4 ?					; 112
+	m_fEntityMoraleMax					real4 ?					; 116
+	m_fDeltaHealth						real4 ?					; 120
+	m_fDeltaPower						real4 ?					; 124
+	m_fDeltaRadiation					real4 ?					; 128
+	m_fDeltaPsyHealth					real4 ?					; 132
+	m_fDeltaCircumspection				real4 ?					; 136
+	m_fDeltaEntityMorale				real4 ?					; 140
 	m_change_v							CEntityCondition@@SConditionChangeV <>; 144
-	m_fMinWoundSize						dword ?					; 176
+	m_fMinWoundSize						real4 ?					; 176
 	m_bIsBleeding						byte ?					; 180
 										byte ? ; undefined
 										byte ? ; undefined
 										byte ? ; undefined
-	m_fHealthHitPart					dword ?					; 184
-	m_fPowerHitPart						dword ?					; 188
-	m_fHealthLost						dword ?					; 192
+	m_fHealthHitPart					real4 ?					; 184
+	m_fPowerHitPart						real4 ?					; 188
+	m_fHealthLost						real4 ?					; 192
 										dword ? ; undefined
 	m_iLastTimeCalled					qword ?					; 200
-	m_fDeltaTime						dword ?					; 208
+	m_fDeltaTime						real4 ?					; 208
 	m_pWho								dword ?					; 212	offset
 	m_iWhoID							word ?					; 216
 										byte ? ; undefined
 										byte ? ; undefined
-	m_fHitBoneScale						dword ?					; 220
-	m_fWoundBoneScale					dword ?					; 224
+	m_fHitBoneScale						real4 ?					; 220
+	m_fWoundBoneScale					real4 ?					; 224
 	m_limping_threshold					dword ?					; 228
 	m_bTimeValid						byte ?					; 232
 	m_bCanBeHarmed						byte ?					; 233
@@ -2311,24 +2573,6 @@ ACTOR_DEFS@@net_update struct ; (sizeof=68, align=4)
 	fHealth						dword ?					; 64
 ACTOR_DEFS@@net_update ends								; 68
 
-SPHNetState struct 4 ; (sizeof=108, align=4)
-	linear_vel					Fvector <>				; 0
-	angular_vel					Fvector <>				; 12
-	force						Fvector <>				; 24
-	torque						Fvector <>				; 36
-	position					Fvector <>				; 48
-	previous_position			Fvector <>				; 60
-	union
-		struct
-			accel				Fvector <>				; 72
-			max_velocity		dword ?					; 84
-		ends
-		quaternion				Fquaternion <>			; 72
-	ends
-	previous_quaternion			Fquaternion <>			; 88
-	enabled						byte ?					; 104
-SPHNetState ends										; 108
-
 CActorCondition struct ; (sizeof=352, align=8)
 	CEntityCondition <>									; 0
 	m_condition_flags			word ?					; 240	flags16
@@ -2880,6 +3124,40 @@ CEatableItemObject struct ; (sizeof=688, align=8)
 	CPhysicItem <>												; 256
 CEatableItemObject ends											; 688
 
+CInifile@@Item	struct ; (sizeof=8, align=4)
+	first									shared_str <>
+	second									shared_str <>
+CInifile@@Item	ends
+
+CInifile@@Sect	struct ; (sizeof=20, align=4)
+	Name_									shared_str <>		; 0	
+	Data									xr_vector <>		; 4		xr_vector<CInifile::Item, xalloc<CInifile::Item>>
+CInifile@@Sect	ends											; 20
+
+SLustkugelParams struct ; (sizeof=24, align=4)
+	name_sect								dword ?				; 0		LPCSTR
+	delay									dword ?				; 4		u32
+	dir										Fvector2 <>			; 8
+	rot										Fvector2 <>			; 16
+SLustkugelParams ends											; 24
+
+CAntirad struct ; (sizeof=728, align=8) old=688
+	CEatableItemObject <>
+;---------------------CPyroBattery------------------------
+	m_fuse_time								dword ?					; 688	u32		замедлитель, миллисек.
+	m_bone_fuse								dword ?					; 692	LPCSTR
+	m_fuse_particles						dword ?					; 696	CScriptParticles*
+	m_params								xr_vector <>			; 700	xr_vector<SLustkugelParams, xalloc<SLustkugelParams>>
+	m_state_battery							byte ?					; 716	u8
+	m_bInitVisual							byte ?					; 717	bool
+											byte ? ; undefined
+											byte ? ; undefined
+	m_current_kugel							dword ?					; 720	SLustkugelParams*	итератор m_params
+	m_number_pyro							dword ?					; 724	u32
+	m_pServerObj							dword ?					; 728	CSE_ALifeItemPyrobattary*
+											dword ? ; undefined
+CAntirad ends														; 736	size
+
 CHudItemObject struct ; (sizeof=712, align=8)
 	CInventoryItemObject <>											; 0
 	CHudItem <>														; 648
@@ -3186,7 +3464,7 @@ CWeaponMagazined struct ; (sizeof=1960, align=8)
 	m_bStopedAfterQueueFired			byte ?							; 1908
 	m_bFireSingleShot					byte ?							; 1909
 	m_bHasDifferentFireModes			byte ?							; 1910
-										byte ? ; undefined
+	m_bBlockAutoAimRG					byte ?							; 1911	NEW	bool	запрет на автоприцел дл€ гранатомЄтов.
 	m_aFireModes						xr_vector <>					; 1912	xr_vector<int,xalloc<int> > ?
 	m_iCurFireMode						dword ?							; 1928
 	m_sCurFireMode						string16 <>						; 1932
@@ -3198,17 +3476,9 @@ CWeaponMagazined struct ; (sizeof=1960, align=8)
 										dword ? ; undefined
 CWeaponMagazined ends													; 1960
 
-CWeaponCustomPistol struct
+CWeaponCustomPistol struct ; (sizeof=1960, align=8)
 	CWeaponMagazined <>
 CWeaponCustomPistol ends
-
-CWeaponRPG7 struct
-	CWeaponCustomPistol <>												; 0
-	m_sGrenadeBoneName					shared_str <>					; 1960
-	m_sHudGrenadeBoneName				shared_str <>					; 1964
-	m_sRocketSection					shared_str <>					; 1968
-										dword ? ; undefined
-CWeaponRPG7 ends														; 1976
 
 CRocketLauncher struct ; (sizeof=40, align=4)
 	CRocketLauncher@vfptr				dword ?					; offset
@@ -3216,6 +3486,18 @@ CRocketLauncher struct ; (sizeof=40, align=4)
 	m_launched_rockets					xr_vector <>			; xr_vector<CCustomRocket *,xalloc<CCustomRocket *> > ?
 	m_fLaunchSpeed						real4 ?
 CRocketLauncher ends
+
+CWeaponRPG7 struct ; (sizeof=2016, align=8)
+	CWeaponCustomPistol <>												; 0
+	CRocketLauncher <>													; 1960
+	m_sGrenadeBoneName					shared_str <>					; 2000
+	m_sHudGrenadeBoneName				shared_str <>					; 2004
+	m_sRocketSection					shared_str <>					; 2008
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+CWeaponRPG7 ends														; 2016
 
 CWeaponMagazinedWGrenade struct ; (sizeof=2456, align=8)
 	CWeaponMagazined <>											; 
@@ -3251,6 +3533,97 @@ CWeaponMagazinedWGrenade struct ; (sizeof=2456, align=8)
 	m_DefaultCartridge2					CCartridge <>			; 
 	grenade_bone_name					shared_str <>			; 
 CWeaponMagazinedWGrenade ends
+
+CWeaponShotgun	struct ; (sizeof=2136, align=8)
+	CWeaponCustomPistol <>										; 0
+	sndShotBoth							HUD_SOUND <>			; 1960
+	m_eSoundShotBoth					dword ?					; 1980	enum ESoundTypes
+	mhud_shot_boths						svector@MotionID_8@ <>	; 1984
+	m_eSoundOpen						dword ?					; 2004	enum ESoundTypes
+	m_eSoundAddCartridge				dword ?					; 2008	enum ESoundTypes
+	m_eSoundClose						dword ?					; 2012	enum ESoundTypes
+	m_sndOpen							HUD_SOUND <>			; 2016
+	m_sndAddCartridge					HUD_SOUND <>			; 2036
+	m_sndClose							HUD_SOUND <>			; 2056
+	mhud_open							svector@MotionID_8@ <>	; 2076
+	mhud_add_cartridge					svector@MotionID_8@ <>	; 2096
+	mhud_close							svector@MotionID_8@ <>	; 2116
+CWeaponShotgun	ends											; 2136
+
+CWeaponRG6 struct ; (sizeof=2176, align=8)
+	CRocketLauncher <>											; 0
+	CWeaponShotgun <>											; 40
+CWeaponRG6 ends													; 2176
+
+SRoketContact struct ; (sizeof=25, align=1)
+	contact								byte ?					; 0
+	pos									Fvector <>				; 1
+	up									Fvector <>				; 13
+SRoketContact ends
+
+CCustomRocket struct ; (sizeof=664, align=8)
+	CPhysicItem <>												; 0
+	CPHUpdateObject <>											; 432
+	m_bLaunched							byte ?					; 448
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	m_pOwner							dword ?					; 452	offset
+	m_contact							SRoketContact <>		; 456
+	m_LaunchXForm						Fmatrix <>				; 481
+	m_vLaunchVelocity					Fvector <>				; 545
+	m_vLaunchAngularVelocity			Fvector <>				; 557
+	m_bEnginePresent					byte ?					; 569	NEW было по смещению 576
+	m_bOpenParachute					byte ?					; 570	NEW bool //открыт ли парашют?
+	m_bStartRocket						byte ?					; 571	NEW bool //—тарт ракеты!!!
+	m_eState							dword ?					; 572	enum CCustomRocket::ERocketState
+	m_fSpeedDescent						real4 ?					; 576	NEW	скорость снижени€ парашюта, если он есть.
+	m_dwEngineWorkTime					dword ?					; 580
+	m_fEngineImpulse					dword ?					; 584
+	m_fEngineImpulseUp					dword ?					; 588
+	m_dwEngineTime						dword ?					; 592
+	m_bLightsEnabled					byte ?					; 596
+	m_bStopLightsWithEngine				byte ?					; 597
+	m_bCanContactExplo					byte ?					; 598	NEW ћожет ли граната взорватьс€ от контакта с чем либо?
+	m_bCanTimerExplo					byte ?					; 599	NEW ћожет ли граната взорватьс€ от самоликвидатора?
+	m_pTrailLight						resptr_core <>			; 600	resptr_core<IRender_Light,resptrcode_light> ?
+	m_TrailLightColor					Fcolor <>				; 604
+	m_fTrailLightRange					dword ?					; 620
+	m_flyingSound						ref_sound <>			; 624
+	m_sEngineParticles					shared_str <>			; 628
+	m_pEngineParticles					dword ?					; 632	offset
+	m_sFlyParticles						shared_str <>			; 636
+	m_pFlyParticles						dword ?					; 640	offset
+	m_vPrevVel							Fvector <>				; 644
+	m_time_to_explode					dword ?					; 656
+	m_fTimeOpenParachute				real4 ?					; 660	NEW врем€ когда откроетс€ парашют, если он есть.
+CCustomRocket ends												; 664
+
+SOrientedHP struct ; (sizeof=8, align=4)
+	H									real4 ?
+	P									real4 ?
+SOrientedHP ends
+
+SStarParams struct ; (sizeof=16, align=4)
+	m_rocket							dword ?
+	dir									SOrientedHP <>
+	speed								real4 ?
+SStarParams ends
+
+CExplosiveRocket struct ; (sizeof=1144, align=8)
+	CCustomRocket <>											; 0
+	CInventoryItem <>											; 664
+	CExplosive <>												; 880
+;------------===CExplosiveRocketPyro===------------				NEW		!!! новый класс 
+	m_number_pyro						dword ?					; 1112
+	m_type_element						dword ?					; 1116
+	m_fStartSpeed						real4 ?					; 1120
+	m_SubElements						xr_vector <>			; 1124	xr_vector<SStarParams,xalloc<SStarParams>>
+	m_IgnorCollideID					word ?					; 1140	ID объекта с которым игнорируетс€ коллизи€.
+										word ? ; undefined
+	m_start_particles					dword ?					; 1144	CScriptParticles*
+	m_start_sound						ref_sound <>			; 1148	*
+CExplosiveRocket ends											; 1152
 
 resptr_core struct ; (sizeof=4, align=4)
 	p_									dword ?					; 
@@ -3570,26 +3943,27 @@ FHierrarhyVisual struct ; (sizeof=88, align=4)
 	bDontDelete							dword ?					; 84
 FHierrarhyVisual ends											; 88
 
+;DEFINE_VECTOR(intrusive_ptr<CSkeletonWallmark>, SkeletonWMVec, SkeletonWMVecIt);
 CKinematics		struct ; (sizeof=180, align=4)
 	FHierrarhyVisual <>											; 0
-	m_lod								dword ?					; 88	offset*
-	wallmarks							xr_vector <>			; 92	xr_vector<intrusive_ptr<CSkeletonWallmark,intrusive_base>,xalloc<intrusive_ptr<CSkeletonWallmark,intrusive_base> > > ?
+	m_lod								dword ?					; 88	IRender_Visual*
+	wallmarks							xr_vector <>			; 92	SkeletonWMVec
 	wm_frame							dword ?					; 108
-	children_invisible					xr_vector <>			; 112	xr_vector<IRender_Visual *,xalloc<IRender_Visual *> > ?
-	pUserData							dword ?					; 128	offset*
-	bone_instances						dword ?					; 132	offset*
-	bones								dword ?					; 136	offset*
+	children_invisible					xr_vector <>			; 112	xr_vector<IRender_Visual*,xalloc<IRender_Visual*>>
+	pUserData							dword ?					; 128	CInifile*
+	bone_instances						dword ?					; 132	CBoneInstance*
+	bones								dword ?					; 136	vecBones*
 	iRoot								word ?					; 140
 	m_anim_flags						byte ?					; 142	Flag8	NEW
 										byte ? ; undefined
-	bone_map_N							dword ?					; 144	offset*
-	bone_map_P							dword ?					; 148	offset*
+	bone_map_N							dword ?					; 144	accel*
+	bone_map_P							dword ?					; 148	accel*
 	Update_Visibility					dword ?					; 152
 	UCalc_Time							dword ?					; 160
 	UCalc_Visibox						dword ?					; 164
 	visimask							qword ?					; 168	flags64
-	Update_Callback						dword ?					; 172	offset*
-	Update_Callback_Param				dword ?					; 176	offset*
+	Update_Callback						dword ?					; 172	UpdateCallback
+	Update_Callback_Param				dword ?					; 176	void*
 CKinematics		ends											; 180
 
 CKinematicsAnimated struct ; (sizeof=17916, align=4)
@@ -4025,6 +4399,56 @@ SGameMtl struct ; (sizeof=60, align=4)
 	fSndOcclusionFactor			real4 ?			; 56
 SGameMtl ends									; 60
 
+dSurfaceParameters struct ; (sizeof=44, align=4)
+	mode						dword ?					; 0
+	mu							dword ?					; 4
+	mu2							dword ?					; 8
+	bounce						dword ?					; 12
+	bounce_vel					dword ?					; 16
+	soft_erp					dword ?					; 20
+	soft_cfm					dword ?					; 24
+	motion1						dword ?					; 28
+	motion2						dword ?					; 32
+	slip1						dword ?					; 36
+	slip2						dword ?					; 40
+dSurfaceParameters ends									; 44
+
+dContactGeom struct ; (sizeof=44, align=4)
+	pos							dword 4 dup(?)			; 0
+	normal						dword 4 dup(?)			; 16
+	depth						dword ?					; 32
+	g1							dword ?					; 36	offset
+	g2							dword ?					; 40	offset
+dContactGeom ends										; 44
+
+dContact struct ; (sizeof=104, align=4)
+	surface						dSurfaceParameters <>	; 0
+	geom						dContactGeom <>			; 44
+	fdir1						dword 4 dup(?)			; 88
+dContact ends											; 104
+
+dxGeomUserData struct ; (sizeof=96, align=4)
+	last_pos					dword 4 dup(?)			; 0
+	pushing_neg					byte ?					; 16
+	pushing_b_neg				byte ?					; 17
+	b_static_colide				byte ?					; 18
+								byte ? ; undefined 19
+	neg_tri						dword ?					; 20	offset
+	b_neg_tri					dword ?					; 24	offset
+	ph_object					dword ?					; 28	offset
+	ph_ref_object				dword ?					; 32	offset
+	material					word ?					; 36
+	tri_material				word ?					; 38
+	callback					dword ?					; 40	offset
+	callback_data				dword ?					; 44	offset
+	object_callbacks			dword ?					; 48	offset
+	element_position			word ?					; 52
+	bone_id						word ?					; 54
+	cashed_tries				xr_vector <>			; 56	xr_vector<int,xalloc<int> > ?
+	last_aabb_size				Fvector <>				; 72
+	last_aabb_pos				Fvector <>				; 84
+dxGeomUserData ends										; 96
+
 pureRender struct ; (sizeof=4, align=4)
 	pureRender@vfptr			dword ?			; offset
 pureRender ends
@@ -4111,6 +4535,25 @@ CObjectSpace struct ; (sizeof=116, align=4)
 	r_spatial					xr_vector <>			; 100	xr_vector<ISpatial *,xalloc<ISpatial *> > ?
 CObjectSpace ends										; 116
 
+CCameraManager struct ; (sizeof=0xC0, align=4)
+	vPosition							Fvector <>		; 0
+	vDirection							Fvector <>		; 12
+	vNormal								Fvector <>		; 24
+	vRight								Fvector <>		; 36
+	m_EffectorsCam						xr_vector <>	; 48	xr_vector<CEffectorCam *,xalloc<CEffectorCam *> > ?
+	m_EffectorsCam_added_deffered		xr_vector <>	; 64	xr_vector<CEffectorCam *,xalloc<CEffectorCam *> > ?
+	m_EffectorsCam_removed_deffered		xr_vector <>	; 80	xr_vector<CEffectorCam *,xalloc<CEffectorCam *> > ?
+	m_EffectorsPP						xr_vector <>	; 96	xr_vector<CEffectorPP *,xalloc<CEffectorPP *> > ?
+	fFov								dword ?			; 112
+	fFar								dword ?			; 116
+	fAspect								dword ?			; 120
+	m_bAutoApply						byte ?			; 124
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	pp_affected							SPPInfo <>		; 128
+CCameraManager ends										; 192
+
 IGame_Level struct ; (sizeof=352, align=8)
 	DLL_Pure <>									; 0
 	IInputReceiver <>							; 16
@@ -4122,7 +4565,7 @@ IGame_Level struct ; (sizeof=352, align=8)
 	Sounds_Random				xr_vector <>	; 40	xr_vector<ref_sound,xalloc<ref_sound> > ?
 	Sounds_Random_dwNextTime	dword ?			; 56
 	Sounds_Random_Enabled		dword ?			; 60
-	m_pCameras					dword ?			; 64	offset
+	m_pCameras					dword ?			; 64	CCameraManager*
 	snd_ER						xr_vector <>	; 68	xr_vector<ISpatial *,xalloc<ISpatial *> > ?
 	Objects						CObjectList <>	; 84
 	ObjectSpace					CObjectSpace <>	; 204
@@ -4416,8 +4859,8 @@ CRenderDevice struct ; (sizeof=848, align=8)
 	dwPrecacheTotal					dword ?					; 252
 	dwWidth							dword ?					; 256
 	dwHeight						dword ?					; 260
-	fWidth_2						dword ?					; 264
-	fHeight_2						dword ?					; 268
+	fWidth_2						real4 ?					; 264
+	fHeight_2						real4 ?					; 268
 	b_is_Ready						dword ?					; 272
 	b_is_Active						dword ?					; 276
 	m_WireShader					resptr_core <>			; 280	resptr_core<Shader,resptrcode_shader> ?
@@ -4435,8 +4878,8 @@ CRenderDevice struct ; (sizeof=848, align=8)
 	Resources						dword ?					; 468	offset
 	Statistic						dword ?					; 472	offset
 	Gamma							CGammaControl <>		; 476
-	fTimeDelta						dword ?					; 504
-	fTimeGlobal						dword ?					; 508
+	fTimeDelta						real4 ?					; 504
+	fTimeGlobal						real4 ?					; 508
 	dwTimeDelta						dword ?					; 512
 	dwTimeGlobal					dword ?					; 516
 	dwTimeContinual					dword ?					; 520
@@ -4458,6 +4901,23 @@ CRenderDevice ends											; 848
 ClientID struct ; (sizeof=4, align=4)
 	id								dword ?	
 ClientID ends
+
+CALifeTimeManager struct ; (sizeof=40, align=8)
+	vfptr							dword ?					; 0
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+	m_game_time						qword ?					; 8
+	m_time_factor					real4 ?					; 16
+	m_normal_time_factor			real4 ?					; 20
+	m_start_time					dword ?					; 24
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+	m_start_game_time				qword ?					; 32
+CALifeTimeManager ends										; 40
 
 game_GameState struct ; (sizeof=152, align=8)
 	DLL_Pure <>												; 0
@@ -4506,15 +4966,15 @@ game_cl_GameState ends										; 200
 
 CAI_Space struct ; (sizeof=40, align=4)
 	vfptr							dword ?					; 0		offset
-	m_game_graph					dword ?					; 4		offset
-	m_cross_table					dword ?					; 8		offset
-	m_level_graph					dword ?					; 12	offset
-	m_graph_engine					dword ?					; 16	offset
-	m_ef_storage					dword ?					; 20	offset
-	m_alife_simulator				dword ?					; 24	offset
-	m_cover_manager					dword ?					; 28	offset
-	m_script_engine					dword ?					; 32	offset
-	m_patrol_path_storage			dword ?					; 36	offset
+	m_game_graph					dword ?					; 4		CGameGraph*
+	m_cross_table					dword ?					; 8		CGameLevelCrossTable*
+	m_level_graph					dword ?					; 12	CLevelGraph*
+	m_graph_engine					dword ?					; 16	CGraphEngine*
+	m_ef_storage					dword ?					; 20	CEF_Storage*
+	m_alife_simulator				dword ?					; 24	CALifeSimulator*
+	m_cover_manager					dword ?					; 28	CCoverManager*
+	m_script_engine					dword ?					; 32	CScriptEngine*
+	m_patrol_path_storage			dword ?					; 36	CPatrolPathStorage*
 CAI_Space ends												; 40
 
 CDialogHolder struct ; (sizeof=44, align=4)
@@ -5099,3 +5559,68 @@ CWeaponMounted struct ; (sizeof=840, align=8)
 									byte ? ; undefined
 									byte ? ; undefined
 CWeaponMounted ends											; 
+
+CPHMesh struct ; (sizeof=4, align=4)
+	Geom							dword ?					; 
+CPHMesh ends
+
+CPHItemList?CPHUpdateObject? struct ; (sizeof=12, align=4)
+	first_next						dword ?					; 
+	last_tome						dword ?					; 
+	size_							word ?					; 
+									byte ? ; undefined
+									byte ? ; undefined
+CPHItemList?CPHUpdateObject? ends
+
+; ---------------------------------------------------------------------------
+
+CPHItemList?CPHObject? struct ; (sizeof=12, align=4)
+	first_next						dword ?					; 
+	last_tome						dword ?					; 
+	size_							word ?					; 
+									byte ? ; undefined
+									byte ? ; undefined
+CPHItemList?CPHObject? ends
+
+CPHWorld struct ; (sizeof=168, align=8)
+	pureRender <>													; 0
+									byte ? ; undefined 4
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+	m_start_time					qword ?							; 8
+	m_delay							dword ?							; 16
+	m_previous_delay				dword ?							; 20
+	m_reduce_delay					dword ?							; 24
+	m_update_delay_count			dword ?							; 28
+	b_world_freezed					byte ?							; 32
+	b_processing					byte ?							; 33
+	b_exist							byte ?							; 34
+									byte ? ; undefined
+	Mesh							CPHMesh <>						; 36
+	m_objects						CPHItemList?CPHObject? <>		; 40
+	m_freezed_objects				CPHItemList?CPHObject? <>		; 52
+	m_recently_disabled_objects		CPHItemList?CPHObject? <>		; 64
+	m_update_objects				CPHItemList?CPHUpdateObject? <>	; 76
+	m_freezed_update_objects		CPHItemList?CPHUpdateObject? <>	; 88
+	m_motion_ray					dword ?							; 100
+	m_commander						dword ?							; 104
+	r_spatial						xr_vector <>					; 108
+									byte ? ; undefined 120
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+	m_steps_num						qword ?							; 128
+	m_frame_sum						qword ?							; 136
+	m_previous_frame_time			dword ?							; 144
+	b_frame_mark					byte ?							; 148
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+	m_frame_time					dword ?							; 152
+	m_update_time					dword ?							; 156
+	disable_count					word ?							; 160
+									byte ? ; undefined
+									byte ? ; undefined
+	m_gravity						real4 ?							; 164
+CPHWorld ends														; 168

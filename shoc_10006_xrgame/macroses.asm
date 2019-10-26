@@ -58,6 +58,13 @@ name_param		dd	param
 .code
 ENDM
 
+const_static_xmm4 MACRO name_param:REQ, param:VARARG
+.const
+align 16
+name_param		dd	param
+.code
+ENDM
+
 static_int MACRO name_param:REQ, param:VARARG
 .data
 align 4
@@ -222,7 +229,7 @@ ENDM
 
 PRINT_VECTOR MACRO fmt_txt:REQ, val:REQ
 	pusha
-	push	val
+	@push2mem(val)
 	push	const_static_str$(fmt_txt)
 	call	Log_vector3
 	add		esp, 8
@@ -483,6 +490,9 @@ mrm MACRO FirstArgument:REQ, SecondArgument:REQ
 			movzx	eax, SecondArgument
 			mov		FirstArgument, ax
 		ENDIF
+	ELSEIF itemSize EQ 16
+		movups	xmm0, SecondArgument
+		movups	FirstArgument, xmm0
 	ELSE
 		itemSize=TYPE (SecondArgument)
 		IF (itemSize EQ 4) or (itemSize EQ 0)
@@ -491,7 +501,7 @@ mrm MACRO FirstArgument:REQ, SecondArgument:REQ
 		ELSE
 			movzx	eax, SecondArgument
 			mov		FirstArgument, eax
-		ENDIF	
+		ENDIF
 	ENDIF
 ENDM
 m2m MACRO param1:req, param2:req
@@ -522,6 +532,25 @@ ELSE
 	shufps	xmm0, xmm0, 11100110b	; 3212t		копируем 2-й элемент в 0-й элемент
 	addss	xmm0, xmm1				; xmm0 = z + xmm1
 ENDIF	
+ENDM
+
+Fvector4@normalize MACRO vec_this:req
+	IF @SearchStr(<vec_this>,<xmm0>) EQ 0
+	movups	xmm0, vec_this
+	ENDIF
+	movaps	xmm2, xmm0
+	mulps	xmm0, xmm0
+	movss	xmm1, xmm0				; xmm1.x = x
+	shufps	xmm0, xmm0, 11100101b	; 3211t		копируем 1-й элемент в 0-й элемент
+	addss	xmm1, xmm0				; xmm1 = x + y
+	shufps	xmm0, xmm0, 11100110b	; 3212t		копируем 2-й элемент в 0-й элемент
+	addss	xmm0, xmm1				; xmm0 = z + xmm1
+	sqrtss	xmm1, xmm0
+	xorps	xmm0, xmm0
+	movflt	xmm0, 1.0
+	divss	xmm0, xmm1
+	shufps	xmm0, xmm0, 11000000b
+	mulps	xmm0, xmm2
 ENDM
 
 Fvector@normalize MACRO vec_this:req
@@ -816,11 +845,11 @@ ENDM
 Fbox4@point_in_box MACRO this_box:req, point:req
 	;;point>box_min
 	movaps	xmm0, point
-	cmpnleps xmm0, this_box.min		; 10 > 20 = 0FFFFFFFFh  20 <= 10 = 0
+	cmpnleps xmm0, this_box.min		;; 10 > 20 = 0FFFFFFFFh  20 <= 10 = 0
 	movmskps eax, xmm0
 	;;point<box_max
 	movaps	xmm0, point
-	cmpltps xmm0, this_box.max		; 10 < 20 = 0FFFFFFFFh  20 <= 10 = 0
+	cmpltps xmm0, this_box.max		;; 10 < 20 = 0FFFFFFFFh  20 <= 10 = 0
 	movmskps edx, xmm0
 	and		eax, edx
 	cmp		eax, 111b
@@ -971,22 +1000,40 @@ float_set MACRO flt_this:req, param:req
 ;;	echo is_memory
 ENDM
 
-Fmatrix4_set MACRO matrix_this:req, i:req, j:req, k:req, c_:req
-	movups	xmm0, i
-	movups	matrix_this.i, xmm0
-	movups	xmm0, j
-	movups	matrix_this.j, xmm0
-	movups	xmm0, k
-	movups	matrix_this.k, xmm0
-	movups	xmm0, c_
-	movups	matrix_this.c_, xmm0
+Fmatrix4_set MACRO matrix_this:req, vec_i:req, vec_j, vec_k, vec_c
+	IFNB <vec_j>
+		movups	xmm0, vec_i
+		movups	matrix_this.i, xmm0
+		movups	xmm0, vec_j
+		movups	matrix_this.j, xmm0
+		movups	xmm0, vec_k
+		movups	matrix_this.k, xmm0
+		movups	xmm0, vec_c
+		movups	matrix_this.c_, xmm0
+	ELSE
+		movups	xmm0, vec_i.i
+		movups	matrix_this.i, xmm0
+		movups	xmm0, vec_i.j
+		movups	matrix_this.j, xmm0
+		movups	xmm0, vec_i.k
+		movups	matrix_this.k, xmm0
+		movups	xmm0, vec_i.c_
+		movups	matrix_this.c_, xmm0
+	ENDIF
 ENDM
 
-Fvector4_set MACRO vec_this:req, vec_x:req, vec_y:req, vec_z:req, vec_w:req
-	float_set	vec_this.x, vec_x
-	float_set	vec_this.y, vec_y
-	float_set	vec_this.z, vec_z
-	float_set	vec_this.w, vec_w
+Fvector4_set MACRO vec_this:req, vec_x:req, vec_y, vec_z, vec_w
+	IFNB <vec_y>
+		float_set	vec_this.x, vec_x
+		float_set	vec_this.y, vec_y
+		float_set	vec_this.z, vec_z
+		float_set	vec_this.w, vec_w
+	ELSE
+		float_set	vec_this.x, vec_x.x
+		float_set	vec_this.y, vec_x.y
+		float_set	vec_this.z, vec_x.z
+		float_set	vec_this.w, vec_x.w
+	ENDIF
 ENDM
 
 Fvector_set MACRO vec_this:req, vec0:req, vec1, vec2
@@ -1042,6 +1089,7 @@ PI					equ	 3.14159265359
 M_PI				equ -3.14159265359
 PI_MUL_2			equ	 6.28318530718
 R_PI_MUL_2			equ	 0.15915494309
+PI_DIV_2			equ  1.5707963
 ;// normalize angle (0..2PI)
 ;ICF float		angle_normalize_always	(float a)
 ;{
@@ -1094,16 +1142,22 @@ local exit
 exit:
 ENDM
 
-
-xr_memory	MACRO reg:REQ
+xr_memory$	MACRO reg:VARARG	;;REQ
+	@push2mem(reg)
 	mov		ecx, ds:Memory				; xrMemory Memory
-	push	reg
+	call	ds:xrMemory__mem_alloc
+	EXITM	<eax>
+ENDM
+
+xr_memory	MACRO reg:VARARG	;;REQ
+	@push2mem(reg)
+	mov		ecx, ds:Memory				; xrMemory Memory
 	call	ds:xrMemory__mem_alloc
 ENDM
 
 xr_mem_free	MACRO reg:REQ
-	mov		ecx, ds:Memory				; xrMemory Memory
 	push	reg
+	mov		ecx, ds:Memory				; xrMemory Memory
 	call	ds:xrMemory__mem_free
 ENDM
 
@@ -1143,6 +1197,163 @@ Level__Objects_net_Find MACRO obj_id:REQ
 	mov		eax, [ecx]
 	lea		ecx, [eax+54h]
 	call	ds:CObjectList__net_Find	; CObjectList::net_Find(uint)
+ENDM
+
+Level@@Objects_net_Find MACRO obj_id:REQ
+	Level__Objects_net_Find  obj_id
+	EXITM <eax>
+ENDM
+
+CObject@@H_SetParent MACRO this_:req, new_parent:req, just_before_destroy:=<0>
+	@push2mem	(just_before_destroy)
+	@push2mem	(new_parent)
+	@reg2mem	(ecx, this_)
+	call	ds:CObject__H_SetParent
+	EXITM <>
+ENDM
+
+CObject@@H_Root MACRO this_:req
+	@reg2mem	(ecx, this_)
+	call	ds:H_Root
+	EXITM <eax>
+ENDM
+
+CObject@@Radius MACRO this_:req
+	@reg2mem	(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+14h]
+	call	eax
+	EXITM <>
+ENDM
+
+CObject@@Center MACRO this_:req, pos:req
+	@push2mem	(pos)
+	@reg2mem	(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+10h]
+	call	eax
+	EXITM <>
+ENDM
+
+ref_sound@@create MACRO S:req, fName:req, sound_type:req, game_type:req
+	@push2mem(game_type)
+	@push2mem(sound_type)
+	@push2mem(fName)
+	@push2mem(S)
+	mov		ecx, ds:CSound_manager_interface__Sound
+	mov		ecx, [ecx]
+	mov		edx, [ecx]
+	mov		eax, [edx+1Ch]
+	call	eax
+	EXITM <>
+ENDM
+;( ref_sound& S, CObject* O,	const Fvector &pos,	u32 flags=0, float delay=0.f)
+ref_sound@@play_at_pos MACRO S:req, O:req, pos:req, flags:=<0>, delay:=<0>
+	@push2mem(delay)
+	@push2mem(flags)
+	@push2mem(pos)
+	@push2mem(O)
+	@push2mem(S)
+	mov		ecx, ds:CSound_manager_interface__Sound
+	mov		ecx, [ecx]
+	mov		edx, [ecx]
+	mov		eax, [edx+34h]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@get_LinearVel MACRO this_:req, velocity:req
+	@push2mem(velocity)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+9Ch]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@getMass MACRO this_:req
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+48h]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@applyImpulse MACRO this_:req, dir:req, val:req
+	@push2mem(val)
+	@push2mem(dir)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+60h]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@applyForce MACRO this_:req, dir:req, val:req
+	@push2mem(val)
+	@push2mem(dir)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+5Ch]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@Activate MACRO this_:req, transform:req, lin_vel:req, ang_vel:req, disable:=<0>
+	@push2mem(disable)
+	@push2mem(ang_vel)
+	@push2mem(lin_vel)
+	@push2mem(transform)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+8]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@InterpolateGlobalTransform MACRO this_:req, m:req
+	@push2mem(m)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+10h]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@GetGlobalTransformDynamic MACRO this_:req, m:req
+	@push2mem(m)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+14h]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@TransformPosition MACRO this_:req, m:req
+	@push2mem(m)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+0ACh]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@SetTransform MACRO this_:req, m:req
+	@push2mem(m)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+0C4h]
+	call	eax
+	EXITM <>
+ENDM
+
+CPhysicsShell@@set_CallbackData MACRO this_:req, cd:req
+	@push2mem(cd)
+	@reg2mem(ecx, this_)
+	mov		edx, [ecx]
+	mov		eax, [edx+90h]
+	call	eax
+	EXITM <>
 ENDM
 
 nop2 MACRO
@@ -1243,6 +1454,15 @@ LOCAL type_reg
 	ret
 ENDM
 
+EQ_QWORD MACRO param_qword:req, shortname:req
+LOCAL shortname_lo, shortname_hi
+	shortname_lo	SUBSTR <&shortname>, 6, 4
+	shortname_hi	SUBSTR <&shortname>, 2, 4
+	shortname_lo	CATSTR <'>,shortname_lo,<'>		;; добавляем кавычки
+	shortname_hi	CATSTR <'>,shortname_hi,<'>
+	EXITM <param_qword.hi==shortname_hi && param_qword.lo==shortname_lo>
+ENDM
+
 ;безусловный assert, авост игры.
 R_ASSERT MACRO msg_txt:REQ, name_proc
 LOCAL file_name
@@ -1251,13 +1471,13 @@ LOCAL file_name
 	mov		ecx, ds:Debug
 	push	offset ignore_always
 	IFNB <name_proc>
-	push	static_str$(name_proc)		;; имя процедуры
+	push	const_static_str$(name_proc)		;; имя процедуры
 	ELSE
 	push	offset aEmpty
 	ENDIF
 	push	@Line			 			;; номер строки
-	push	static_str$(file_name)		;; имя файла
-	push	static_str$(msg_txt)		;; сообщение
+	push	const_static_str$(file_name)		;; имя файла
+	push	const_static_str$(msg_txt)		;; сообщение
 	call	ds:xrDebug__fail
 ENDM
 
@@ -1273,6 +1493,37 @@ DELETE_TEXTURE MACRO pTexture:req
 	mov		eax, ds:resptrcode_shader@@create
 	add		eax, offsetDelete_Texture
 	call	eax
+ENDM
+
+Fvector@@random_dir MACRO vec_this:req
+	push	edi
+	push	esi
+	@reg2mem(esi, vec_this)
+	mov     edi, ds:Random
+	call	Func@Fvector@@random_dir
+	pop		esi
+	pop		edi
+	EXITM <>
+ENDM
+
+Fvector@@getH MACRO vec_this:req
+	@reg2mem(ecx, vec_this)
+	call	Func@Fvector@@getH
+	EXITM <>
+ENDM
+
+Fvector@@getP MACRO vec_this:req
+	@reg2mem(ecx, vec_this)
+	call	Func@Fvector@@getP
+	EXITM <>
+ENDM
+
+@random_dir MACRO vec_this:req, src_dir:req, dispersion:req
+	@push2mem	(dispersion)
+	@push2mem	(src_dir)
+	@reg2mem	(eax, vec_this)
+	call	random_dir
+	EXITM <>
 ENDM
 
 @reg2mem MACRO reg:req, mem:req
@@ -1299,6 +1550,8 @@ ENDM
 			lea		eax, _mem
 			push	eax
 		ENDIF
+	ELSEIF @InStr(1, <&mem>, <">) EQ 1
+		push	const_static_str$(mem)
 	ELSE
 		push	mem
 	ENDIF
@@ -1311,16 +1564,51 @@ ENDM
 	call	xr_strcmp
 	EXITM <eax>
 ENDM
-;str1 -> str2
-StrCopy MACRO str1:req, str2:req
-	@reg2mem (edx, str1)
-	@reg2mem (ecx, str2)
-	.repeat
-		mov		al, [edx]
-		mov		[ecx], al
-		inc		edx
+;str_source -> str_dest		//возвращает в eax длину скопированой строки.
+StrCopy MACRO str_source:req, str_dest:req, char_separator
+	@reg2mem (ecx, str_source)
+	@reg2mem (eax, str_dest)
+	push	eax
+	.while (true)
+		mov		dl, [ecx]
+		mov		[eax], dl
+IFNB <char_separator>
+		.break .if (dl==0 || dl==char_separator)
+ELSE
+		.break .if (dl==0)
+ENDIF
 		inc		ecx
-	.until (al==0)
+		inc		eax
+	.endw
+IFNB <char_separator>
+	mov		byte ptr [eax], 0
+ENDIF
+	pop		ecx
+	sub		eax, ecx
+	EXITM <>
+ENDM
+
+@ITOA MACRO _Value:req, _Dest:req, _Radix:req
+	@push2mem (_Radix)
+	@push2mem (_Dest)
+	@push2mem (_Value)
+	call	ds:_itoa
+	add		esp, 12
+	EXITM <>
+ENDM
+
+@ATOI MACRO _Dest:req
+	@push2mem (_Dest)
+	call	ds:atoi
+	add		esp, 4
+	EXITM <eax>
+ENDM
+
+@ATOF MACRO _Dest:req
+	@push2mem (_Dest)
+	call	ds:atof
+	add		esp, 4
+	EXITM <>
 ENDM
 
 @LINE_EXIST MACRO name_sect:req, name_param:req
@@ -1360,6 +1648,55 @@ ENDM
 	EXITM <al>
 ENDM
 
+@R_BOOL MACRO name_sect:req, name_param:req
+	@push2mem (name_param)
+	@push2mem (name_sect)
+	mov		eax, ds:pSettings			; CInifile const * const pSettings
+	mov		ecx, dword ptr[eax]
+	call	ds:r_bool
+	EXITM <al>
+ENDM
+
+@R_STRING MACRO name_sect:req, name_param:req
+	@push2mem (name_param)
+	@push2mem (name_sect)
+	mov		eax, ds:pSettings			; CInifile const * const pSettings
+	mov		ecx, dword ptr[eax]
+	call	ds:r_string
+	EXITM <eax>
+ENDM
+
+@R_SECTION MACRO name_sect:req
+	@push2mem (name_sect)
+	mov		eax, ds:pSettings			; CInifile const * const pSettings
+	mov		ecx, dword ptr[eax]
+	call	ds:r_section
+	EXITM <>
+ENDM
+
+CGameObject@@u_EventGen MACRO P:req, type_:req, dest:req
+	push	esi
+	@push2mem (dest)
+	@push2mem (type_)
+	@reg2mem (esi, P)
+	call	CGameObject__u_EventGen
+	add		esp, 8
+	pop		esi
+	EXITM <>
+ENDM
+
+CGameObject@@u_EventSend MACRO P:req, dwFlags:=<8>
+	push	0
+	push	dwFlags
+	@push2mem (P)
+	mov		eax, ds:g_pGameLevel	; IGame_Level * g_pGameLevel
+	mov		eax, [eax]
+	mov		edx, [eax+160h]
+	mov		edx, [edx+10h]
+	lea		ecx, [eax+160h]
+	call	edx
+	EXITM <>
+ENDM
 ;		value equ @SubStr(<&expression>, num+2)
 ;		dest equ @SubStr(<&expression>, 1, num-1)
 ;		%echo value

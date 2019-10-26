@@ -1,1608 +1,355 @@
 
 PERFORM_EXPORT_BOOL__STRING MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ebx, eax
-	xor     al, al
-	mov     byte ptr [esp+88h-6Ch], al
-	mov     ecx, [esp+88h-6Ch]
-	mov     byte ptr [esp+88h-64h], al
-	mov     eax, [esp+88h-64h]
-	push    eax
-	push    ecx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+94h-74h]
-	mov     [esp+94h-74h], offset fun_to_export
-	call    give_info_portion_register
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__bool__string
 ENDM
 
 PERFORM_EXPORT_PROPERTY__FLOAT_RW MACRO get_fun:REQ, set_fun:REQ, property_name_str:REQ
-	mov     byte ptr [esp+88h-74h], bl
-	mov     eax, [esp+88h-74h]
-	push    eax
-	push    offset set_fun
-	push    static_str$(property_name_str) 
-	mov     edx, offset get_fun
-	mov     edi, ebp
-	call    register__float_rw_property
+	mov		edi, eax
+	push	0
+	push	offset set_fun
+	push	const_static_str$(property_name_str) 
+	mov		edx, offset get_fun
+	call	register__float_rw_property
 ENDM
 
-
+PERFORM_EXPORT_VECTOR__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register_go_vector__void
+ENDM
 
 PERFORM_EXPORT_VOID__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	xor     bl, bl
-	mov     byte ptr [esp+88h-64h], bl
-	mov     ecx, [esp+88h-64h]
-	push    ecx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     edx, [esp+8Ch-6Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	push    eax
-	lea     eax, [esp+98h-74h]
-	mov     [esp+98h-74h], offset fun_to_export
-	call    register__void__void
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__void
 ENDM
-
 
 PERFORM_EXPORT_BOOL__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	xor     bl, bl
-	mov     byte ptr [esp+88h-64h], bl
-	mov     ecx, [esp+88h-64h]
-	push    ecx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     edx, [esp+8Ch-6Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	push    eax
-	lea     eax, [esp+98h-74h]
-	mov     [esp+98h-74h], offset fun_to_export
-	call    register__critically_wounded
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__bool__void
 ENDM
 
-
 PERFORM_EXPORT_VOID__BOOL MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ecx, eax
-	mov     byte ptr [esp+58h-38h], bl
-	mov     eax, [esp+58h-38h]
-	push    eax
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+64h-48h]
-	mov     ebx, ecx
-	mov     [esp+64h-48h], offset fun_to_export
-	call    enable_vision_register
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__bool
 ENDM
 
 PERFORM_EXPORT_STRING__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     byte ptr [esp+88h-64h], bl
-	mov     edx, [esp+88h-64h]
-	push    edx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     ecx, [esp+8Ch-6Ch]
-	push    ecx
-	push    static_str$(fun_name_str)
-	push    eax
-	lea     eax, [esp+98h-74h]
-	mov     [esp+98h-74h], offset fun_to_export
-	call    register__string_void
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__string__void
 ENDM
 
 PERFORM_EXPORT_VOID__STRING MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ebx, eax
-	xor     al, al
-	mov     byte ptr [esp+88h-6Ch], al
-	mov     ecx, [esp+88h-6Ch]
-	mov     byte ptr [esp+88h-64h], al
-	mov     eax, [esp+88h-64h]
-	push    eax
-	push    ecx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+94h-74h]
-	mov     [esp+94h-74h], offset fun_to_export
-	call    register__set_tip_text
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__string
 ENDM
 
-PERFORM_EXPORT_INT__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ecx, eax
-	mov     byte ptr [esp+58h-38h], bl
-	mov     eax, [esp+58h-38h]
-	push    eax
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+64h-48h]
-	mov     ebx, ecx
-	mov     [esp+64h-48h], offset fun_to_export
-	call    register_general_goodwill
+PERFORM_EXPORT_INT__GO MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__int__go
 ENDM
 
 PERFORM_EXPORT_UINT__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	xor     bl, bl
-	mov     byte ptr [esp+88h-64h], bl
-	mov     ecx, [esp+88h-64h]
-	push    ecx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     edx, [esp+8Ch-6Ch]
-	push    edx
-	lea     ecx, [esp+90h-74h]
-	push    ecx
-	push    static_str$(fun_name_str)
-	push    eax
-	mov     [esp+9Ch-74h], offset fun_to_export
-	call    register_object_count
+	push	0
+	push	0
+	mov		ppFuncExport, offset fun_to_export
+	lea		ecx, ppFuncExport
+	push	ecx
+	push	const_static_str$(fun_name_str)
+	push	eax
+	call	register__u32__void@const
 ENDM
 
 PERFORM_EXPORT_FLOAT__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	xor ebx, ebx
-	mov     byte ptr [esp+88h-74h], bl
-	mov     ecx, [esp+88h-74h]
-	push    ecx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     edx, [esp+8Ch-6Ch]
-	push    edx
-	lea     ecx, [esp+90h-64h]
-	push    ecx
-	push    static_str$(fun_name_str)
-	push    eax
-	mov     [esp+9Ch-64h], offset fun_to_export
-	call    register_get_bleeding
+	push	0
+	push	0
+	mov		ppFuncExport, offset fun_to_export
+	lea		ecx, ppFuncExport
+	push	ecx
+	push	const_static_str$(fun_name_str)
+	push	eax
+	call	register__float__void@const
 ENDM
 
 PERFORM_EXPORT_VOID__FLOAT MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ebx, eax
-	xor     al, al
-	mov     byte ptr [esp+88h-6Ch], al
-	mov     ecx, [esp+88h-6Ch]
-	mov     byte ptr [esp+88h-64h], al
-	mov     eax, [esp+88h-64h]
-	push    eax
-	push    ecx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+94h-74h]
-	mov     [esp+94h-74h], offset fun_to_export
-	call    register_set_actor_direction
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__float
 ENDM
 
-
-PERFORM_EXPORT_BOOL__GO MACRO registering_function:REQ, fun_to_export:REQ
-	mov     ebx, eax
-	xor     al, al
-	mov     byte ptr [esp+58h-40h], al
-	mov     ecx, [esp+58h-40h]
-	mov     byte ptr [esp+58h-38h], al
-	mov     eax, [esp+58h-38h]
-	push    eax
-	push    ecx
-	lea     eax, [esp+60h-48h]
-	mov     [esp+60h-48h], offset fun_to_export
-	call    registering_function
+PERFORM_EXPORT_BOOL__GO MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__bool__go
 ENDM
 
-REGISTER_BOOL__GO MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-var_48 = dword ptr -48h
-var_44 = dword ptr -44h
-var_3C = byte ptr -3Ch
-	sub     esp, 4Ch
-	push    esi
-	push    edi
-	lea     esi, [esp+54h-3Ch]
-	mov     edi, eax
-	call    sub_1015DEF0
-	mov     eax, [edi]
-	push    eax
-	lea     esi, [esp+58h-48h]
-	call    sub_1014F020
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
-	mov     eax, [esp+54h-48h]
-	test    eax, eax
-	jz      short lab1
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-lab1:
-	mov     edi, [edi]
-	push    edi
-	lea     esi, [esp+58h-48h]
-	call    sub_1014F450
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	test    eax, eax
-	jz      short lab2
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-lab2:
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebx
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ
-	pop     edi
-	mov     eax, ebx
-	pop     esi
-	add     esp, 4Ch
-	retn    8
-register_fun_name endp
+PERFORM_EXPORT_GO__INT MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__go__int
 ENDM
 
-PERFORM_EXPORT_GO__INT MACRO registering_function:REQ, fun_to_export:REQ
-	xor     bl, bl
-	mov     ecx, eax
-	mov     byte ptr [esp+88h-64h], bl
-	mov     edx, [esp+88h-64h]
-	mov     byte ptr [esp+88h-6Ch], bl
-	mov     eax, [esp+88h-6Ch]
-	push    edx
-	push    eax
-	lea     eax, [esp+90h-74h]
-	mov     ebx, ecx
-	mov     [esp+90h-74h], offset fun_to_export
-	call    registering_function
+PERFORM_EXPORT_FLOAT__PU32 MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__float__pu32
 ENDM
 
-REGISTER_GO__INT MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-
-	sub     esp, 4Ch
-	push    esi
-	push    edi
-	lea     esi, [esp+54h-3Ch]
-	mov     edi, eax
-	call    sub_10151320
-	mov     eax, [edi]
-	push    eax
-	lea     esi, [esp+58h-48h]
-	call    sub_10151A80
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	test    eax, eax
-	jz      short lab2
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-lab2:
-	mov     edi, [edi]
-	push    edi
-	lea     esi, [esp+58h-48h]
-	call    sub_10151AE0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	test    eax, eax
-	jz      short lab1
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-lab1:
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebx
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	mov     eax, ebx
-	pop     esi
-	add     esp, 4Ch
-	retn    8
-register_fun_name endp
+PERFORM_EXPORT_FLOAT__INT MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__float__int
 ENDM
 
-PERFORM_EXPORT_FLOAT__INT__WRONG MACRO registering_function:REQ, fun_to_export:REQ
-	mov     ecx, eax
-	mov     byte ptr [esp+88h-64h], bl
-	mov     edx, [esp+88h-64h]
-	mov     byte ptr [esp+88h-6Ch], bl
-	mov     eax, [esp+88h-6Ch]
-	push    edx
-	push    eax
-	lea     eax, [esp+90h-74h]
-	mov     ebx, ecx
-	mov     [esp+90h-74h], offset fun_to_export
-	call    registering_function
+PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__vector_float_int
 ENDM
 
-REGISTER_FLOAT__INT___WRONG MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-
-	sub     esp, 4Ch
-	push    esi
-	push    edi
-	lea     esi, [esp+54h-3Ch]
-	mov     edi, eax
-	call    sub_10151320 ; +
-	mov     eax, [edi]
-	push    eax
-	lea     esi, [esp+58h-48h]
-	call    sub_10151A80 ; +
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	;+
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	test    eax, eax
-	jz      short loc_1014E52D
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1014E52D:
-	mov     edi, [edi]
-	push    edi
-	lea     esi, [esp+58h-48h]
-	call    sub_101513C0 ;+
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+54h-48h]
-	test    eax, eax
-	jz      short loc_1014E55A
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1014E55A:
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebx
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ
-	pop     edi
-	mov     eax, ebx
-	pop     esi
-	add     esp, 4Ch
-	retn    8
-register_fun_name endp
+PERFORM_EXPORT_U32__STRING_INT MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__u32__str_int
 ENDM
 
-
-PERFORM_EXPORT_FLOAT__INT MACRO registering_function:REQ, fun_to_export:REQ
-	mov     byte ptr [esp+88h-64h], bl
-	mov     edx, [esp+88h-64h]
-	mov     ecx, eax
-	mov     byte ptr [esp+88h-6Ch], bl
-	mov     eax, [esp+88h-6Ch]
-	mov     [esp+88h-74h], offset fun_to_export
-	push    edx
-	push    eax
-	lea     eax, [esp+90h-74h]
-	mov     ebx, ecx
-	call    registering_function
-ENDM
-
-REGISTER_FLOAT__INT MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-
-	sub     esp, 4Ch
-	push    esi
-	push    edi
-	lea     esi, [esp+54h-3Ch]
-	mov     edi, eax
-	call    sub_1014F820
-	mov     eax, [edi]
-	push    eax
-	lea     esi, [esp+58h+var_48]
-	call    sub_10150020
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+54h+var_48]
-	test    eax, eax
-	jz      short loc_1014DEDD
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1014DEDD: 
-	mov     edi, [edi]
-	push    edi
-	lea     esi, [esp+58h+var_48]
-	call    sub_10150A80
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+54h+var_48]
-	test    eax, eax
-	jz      short loc_1014DF0A
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1014DF0A: 
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebx
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
-	pop     edi
-	mov     eax, ebx
-	pop     esi
-	add     esp, 4Ch
-	retn    8
-register_fun_name endp
-ENDM
-
-PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT MACRO registering_function:REQ, fun_to_export:REQ
-	mov     byte ptr [esp+58h-38h], bl
-	mov     ecx, [esp+58h-38h]
-	push    ecx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    eax
-	lea     eax, [esp+64h-48h]
-	mov     [esp+64h-48h], offset fun_to_export
-	call    registering_function
-ENDM
-
-REGISTER_VOID__VECTOR_FLOAT_INT MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-arg_0           = dword ptr  4
-
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+arg_0]
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1015EA90
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015EBD0
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_10159751
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_10159751: 
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015EC30
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_1015977E
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1015977E:
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebp
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    0Ch
-register_fun_name endp
-ENDM
-
-PERFORM_EXPORT_U32__STRING_INT MACRO registering_function:REQ, fun_to_export:REQ
-	mov     [esp+58h-48h], offset fun_to_export
-	xor     bl, bl
-	mov     byte ptr [esp+58h-38h], bl
-	mov     edx, [esp+58h-38h]
-	push    edx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     ecx, [esp+5Ch-40h]
-	push    ecx
-	push    eax
-	lea     eax, [esp+64h-48h]
-	call    registering_function
-ENDM
-;REGISTER_INT__STRING_INT
-REGISTER_U32__STRING_INT MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-arg_0           = dword ptr  4
-
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+arg_0]
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1015D390
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015D480
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_101588C1
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_101588C1: 
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015D4E0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_101588EE
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_101588EE: 
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebp
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    0Ch
-register_fun_name endp
-ENDM
-
-
-
-PERFORM_EXPORT_VOID__INT_INT MACRO registering_function:REQ, fun_to_export:REQ
-	xor     bl, bl
-	mov     byte ptr [esp+58h-38h], bl
-	mov     ecx, [esp+58h-38h]
-	push    ecx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    eax
-	lea     eax, [esp+64h-48h]
-	mov     [esp+64h-48h], offset fun_to_export
-	call    registering_function
-ENDM
-
-REGISTER_VOID__INT_INT MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-arg_0           = dword ptr  4
-
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+arg_0]
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1015A230
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015F0E0
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_10157301
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_10157301:
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015A320
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_1015732E
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1015732E:
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebp
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    0Ch
-register_fun_name endp
+PERFORM_EXPORT_VOID__INT_INT MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__u32_u32
 ENDM
 
 PERFORM_EXPORT_VOID__GO MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ecx, eax
-	mov     byte ptr [esp+58h-38h], bl
-	mov     eax, [esp+58h-38h]
-	push    eax
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+64h-48h]
-	mov     ebx, ecx
-	mov     [esp+64h-48h], offset fun_to_export
-	call    register__run_talk_dialog
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__run_talk_dialog
 ENDM
 
 PERFORM_EXPORT_VOID__GO_BOOL MACRO fun_to_export:REQ, fun_name_str:REQ
-	xor		bl, bl
-	;;;mov     ecx, eax
-	mov     byte ptr [esp+58h-38h], bl
-	mov     ecx, [esp+58h-38h]
-	push    ecx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    static_str$(fun_name_str)
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
 	push	eax
-	lea     eax, [esp+68h-48h]
-	mov     [esp+68h-48h], offset fun_to_export
-	call    register__void__go_bool
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__go_bool
 ENDM
 
 PERFORM_EXPORT_GO__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     byte ptr [esp+88h-64h], bl
-	mov     ecx, [esp+88h-64h]
-	push    ecx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     edx, [esp+8Ch-6Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	push    eax
-	lea     eax, [esp+98h-74h]
-	mov     [esp+98h-74h], offset fun_to_export
-	call    register__get_best_item
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__get_best_item
 ENDM
 
-
-
-PERFORM_EXPORT_VECTOR__STRING MACRO registering_function:REQ, fun_to_export:REQ
-	mov     ecx, eax
-	mov     byte ptr [esp+58h-38h], bl
-	mov     eax, [esp+58h-38h]
-	mov     byte ptr [esp+58h-40h], bl
-	mov     edx, [esp+58h-40h]
-	push    eax
-	push    edx
-	lea     eax, [esp+60h-48h]
-	mov     ebx, ecx
-	mov     [esp+60h-48h], offset fun_to_export
-	call    registering_function
+PERFORM_EXPORT_VECTOR__STRING MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__vector__string
 ENDM
 
-REGISTER_VECTOR__STRING MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-	sub     esp, 4Ch
-	push    esi
-	push    edi
-	lea     esi, [esp+54h-3Ch]
-	mov     edi, eax
-	call    sub_1015C7E0
-	mov     eax, [edi]
-	push    eax
-	lea     esi, [esp+58h+var_48]
-	call    sub_1015C880
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
-	test    eax, eax
-	jz      short loc_101583FD
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_101583FD:
-	mov     edi, [edi]
-	push    edi
-	lea     esi, [esp+58h+var_48]
-	call    sub_1015C8E0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
-	test    eax, eax
-	jz      short loc_1015842A
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_1015842A:
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebx
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	mov     eax, ebx
-	pop     esi
-	add     esp, 4Ch
-	retn    8
-register_fun_name endp
+PERFORM_EXPORT_INIFILE__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		ecx, ppFuncExport
+	push	ecx
+	push	eax
+	call	register__CScriptIniFile__void
 ENDM
 
-
-PERFORM_EXPORT_INIFILE__VOID MACRO registering_function:REQ, fun_to_export:REQ
-	mov     byte ptr [esp+58h-38h], bl
-	mov     ecx, [esp+58h-38h]
-	push    ecx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	lea     ecx, [esp+60h-48h]
-	push    ecx
-	push    eax
-	mov     [esp+68h-48h], offset fun_to_export
-	call    registering_function
-ENDM
-
-
-REGISTER_INIFILE__VOID MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-var_30          = dword ptr -30h
-var_2C          = dword ptr -2Ch
-var_28          = dword ptr -28h
-var_24          = dword ptr -24h
-var_20          = dword ptr -20h
-var_1C          = dword ptr -1Ch
-var_18          = dword ptr -18h
-var_14          = byte ptr -14h
-var_10          = dword ptr -10h
-var_C           = dword ptr -0Ch
-var_8           = dword ptr -8
-var_4           = dword ptr -4
-arg_0           = dword ptr  4
-arg_4           = dword ptr  8
-
-	sub     esp, 48h
-	push    ebp
-	mov     ebp, [esp+4Ch+arg_4]
-	push    esi
-	push    edi
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??0overload_rep_base@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep_base::overload_rep_base(void)
-	xor     edi, edi
-	push    edi
-	lea     ecx, [esp+58h+var_14]
-	mov     [esp+58h+var_2C], edi
-	mov     [esp+58h+var_28], edi
-	mov     [esp+58h+var_24], edi
-	mov     [esp+58h+var_20], edi
-	mov     [esp+58h+var_1C], edi
-	mov     [esp+58h+var_18], edi
-	mov     [esp+58h+var_10], edi
-	mov     [esp+58h+var_C], edi
-	mov     [esp+58h+var_8], edi
-	mov     byte ptr [esp+58h+var_4], 1
-	call    sub_10002EB5
-	mov     eax, [ebp+0]
-	push    eax
-	lea     esi, [esp+58h+var_48]
-	mov     [esp+58h+var_30], 1
-	call    sub_10150F20
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
-	cmp     eax, edi
-	jz      short loc_101579AF
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_101579AF:
-	mov     ebp, [ebp+0]
-	push    ebp
-	lea     esi, [esp+58h+var_48]
-	call    sub_1015B3E0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
-	cmp     eax, edi
-	jz      short loc_101579DD
-	mov     ecx, [esp+54h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_101579DD:
-	mov     esi, [esp+54h+arg_0]
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, esi
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	mov     eax, esi
-	pop     esi
-	pop     ebp
-	add     esp, 48h
-	retn    10h
-register_fun_name endp
-ENDM
-
-
-
-PERFORM_EXPORT_VOID__STR_BOOL MACRO registering_function:REQ, fun_to_export:REQ
-	xor     bl, bl
-	mov     byte ptr [esp+88h-64h], bl
-	mov     edx, [esp+88h-64h]
-	push    edx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     ecx, [esp+8Ch-6Ch]
-	push    ecx
-	push    eax
-	lea     eax, [esp+94h-74h]
-	mov     [esp+94h-74h], offset fun_to_export
-	call    registering_function
-ENDM
-
-
-REGISTER_VOID__STR_BOOL MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-arg_0           = dword ptr  4
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+arg_0]
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1014EE70
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1014EF60
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_1014C951
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1014C951:
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1014EFC0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_1014C97E
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-
-loc_1014C97E:
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebp
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    0Ch
-register_fun_name endp
+PERFORM_EXPORT_VOID__STR_BOOL MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__str_bool
 ENDM
 
 PERFORM_EXPORT_VOID__VECTOR MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ecx, eax
-	mov     byte ptr [esp+88h-64h], bl
-	mov     eax, [esp+88h-64h]
-	push    eax
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     edx, [esp+8Ch-6Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+94h-74h]
-	mov     ebx, ecx
-	mov     [esp+94h-74h], offset fun_to_export
-	call    register_go_void__vector
-ENDM
-
-
-PERFORM_EXPORT_VECTOR__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-;	xor     bl, bl
-;	mov     byte ptr [esp+88h-64h], bl
-;	mov     edx, [esp+88h-64h]
-;	push    edx
-;	mov     byte ptr [esp+8Ch-6Ch], bl
-;	mov     ecx, [esp+8Ch-6Ch]
-;	push    ecx
-;	lea     edx, [esp+90h-74h]
-;	push    edx
-;	push    offset fun_name
-;	push    eax
-;	mov     [esp+9Ch-74h], offset fun_to_export
-;	call    register_go_const_vector__void
-	mov     byte ptr [esp+88h-64h], bl
-	mov     edx, [esp+88h-64h]
-	push    edx
-	mov     byte ptr [esp+8Ch-6Ch], bl
-	mov     ecx, [esp+8Ch-6Ch]
-	push    ecx
-	push    static_str$(fun_name_str)  ; "center"
-	push    eax
-	lea     eax, [esp+98h-74h]
-	mov     [esp+98h-74h], offset fun_to_export		;CScriptGameObject__Center
-	call    register_go_vector__void
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register_go_void__vector
 ENDM
 
 PERFORM_EXPORT_VOID__INT MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     ebx, eax
-	xor     al, al
-	mov     byte ptr [esp+58h-40h], al
-	mov     ecx, [esp+58h-40h]
-	mov     byte ptr [esp+58h-38h], al
-	mov     eax, [esp+58h-38h]
-	push    eax
-	push    ecx
-	push    static_str$(fun_name_str)
-	lea     eax, [esp+64h-48h]
-	mov     [esp+64h-48h], offset fun_to_export
-	call    register__set_character_rank
+	mov		ebx, eax
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__set_character_rank
 ENDM
 
-
-PERFORM_EXPORT_VOID__INT_INT_INT MACRO registering_function:REQ, fun_to_export:REQ
-	xor     bl, bl
-	mov     byte ptr [esp+58h-38h], bl
-	mov     ecx, [esp+58h-38h]
-	push    ecx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    eax
-	lea     eax, [esp+64h-48h]
-	mov     [esp+64h-48h], offset fun_to_export
-	call    registering_function
-ENDM
-
-REGISTER_VOID__INT_INT_INT MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc near
-
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-arg_0           = dword ptr  4
-
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+arg_0]
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1015A380
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015A4C0
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_101573A1
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_101573A1:
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015A520
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_101573CE
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_101573CE:
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str)
-	mov     ecx, ebp
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    0Ch
-register_fun_name endp
-ENDM
-
-PERFORM_REGISTER_UINT__VECTOR_PVECTOR MACRO registering_function:REQ, fun_to_export:REQ
-var_48          = dword ptr -48h
-var_40          = dword ptr -40h
-var_38          = dword ptr -38h
-	xor     bl, bl
-	mov     byte ptr [esp+58h+var_38], bl
-	mov     ecx, [esp+58h+var_38]
-	mov     byte ptr [esp+58h+var_40], bl
-	mov     edx, [esp+58h+var_40]
-	mov     [esp+58h+var_48], offset fun_to_export
-	push    ecx
-	push    edx
-	push    eax
-	lea     eax, [esp+64h+var_48]
-	call    registering_function
-ENDM
-
-REGISTER_UINT__VECTOR_PVECTOR MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc
-var_48          = dword ptr -48h
-var_44          = dword ptr -44h
-var_3C          = byte ptr -3Ch
-arg_0           = dword ptr  4
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+arg_0]
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1015CC50
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015CD40
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:luabind__detail__overload_rep_base__set_match_fun
-;?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-;luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_10158651
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_10158651:
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch+var_48]
-	call    sub_1015CDA0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:luabind__detail__overload_rep__set_fun
-;?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
-; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h+var_48]
-	test    eax, eax
-	jz      short loc_1015867E
-	mov     ecx, [esp+58h+var_44]
-	push    1
-	push    ecx
-	call    eax
-	add     esp, 8
-loc_1015867E:
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str) ; "accessible_nearest"
-	mov     ecx, ebp
-	call    ds:luabind__detail__class_base__add_method
-;?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:luabind__detail__overload_rep___overload_rep
-;??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    0Ch
-register_fun_name endp
+PERFORM_EXPORT_VOID__U32_U32_U32 MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__u32_u32_u32
 ENDM
 
 PERFORM_EXPORT_U32__VOID MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     byte ptr [esp+88h+64h], bl
-	mov     ecx, [esp+88h+64h]
-	push    ecx
-	mov     byte ptr [esp+8Ch+6Ch], bl
-	mov     edx, [esp+8Ch+6Ch]
-	push    edx
-	push    static_str$(fun_name_str) ; "get_ammo_in_magazine"
-	push    eax
-	lea     eax, [esp+98h+74h]
-	mov     [esp+98h+74h], offset fun_to_export
-	call    register__u32__void
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__u32__void
 ENDM
 
-REGISTER_VOID__U32_PVECTOR MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc
-arg_0           = dword ptr  4
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+arg_0]
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1015BBC0
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch-48h]
-	call    sub_1015BCB0
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h-48h]
-	.if (eax)
-		mov     ecx, [esp+58h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch-48h]
-	call    sub_1015BD10
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h-48h]
-	.if (eax)
-		mov     ecx, [esp+58h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str) ; "set_sight"
-	mov     ecx, ebp
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    12
-register_fun_name endp
-ENDM
-
-PERFORM_EXPORT_VOID__U32_PVECTOR MACRO registering_function:REQ, fun_to_export:REQ
-	mov     byte ptr [esp+58h-38h], bl
-	mov     ecx, [esp+58h-38h]
-	push    ecx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    eax
-	lea     eax, [esp+64h-48h]
-	mov     [esp+64h-48h], offset fun_to_export
-	call    registering_function
+PERFORM_EXPORT_VOID__U32_PVECTOR MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__u32_pvector
 ENDM
 
 PERFORM_EXPORT_VOID__FLOAT_FLOAT MACRO fun_to_export:REQ, fun_name_str:REQ
-	mov     byte ptr [esp+58h-38h], bl
-	mov     ecx, [esp+58h-38h]
-	push    ecx
-	mov     byte ptr [esp+5Ch-40h], bl
-	mov     edx, [esp+5Ch-40h]
-	push    edx
-	push    static_str$(fun_name_str)
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
 	push	eax
-	lea     eax, [esp+68h-48h]
-	mov     [esp+68h-48h], offset fun_to_export
-	call    register__void__float_float
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__void__float_float
 ENDM
 
-REGISTER_BOOL__PVECTOR MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc
-	sub     esp, 4Ch
-	push    esi
-	push    edi
-	lea     esi, [esp+54h-3Ch]
-	mov     edi, eax
-	call    sub_10151720
-	mov     eax, [edi]
-	push    eax
-	lea     esi, [esp+58h-48h]
-	call    sub_1015CAF0
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	.if (eax)
-		mov     ecx, [esp+54h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	mov     edi, [edi]
-	push    edi
-	lea     esi, [esp+58h-48h]
-	call    sub_1015EA30
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	.if (eax)
-		mov     ecx, [esp+54h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str) ; "accessible"
-	mov     ecx, ebx
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	mov     eax, ebx
-	pop     esi
-	add     esp, 4Ch
-	retn    8
-register_fun_name endp
-ENDM
-
-PERFORM_EXPORT_BOOL__PVECTOR MACRO registering_function:REQ, fun_to_export:REQ
-	mov     ecx, eax
-	mov     [esp+58h-38h], bl
-	mov     edx, [esp+58h-38h]
-	mov     [esp+58h-40h], bl
-	mov     eax, [esp+58h-40h]
-	push    edx
-	push    eax
-	lea     eax, [esp+60h-48h]
-	mov     ebx, ecx
-	mov     [esp+60h-48h], offset fun_to_export
-	call    registering_function
-ENDM
-
-REGISTER_BOOL__U32 MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc
-	sub     esp, 4Ch
-	push    esi
-	push    edi
-	lea     esi, [esp+54h-3Ch]
-	mov     edi, eax
-	call    sub_1015CB50
-	mov     eax, [edi]
-	push    eax
-	lea     esi, [esp+58h-48h]
-	call    sub_10150020
-	mov     eax, esi
-	push    eax
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	.if (eax)
-		mov     ecx, [esp+54h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	mov     edi, [edi]
-	push    edi
-	lea     esi, [esp+58h-48h]
-	call    sub_1015CBF0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h-48h]
-	.if (eax)
-		mov     ecx, [esp+54h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	lea     edx, [esp+54h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str) ; "accessible"
-	mov     ecx, ebx
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	mov     eax, ebx
-	pop     esi
-	add     esp, 4Ch
-	retn    8
-register_fun_name endp
-ENDM
-
-PERFORM_EXPORT_BOOL__U32 MACRO registering_function:REQ, fun_to_export:REQ
-	mov     ebx, eax
-	xor     al, al
-	mov     byte ptr [esp+58h-38h], al
-	mov     ecx, [esp+58h-38h]
-	mov     byte ptr [esp+58h-40h], al
-	mov     edx, [esp+58h-40h]
-	push    ecx
-	push    edx
-	lea     eax, [esp+60h-48h]
-	mov     [esp+60h-48h], offset fun_to_export
-	call    registering_function
-ENDM
-
-REGISTER_U32__STR_INT MACRO register_fun_name:REQ, fun_name_str:REQ
-align_proc
-register_fun_name proc
-	sub     esp, 48h
-	push    ebx
-	push    ebp
-	mov     ebp, [esp+50h+4];arg_0
-	push    esi
-	push    edi
-	lea     edi, [esp+58h-3Ch]
-	mov     ebx, eax
-	call    sub_1015D390
-	mov     eax, [ebx]
-	push    eax
-	lea     esi, [esp+5Ch-48h]
-	call    sub_1015D480
-	mov     eax, esi
-	push    eax
-	mov     ecx, edi
-	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h-48h]
-	.if (eax)
-		mov     ecx, [esp+58h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	mov     ebx, [ebx]
-	push    ebx
-	lea     esi, [esp+5Ch-48h]
-	call    sub_1015D4E0
-	mov     edx, esi
-	push    edx
-	lea     ecx, [esp+5Ch-3Ch]
-	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+58h-48h]
-	.if (eax)
-		mov     ecx, [esp+58h-44h]
-		push    1
-		push    ecx
-		call    eax
-		add     esp, 8
-	.endif
-	lea     edx, [esp+58h-3Ch]
-	push    edx
-	push    static_str$(fun_name_str) ; "get_task_state"
-	mov     ecx, ebp
-	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+58h-3Ch]
-	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
-	pop     edi
-	pop     esi
-	mov     eax, ebp
-	pop     ebp
-	pop     ebx
-	add     esp, 48h
-	retn    12
-register_fun_name endp
+PERFORM_EXPORT_BOOL__U32 MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__bool__u32
 ENDM
 
 PERFORM_EXPORT_VOID__STR_STR MACRO fun_to_export:REQ, fun_name_str:REQ
-	xor     bl, bl
-	mov     byte ptr [esp+14h+8h], bl
-	mov     ecx, [esp+14h+8h]
-	push    ecx
-	mov     byte ptr [esp+18h+0Ch], bl
-	mov     edx, [esp+18h+0Ch]
-	push    edx
-	push    static_str$(fun_name_str) ; "set_trader_sound"
-	push    eax
-	lea     eax, [esp+24h+10h]
-	mov     [esp+24h+10h], offset fun_to_export
-	call    register_void__str_str
+	push	0
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register_void__str_str
+ENDM
+
+PERFORM_EXPORT_UINT__VECTOR_PVECTOR MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__uint__vector_pvector
+ENDM
+
+PERFORM_EXPORT_BOOL__PVECTOR_FLOAT MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__bool__pvector_float
+ENDM
+
+PERFORM_EXPORT_BOOL__PVECTOR MACRO fun_to_export:REQ, fun_name_str:REQ
+	mov		ebx, eax
+	push	0
+	push	const_static_str$(fun_name_str)
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__bool__pvector
+ENDM
+
+PERFORM_EXPORT_U32__FLOAT_PVECTOR MACRO fun_to_export:REQ, fun_name_str:REQ
+	push	0
+	push	const_static_str$(fun_name_str)
+	push	eax
+	mov		ppFuncExport, offset fun_to_export
+	lea		eax, ppFuncExport
+	call	register__u32__float_pvector
 ENDM

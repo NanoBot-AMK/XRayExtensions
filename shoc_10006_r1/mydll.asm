@@ -13,6 +13,7 @@ LibMain ENDP
 
 ; вставки из целевой либы
 include xrrender_r1_stubs.asm
+include ../utils/macro_base.asm
 
 ; позиция в том месте, где в целевой DLL начинается наша секция
 org sec1_sec2_dist

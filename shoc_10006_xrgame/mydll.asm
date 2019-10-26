@@ -42,6 +42,7 @@ org sec1_sec2_dist
 
 include defines.asm
 include utils.asm
+include xr_vector.asm
 include actor_input_fix.asm
 include global_ns_fix.asm
 include global_ns_fix2.asm
@@ -112,14 +113,18 @@ include quicksave_fix.asm
 include relations_fix.asm
 include zoom_factor_fix.asm
 include art_activation_fix.asm
+include physics_fix.asm
 include self_anim_stalker.asm
 include trader.asm
 include ballistics_calc.asm
 include turrel.asm
+include particle_fix.asm
+include pyrotechnics.asm
+include pyrobattery.asm
+include explosive_rocket.asm
 include level_explosive.asm
 include anomaly.asm
-include physics_fix.asm
 include vector_fix.asm
-
+include register_classes_fix.asm
 
 end LibMain

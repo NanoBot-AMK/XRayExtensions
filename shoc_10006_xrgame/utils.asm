@@ -1,7 +1,7 @@
 
 
 align_proc
-CGameObject@@lua_game_object proc
+CGameObject@@lua_game_object proc (dword)
 ;ecx - this		CGameObject*
 	ASSUME	ecx:ptr CGameObject
 	xor		eax, eax

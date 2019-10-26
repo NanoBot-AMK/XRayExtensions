@@ -109,6 +109,18 @@ GAME_ARTEFACTHUNT		= 4
 GAME_END_LIST			= 5
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;-------------ISpatial---------------
+STYPE_RENDERABLE			= dword ptr (1 shl 0)
+STYPE_LIGHTSOURCE			= dword ptr (1 shl 1)
+STYPE_COLLIDEABLE			= dword ptr (1 shl 2)
+STYPE_VISIBLEFORAI			= dword ptr (1 shl 3)
+STYPE_REACTTOSOUND			= dword ptr (1 shl 4)
+STYPE_PHYSIC				= dword ptr (1 shl 5)
+STYPE_OBSTACLE				= dword ptr (1 shl 6)
+STYPE_SHAPE					= dword ptr (1 shl 7)
+STYPEFLAG_INVALIDSECTOR		= dword ptr (1 shl 16)
+;------------------------------------
+
 ;DIK_keys {
 DIK_0				= 11		;
 DIK_1				= 2			;
@@ -322,3 +334,100 @@ kFORCEDWORD				= -1
 CEffect_Rain@stIdle           = 0
 CEffect_Rain@stWorking        = 1
 ;}
+;enum EIIFlags{
+FdropManual				= word ptr (1 shl 0)
+FCanTake				= word ptr (1 shl 1)
+FCanTrade				= word ptr (1 shl 2)
+Fbelt					= word ptr (1 shl 3)
+Fruck					= word ptr (1 shl 4)
+FRuckDefault			= word ptr (1 shl 5)
+FUsingCondition			= word ptr (1 shl 6)
+FAllowSprint			= word ptr (1 shl 7)
+Fuseful_for_NPC			= word ptr (1 shl 8)
+FInInterpolation		= word ptr (1 shl 9)
+FInInterpolate			= word ptr (1 shl 10)
+FIsQuestItem			= word ptr (1 shl 11)
+;};
+;enum {
+sg_Undefined			= 0
+sg_SourceType			= dword ptr -1
+sg_forcedword			= dword ptr -1
+;};
+;enum {
+sm_Looped				= dword ptr (1 shl 0)		;//!< Looped
+sm_2D					= dword ptr (1 shl 1)		;//!< 2D mode
+sm_forcedword			= dword ptr -1
+;};
+;enum esound_type{
+st_Effect				= dword ptr 0
+st_Music				= dword ptr 1
+st_forcedword			= dword ptr -1
+;};
+
+;enum ESoundTypes {
+SOUND_TYPE_NO_SOUND					= dword ptr 00000000h
+
+SOUND_TYPE_WEAPON					= dword ptr 80000000h
+SOUND_TYPE_ITEM						= dword ptr 40000000h
+SOUND_TYPE_MONSTER					= dword ptr 20000000h
+SOUND_TYPE_ANOMALY					= dword ptr 10000000h
+SOUND_TYPE_WORLD					= dword ptr 08000000h
+
+SOUND_TYPE_PICKING_UP				= dword ptr 04000000h
+SOUND_TYPE_DROPPING					= dword ptr 02000000h
+SOUND_TYPE_HIDING					= dword ptr 01000000h
+SOUND_TYPE_TAKING					= dword ptr 00800000h
+SOUND_TYPE_USING					= dword ptr 00400000h
+
+SOUND_TYPE_SHOOTING					= dword ptr 00200000h
+SOUND_TYPE_EMPTY_CLICKING			= dword ptr 00100000h
+SOUND_TYPE_BULLET_HIT				= dword ptr 00080000h
+SOUND_TYPE_RECHARGING				= dword ptr 00040000h
+
+SOUND_TYPE_DYING					= dword ptr 00020000h
+SOUND_TYPE_INJURING					= dword ptr 00010000h
+SOUND_TYPE_STEP						= dword ptr 00008000h
+SOUND_TYPE_TALKING					= dword ptr 00004000h
+SOUND_TYPE_ATTACKING				= dword ptr 00002000h
+SOUND_TYPE_EATING					= dword ptr 00001000h
+
+SOUND_TYPE_IDLE						= dword ptr 00000800h
+
+SOUND_TYPE_OBJECT_BREAKING			= dword ptr 00000400h
+SOUND_TYPE_OBJECT_COLLIDING			= dword ptr 00000200h
+SOUND_TYPE_OBJECT_EXPLODING			= dword ptr 00000100h
+SOUND_TYPE_AMBIENT					= dword ptr 00000080h
+
+SOUND_TYPE_ITEM_PICKING_UP			= dword ptr SOUND_TYPE_ITEM OR SOUND_TYPE_PICKING_UP
+SOUND_TYPE_ITEM_DROPPING			= dword ptr SOUND_TYPE_ITEM OR SOUND_TYPE_DROPPING
+SOUND_TYPE_ITEM_HIDING				= dword ptr SOUND_TYPE_ITEM OR SOUND_TYPE_HIDING
+SOUND_TYPE_ITEM_TAKING				= dword ptr SOUND_TYPE_ITEM OR SOUND_TYPE_TAKING
+SOUND_TYPE_ITEM_USING				= dword ptr SOUND_TYPE_ITEM OR SOUND_TYPE_USING
+
+SOUND_TYPE_WEAPON_SHOOTING			= dword ptr SOUND_TYPE_WEAPON OR SOUND_TYPE_SHOOTING
+SOUND_TYPE_WEAPON_EMPTY_CLICKING	= dword ptr SOUND_TYPE_WEAPON OR SOUND_TYPE_EMPTY_CLICKING
+SOUND_TYPE_WEAPON_BULLET_HIT		= dword ptr SOUND_TYPE_WEAPON OR SOUND_TYPE_BULLET_HIT
+SOUND_TYPE_WEAPON_RECHARGING		= dword ptr SOUND_TYPE_WEAPON OR SOUND_TYPE_RECHARGING
+
+SOUND_TYPE_MONSTER_DYING			= dword ptr SOUND_TYPE_MONSTER OR SOUND_TYPE_DYING
+SOUND_TYPE_MONSTER_INJURING			= dword ptr SOUND_TYPE_MONSTER OR SOUND_TYPE_INJURING
+SOUND_TYPE_MONSTER_STEP				= dword ptr SOUND_TYPE_MONSTER OR SOUND_TYPE_STEP
+SOUND_TYPE_MONSTER_TALKING			= dword ptr SOUND_TYPE_MONSTER OR SOUND_TYPE_TALKING
+SOUND_TYPE_MONSTER_ATTACKING		= dword ptr SOUND_TYPE_MONSTER OR SOUND_TYPE_ATTACKING
+SOUND_TYPE_MONSTER_EATING			= dword ptr SOUND_TYPE_MONSTER OR SOUND_TYPE_EATING
+
+SOUND_TYPE_ANOMALY_IDLE				= dword ptr SOUND_TYPE_ANOMALY OR SOUND_TYPE_IDLE
+
+SOUND_TYPE_WORLD_OBJECT_BREAKING	= dword ptr SOUND_TYPE_WORLD OR SOUND_TYPE_OBJECT_BREAKING
+SOUND_TYPE_WORLD_OBJECT_COLLIDING	= dword ptr SOUND_TYPE_WORLD OR SOUND_TYPE_OBJECT_COLLIDING
+SOUND_TYPE_WORLD_OBJECT_EXPLODING	= dword ptr SOUND_TYPE_WORLD OR SOUND_TYPE_OBJECT_EXPLODING
+SOUND_TYPE_WORLD_AMBIENT			= dword ptr SOUND_TYPE_WORLD OR SOUND_TYPE_AMBIENT
+
+SOUND_TYPE_WEAPON_PISTOL			= dword ptr SOUND_TYPE_WEAPON
+SOUND_TYPE_WEAPON_GUN				= dword ptr SOUND_TYPE_WEAPON
+SOUND_TYPE_WEAPON_SUBMACHINEGUN		= dword ptr SOUND_TYPE_WEAPON
+SOUND_TYPE_WEAPON_MACHINEGUN		= dword ptr SOUND_TYPE_WEAPON
+SOUND_TYPE_WEAPON_SNIPERRIFLE		= dword ptr SOUND_TYPE_WEAPON
+SOUND_TYPE_WEAPON_GRENADELAUNCHER	= dword ptr SOUND_TYPE_WEAPON
+SOUND_TYPE_WEAPON_ROCKETLAUNCHER	= dword ptr SOUND_TYPE_WEAPON
+;};

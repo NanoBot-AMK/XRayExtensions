@@ -1,20 +1,12 @@
+
 CHECK_VID_RESTART_OPTION MACRO opt_name_str:REQ
-LOCAL no_restart
-LOCAL lab1
-LOCAL opt_name
-	jmp     lab1
-opt_name db opt_name_str, 0
-lab1:
-	mov     esi, offset opt_name
+	mov     esi, static_str$(opt_name_str)
 	;PRINT_UINT "opt: %s", esi
 	mov     ecx, edi
 	call    str_cmp
-	test    al, al
-	;jnz     vid_restart
-	jz     no_restart
-	;PRINT "need restart"
-	jmp     vid_restart
-no_restart:
+	.if (al)
+		jmp		vid_restart
+	.endif
 ENDM
 
 

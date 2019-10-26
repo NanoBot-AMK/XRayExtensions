@@ -4,7 +4,7 @@ if exist mydll.dll del mydll.dll
 if exist xrcore.dll del xrcore.dll
 
 if exist addr.inc goto mmm1
-..\tools\add_code.exe xrcore_orig.dll
+..\tools\AddCode.exe xrcore_orig.dll
 :mmm1
 
 ..\tools\UASM.exe /c /coff /Fo mydll.obj mydll.asm
@@ -12,7 +12,7 @@ if exist addr.inc goto mmm1
 
 if exist mydll.obj del mydll.obj
 
-..\tools\add_code.exe xrcore_orig.dll xrcore.dll mydll.dll corrections_list.txt
+..\tools\AddCode.exe xrcore_orig.dll xrcore.dll mydll.dll corrections_list.txt
 
 if exist mydll.dll del mydll.dll
 

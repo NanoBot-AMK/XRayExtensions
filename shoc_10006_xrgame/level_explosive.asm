@@ -133,8 +133,8 @@ CBulletManager@@_CBulletManager_ext proc
 	retn	4
 CBulletManager@@_CBulletManager_ext endp
 
-static_str		aHalflength_shell,	"halflength_shell"
-static_str		aType_ballistic,	"type_ballistic"
+const_static_str		aHalflength_shell,	"halflength_shell"
+const_static_str		aType_ballistic,	"type_ballistic"
 
 align_proc
 CBulletManager@@Load_ext proc
