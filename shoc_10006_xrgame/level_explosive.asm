@@ -2,7 +2,7 @@
 ;	Project		: XRay - Extensions		
 ;	Module 		: level_explosive.asm
 ;	Created 	: 02.11.2017
-;	Modified 	: 11.11.2017
+;	Modified 	: 19.10.2018
 ;	Author		: NanoBot
 ;	Description : Взрывчатка в классе CBulletExplosive. Вер. 1.0
 ;======================================================================
@@ -10,46 +10,42 @@
 LEVEL__MAX_COUNT_EXPLOSIVES			equ 512
 ;----------------------------------------------------------------------
 ; Таблица виртуальных функций
-	align 4
-	dd offset dbs_CExplosive								; -4
-virtual_CBulletExplosive:
-	dd offset CExplosive@@SetInitiator						; 0
-	dd offset CBulletExplosive@@Initiator					; 4
-	dd offset CExplosive@@cast_IDamageSource				; 8
-	dd offset CExplosive@@_destructor						; 12
-	dd offset CBulletExplosive@@Load						; 16
-	dd offset CExplosive@@Load_char_const_ 					; 20	(char const *)
-	dd offset CExplosive@@net_Destroy						; 24
-	dd offset CExplosive@@net_Relcase						; 28
-	dd offset CExplosive@@UpdateCL							; 32
-	dd offset CExplosive@@Explode							; 36
-	dd offset CBulletExplosive@@ExplodeParams				; 40
-	dd offset CBulletExplosive@@OnEvent						; 44
-	dd offset CBulletExplosive@@OnAfterExplosion			; 48	// погасить партиклы, удалить объект
-	dd offset CBulletExplosive@@OnBeforeExplosion			; 52
-	dd offset CExplosive@@SetCurrentParentID				; 56
-	dd offset CExplosive@@UpdateExplosionPos				; 60		
-	dd offset CBulletExplosive@@GetExplVelocity				; 64
-	dd offset CExplosive@@GetExplPosition					; 68
-	dd offset CExplosive@@GetExplDirection					; 72
-	dd offset CBulletExplosive@@GenExplodeEvent				; 76
-	dd offset CBulletExplosive@@FindNormal					; 80
-	dd offset CBulletExplosive@@cast_game_object     		; 84		
-	dd offset CExplosive@@cast_explosive					; 88		
-	dd offset CExplosive@@GetRayExplosionSourcePos			; 92
-	dd offset CExplosive@@GetExplosionBox					; 96
-	dd offset CBulletExplosive@@ActivateExplosionBox		; 100
-	dd offset CExplosive@@Useful							; 104
-	dd offset CBulletExplosive@@HideExplosive				; 108
-	dd offset CExplosive@@StartLight						; 112
-	dd offset CExplosive@@StopLight							; 116
-	dd offset CBulletExplosive@@UpdateExplosionParticles	; 120
-;----------------------------------------------------------------------
-
-;align 4
-;aWallmark_section			db "wallmark_section", 0
+.const
 align 4
-aHalflength_shell 			db "halflength_shell", 0
+						dd offset dbs_CExplosive								; -4
+vtbl@CBulletExplosive	dd offset CExplosive@@SetInitiator						; 0
+						dd offset CBulletExplosive@@Initiator					; 4
+						dd offset CExplosive@@cast_IDamageSource				; 8
+						dd offset CExplosive@@_destructor						; 12
+						dd offset CBulletExplosive@@Load						; 16
+						dd offset CExplosive@@Load_char_const_ 					; 20	(char const *)
+						dd offset CExplosive@@net_Destroy						; 24
+						dd offset CExplosive@@net_Relcase						; 28
+						dd offset CExplosive@@UpdateCL							; 32
+						dd offset CExplosive@@Explode							; 36
+						dd offset CBulletExplosive@@ExplodeParams				; 40
+						dd offset CBulletExplosive@@OnEvent						; 44
+						dd offset CBulletExplosive@@OnAfterExplosion			; 48	// погасить партиклы, удалить объект
+						dd offset CBulletExplosive@@OnBeforeExplosion			; 52
+						dd offset CExplosive@@SetCurrentParentID				; 56
+						dd offset CExplosive@@UpdateExplosionPos				; 60		
+						dd offset CBulletExplosive@@GetExplVelocity				; 64
+						dd offset CExplosive@@GetExplPosition					; 68
+						dd offset CExplosive@@GetExplDirection					; 72
+						dd offset CBulletExplosive@@GenExplodeEvent				; 76
+						dd offset CBulletExplosive@@FindNormal					; 80
+						dd offset CBulletExplosive@@cast_game_object     		; 84		
+						dd offset CExplosive@@cast_explosive					; 88		
+						dd offset CExplosive@@GetRayExplosionSourcePos			; 92
+						dd offset CExplosive@@GetExplosionBox					; 96
+						dd offset CBulletExplosive@@ActivateExplosionBox		; 100
+						dd offset CExplosive@@Useful							; 104
+						dd offset CBulletExplosive@@HideExplosive				; 108
+						dd offset CExplosive@@StartLight						; 112
+						dd offset CExplosive@@StopLight							; 116
+						dd offset CBulletExplosive@@UpdateExplosionParticles	; 120
+.code
+;----------------------------------------------------------------------
 
 ; иницилизация m_game_object и m_game_object_id
 align_proc
@@ -77,18 +73,18 @@ CExplosive@@Explode_vector_vel_zero proc
 ;vel		= dword ptr 12
 	xor		eax, eax
 	lea     ecx, [esp+0C8h-12];vel
-	mov		[ecx], eax
-	mov		[ecx+4], eax
-	mov		[ecx+8], eax
+	Fvector_set	[ecx].Fvector, eax, eax, eax
 	jmp		return@CExplosive@@Explode_vector_vel_zero
 CExplosive@@Explode_vector_vel_zero endp
 ;---------------------------------------------------------------------------------------
+
 ;конструктор
 align_proc
 CBulletManager@@CBulletManager_ext proc
 ;esi - this
 	ASSUME	esi:ptr CBulletManager
 	xor		eax, eax
+	mov		[esi].m_dwTimeRemainder, eax
 	mov		[esi].m_explosions._Alval, eax
 	mov		[esi].m_explosions._Myfirst, eax
 	mov		[esi].m_explosions._Mylast, eax
@@ -137,14 +133,53 @@ CBulletManager@@_CBulletManager_ext proc
 	retn	4
 CBulletManager@@_CBulletManager_ext endp
 
+static_str		aHalflength_shell,	"halflength_shell"
+static_str		aType_ballistic,	"type_ballistic"
+
+align_proc
+CBulletManager@@Load_ext proc
+	ASSUME	edi:ptr CBulletManager, ebx:ptr CLevel
+	mov		eax, ds:g_pGameLevel
+	sub     edi, CBulletManager.m_ExplodeParticles
+	mov		ebx, [eax]
+	Fvector_set [edi].m_BoundingVolume.min, [ebx].ObjectSpace.m_BoundingVolume.min
+	Fvector_set [edi].m_BoundingVolume.max, [ebx].ObjectSpace.m_BoundingVolume.max
+	xorps	xmm0, xmm0
+	movaps	[edi].m_vecGravityConstDeltaTime, xmm0
+	;m_vecGravityConstDeltaTime.y = m_fGravityConst*(float)m_dwStepTime*0.001f;
+	movss	xmm0, [edi].m_fGravityConst
+	cvtsi2ss xmm1, [edi].m_dwStepTime
+	mulss	xmm0, xmm1
+	mulss	xmm0, float_0p001
+	movss	[edi].m_vecGravityConstDeltaTime.y, xmm0
+	xor		eax, eax
+	mov		[edi].m_BoundingVolume.min.w, eax
+	mov		[edi].m_BoundingVolume.max.w, eax
+	mov		[edi].m_type_ballistic, al	;=0
+	.if (@LINE_EXIST(&aBullet_manager, &aType_ballistic))	;"type_ballistic"
+		mov		[edi].m_type_ballistic, @R_U8(&aBullet_manager, &aType_ballistic)
+	.endif
+	mov		eax, [ebx].game
+	.if ([eax].game_cl_GameState.m_type!=GAME_SINGLE)	; мультиплейер
+		mov		[edi].m_type_ballistic, 1
+	.endif
+	ASSUME	edi:nothing, ebx:nothing
+	pop		edi
+	pop		esi
+	pop		ebp
+	pop		ebx
+	add		esp, 44
+	retn
+CBulletManager@@Load_ext endp
+
 ;запускается из метода CActor::net_Relcase
 align_proc
 CBulletManager@@net_Relcase proc
 ;ebp - CObject*
 	push	esi
 	mov		edx, ds:g_pGameLevel
-	mov		eax, [edx]	; CLevel
-	mov		esi, [eax+m_pBulletManager]
+	mov		eax, [edx]	; 
+	mov		esi, [eax].CLevel.m_pBulletManager
 	ASSUME	esi:ptr CBulletManager,  edi:ptr CBulletExplosive
 	mov		edi, [esi].m_explosions._Myfirst
 	mov		ebx, [esi].m_explosions._Mylast
@@ -262,16 +297,8 @@ CBulletManager@@CreateExplosive endp
 ;взорвать взрывчатку
 align_proc
 CBulletManager@@Explode proc id_explosive:dword, pPosition:dword, pDirection:dword, id_initiator:dword
-local direction1:Fvector4, position1:Fvector4
+local direction:Fvector4, position:Fvector4
 ;esi - this
-;	mov		eax, id_explosive
-;	PRINT_UINT "CBulletManager@@Explode() id_explosive = %d", eax
-;	mov		eax, pPosition
-;	PRINT_VECTOR "position ", eax
-;	mov		eax, pDirection
-;	PRINT_VECTOR "direction ", eax
-;	mov		eax, id_initiator
-;	PRINT_UINT "id_initiator = %d", eax
 	push	esi
 	push	edi
 	mov		esi, ecx
@@ -288,20 +315,20 @@ local direction1:Fvector4, position1:Fvector4
 			ASSUME	edx:ptr Fvector4, eax:ptr Fvector4
 			xorps	xmm2, xmm2
 			mov		edx, pPosition
-			Fvector4_set	position1, [edx].x, [edx].y, [edx].z, 0
-			movups	xmm0, position1
+			Fvector4_set	position, [edx].x, [edx].y, [edx].z, 0
+			movups	xmm0, position
 			mov		edx, pDirection
-			Fvector4_set 	direction1, [edx].x, [edx].y, [edx].z, 0
-			movups	xmm1, direction1
+			Fvector4_set 	direction, [edx].x, [edx].y, [edx].z, 0
+			movups	xmm1, direction
 			movss	xmm2, [edi].m_halflength_shell
 			shufps	xmm2, xmm2, 11000000b	; 3000t
 			mulps	xmm1, xmm2
 			subps	xmm0, xmm1
-			movups	position1, xmm0
+			movups	position, xmm0
 			ASSUME	edx:nothing, eax:nothing
-			Fvector4_set 	direction1, 0.0, 1.0, 0.0, 0
+			Fvector4_set 	direction, 0.0, 1.0, 0.0, 0
 			mov		ecx, edi
-			invoke	CBulletExplosive@@ExplodeParams, addr position1, addr direction1
+			invoke	CBulletExplosive@@ExplodeParams, addr position, addr direction
 			mov		ecx, edi
 			call	CExplosive@@Explode
 			mrm		[edi].m_fExplodeDuration, [edi].m_fExplodeDurationMax
@@ -366,7 +393,7 @@ CBulletExplosive@@CBulletExplosive proc
 ;eax - this
 	ASSUME	eax:ptr CBulletExplosive
 	call	CExplosive@@CExplosive
-	mov		[eax].CExplosive@vfptr, offset virtual_CBulletExplosive
+	mov		[eax].CExplosive@vfptr, offset vtbl@CBulletExplosive
 	ASSUME	eax:nothing
 	retn
 CBulletExplosive@@CBulletExplosive endp
@@ -455,9 +482,9 @@ CBulletExplosive@@OnAfterExplosion proc
 	ASSUME	ecx:ptr CBulletExplosive
 	;объект отработал, удаляем.
 	mov		edx, ds:g_pGameLevel
-	mov		eax, [edx]	; CLevel
+	mov		eax, [edx]	; 
 	push	[ecx].m_id
-	mov		ecx, [eax+m_pBulletManager]
+	mov		ecx, [eax].CLevel.m_pBulletManager
 	call	CBulletManager@@DeleteExplosive
 	ASSUME	ecx:nothing
 	retn
@@ -526,3 +553,40 @@ CBulletExplosive@@UpdateExplosionParticles proc
 	retn
 CBulletExplosive@@UpdateExplosionParticles endp
 ;---------------------------------------------------------------------------------------
+;
+OVERHEAD	= 171
+; void __usercall CBulletManager::TestBullet(CBulletManager *this@<eax>)
+align_proc
+CBulletManager@@TestBullet proc uses esi
+local TICS:_QWORD, dTics:real8
+	mov		esi, eax
+	xor		eax, eax
+	CPUID					; не спариваемая инструкция
+	RDTSC
+	mov		TICS.lo, eax	; сохраняем его
+	mov		TICS.hi, edx
+	xor		eax, eax
+	CPUID					; не спариваемая инструкция
+	mov		eax, esi
+	call	CBulletManager@@CommitRenderSet
+	xor		eax, eax
+	CPUID										; не спариваемая инструкция
+	RDTSC										; снова читаем счетчик
+	sub		eax, TICS.lo						; вычисляем разность
+	sub		eax, OVERHEAD						; вычитаем такты, которые использовали
+	sbb		edx, TICS.hi
+	mov		TICS.lo, eax
+	mov		TICS.hi, edx
+	PRINT_UINT "tics int = %d", eax
+	cvtpi2pd xmm0, TICS
+	movsd	dTics, xmm0
+	push	ecx
+	push	ecx
+	movsd	real8 ptr [esp], xmm0
+	push	static_str$("tics = %.0f")
+	call	Msg
+	add		esp, 12
+	;PRINT_UINT "tics = %d", eax
+	
+	ret
+CBulletManager@@TestBullet endp

@@ -14,7 +14,7 @@ del src.obj
 
 ..\tools\add_code.exe XR_3DA_orig.exe XR_3DA.exe src.exe corrections_list.txt
 
-rem if exist src.exe del src.exe
+if exist src.exe del src.exe
 
 
 @echo.

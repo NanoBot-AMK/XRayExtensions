@@ -45,46 +45,46 @@ CLevel__g_sv_Spawn_fix2 proc
 	retn    4
 CLevel__g_sv_Spawn_fix2 endp
 
-align_proc
-CWeapon__UpdateFireDependencies_internal_dbg_fix2 proc
-	PRINT_UINT "wpn=%x", ebx
-	PRINT_UINT "hud=%x", eax
-	lea     eax, [ebx+298h]
-	PRINT_UINT "hud_cell_addr=%x", eax
-	mov     eax, [ebx+298h]
-	PRINT_MATRIX "hud_xform:", edx
-	; делаем то, что вырезали
-	movzx   ecx, word ptr [edx+0Ch] ; ecx = fire_bone
-	movss   xmm0, dword ptr [edx+14h]
-	jmp back_from_CWeapon__UpdateFireDependencies_internal_dbg_fix2
-CWeapon__UpdateFireDependencies_internal_dbg_fix2 endp
+; align_proc
+; CWeapon__UpdateFireDependencies_internal_dbg_fix2 proc
+	; PRINT_UINT "wpn=%x", ebx
+	; PRINT_UINT "hud=%x", eax
+	; lea     eax, [ebx+298h]
+	; PRINT_UINT "hud_cell_addr=%x", eax
+	; mov     eax, [ebx+298h]
+	; PRINT_MATRIX "hud_xform:", edx
+	; ; делаем то, что вырезали
+	; movzx   ecx, word ptr [edx+0Ch] ; ecx = fire_bone
+	; movss   xmm0, dword ptr [edx+14h]
+	; jmp back_from_CWeapon__UpdateFireDependencies_internal_dbg_fix2
+; CWeapon__UpdateFireDependencies_internal_dbg_fix2 endp
 
-g_saved_vector Vector3 {0.0, 0.0, 0.0}
+;g_saved_vector Vector3 {0.0, 0.0, 0.0}
 
-align_proc
-CShootingObject__RenderLight_dbg_fix2 proc
-	; своё
-	PRINT_VECTOR "fire point", eax
-	push ebx
-	push edi
-	assume eax:PTR Vector3
-	assume edi:PTR Vector3
-	mov edi, offset g_saved_vector
-	;mov Vector3 ptr [ebx].x, Vector3 ptr [eax].x
-	mov ebx, [eax].x
-	mov [edi].x, ebx
-	mov ebx, [eax].y
-	mov [edi].y, ebx
-	mov ebx, [eax].z
-	mov [edi].z, ebx
-	assume eax:nothing
-	assume edi:nothing
-	pop edi
-	pop ebx
-	; делаем то, что вырезали
-	call    CShootingObject__Light_Render
-	jmp back_from_CShootingObject__RenderLight_dbg_fix2
-CShootingObject__RenderLight_dbg_fix2 endp
+; align_proc
+; CShootingObject__RenderLight_dbg_fix2 proc
+	; ; своё
+	; PRINT_VECTOR "fire point", eax
+	; push ebx
+	; push edi
+	; assume eax:PTR Vector3
+	; assume edi:PTR Vector3
+	; mov edi, offset g_saved_vector
+	; ;mov Vector3 ptr [ebx].x, Vector3 ptr [eax].x
+	; mov ebx, [eax].x
+	; mov [edi].x, ebx
+	; mov ebx, [eax].y
+	; mov [edi].y, ebx
+	; mov ebx, [eax].z
+	; mov [edi].z, ebx
+	; assume eax:nothing
+	; assume edi:nothing
+	; pop edi
+	; pop ebx
+	; ; делаем то, что вырезали
+	; call    CShootingObject__Light_Render
+	; jmp back_from_CShootingObject__RenderLight_dbg_fix2
+; CShootingObject__RenderLight_dbg_fix2 endp
 
 align_proc
 CCustomZone__feel_touch_contact_dbg_fix proc
@@ -263,7 +263,7 @@ lab3:
 	mov     [esi+0CCh], edx ; m_iLastTimeCalled_h
 	fchs
 	faddp   st(1), st
-	fmul    ds:flt_1045A260 ; 0.001
+	fmul    ds:float_0p001 ; 0.001
 	fstp    dword ptr [esi+0D0h] ; m_fDeltaTime
 	;
 	mov     eax, dword ptr [esi+0D0h]

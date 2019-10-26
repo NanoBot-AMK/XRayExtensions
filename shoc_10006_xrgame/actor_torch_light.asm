@@ -1,23 +1,21 @@
+
+align_proc
 actor_torch_light proc
-	mov		edi, [esi+2ACh]
-;	mov		edi, [edi]
-	mov		bl, byte ptr [esi+2A8h]
-	test	bl, 1
-	jz		torch_off
-	mov		esi, yes
-	jmp		torch_exit
-	
-torch_off:
-	mov		esi, no
-	
-torch_exit:	
-	mov		dword ptr [edi+290h], esi
-	pop     edi
-	pop     esi
-	pop     ebx
-	mov     esp, ebp
-	jmp back_from_actor_torch_light
+;edi - light*
+;esi - CTorch*
+	% echo @CatStr(% light.vis);;sizeof
+	% echo @CatStr(% light.X)
+	ASSUME	esi:ptr CTorch, edi:ptr light	;IRender_Light
+	mov		edi, [esi].light_render.p_			;+2ACh	IRender_Light*
+	movzx	eax, [esi].m_switched_on	;+2A8h
+	mov		dword ptr [edi+290h], eax	; размер light 624 байт
+	ASSUME	esi:nothing, edi:nothing
+	;return;
+	pop		edi
+	pop		esi
+	pop		ebx
+	mov		esp, ebp
+	pop		ebp
+	retn	4
 actor_torch_light endp
 
-yes dd 1
-no dd 0

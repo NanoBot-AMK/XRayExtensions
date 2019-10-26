@@ -285,7 +285,6 @@ PERFORM_EXPORT_VOID__FLOAT				CScriptGameObject@@SetCameraFOV,			"set_camera_fov
 PERFORM_EXPORT_FLOAT__INT				register_get_custom_monster_float,			CScriptGameObject@@GetGameObjectFloat	;;CScriptGameObject@@GetCustomMonsterFloat
 PERFORM_EXPORT_U32__STRING_INT			register_get_custom_monster_int,			CScriptGameObject@@GetGameObjectInt		;;CScriptGameObject@@GetCustomMonsterInt
 
-;PERFORM_EXPORT_VOID__STRING			CScriptGameObject@@TestStr,					"test_str"
 PERFORM_EXPORT_STRING__VOID				CScriptGameObject@@GetGameObjectSharedStr,	"get_actor_shared_str"
 PERFORM_EXPORT_U32__STRING_INT			register_set_actor_shared_str,				CScriptGameObject@@SetGameObjectSharedStr
 
@@ -383,7 +382,7 @@ PERFORM_EXPORT_U32__STRING_INT			register_save_hud_bone_float,				CScriptGameObj
 PERFORM_EXPORT_FLOAT__INT				register_get_hud_float,						CScriptGameObject@@GetHudFloat
 PERFORM_EXPORT_VOID__VECTOR_FLOAT_INT	register_set_hud_float,						CScriptGameObject@@SetHudFloat
 
-PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetCalibratingVector,	"set_calibrating_vector"
+;;;PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@SetCalibratingVector,	"set_calibrating_vector"
 
 PERFORM_EXPORT_VOID__VOID				CScriptGameObject@@InvalidateInventory,		"invalidate_inventory"
 ;PERFORM_EXPORT_VECTOR__VOID
@@ -1153,6 +1152,7 @@ CScriptGameObject@@item_on_belt proc uses esi edi number:dword
 		mov		edx, [edi].m_belt._Myfirst
 		mov		ecx, number
 		lea		ecx, [edx+ecx*4]
+		xor		eax, eax
 		.if ([edi].m_belt._Mylast>ecx)
 			mov		eax, [ecx]
 			.if (eax)
@@ -1160,12 +1160,9 @@ CScriptGameObject@@item_on_belt proc uses esi edi number:dword
 				mov		edi, [eax].CInventoryItem@m_object ; inventory_item -> CGameObject
 				call	CGameObject__lua_game_object
 				ASSUME	eax:nothing
-				jmp		exit
 			.endif
 		.endif
 	.endif
-	xor		eax, eax
-exit:
 	ret
 CScriptGameObject@@item_on_belt endp
 
@@ -1178,6 +1175,7 @@ CScriptGameObject@@item_in_ruck proc uses esi edi number:dword
 		mov		edx, [edi].m_ruck._Myfirst
 		mov		ecx, number
 		lea		ecx, [edx+ecx*4]
+		xor		eax, eax
 		.if ([edi].m_ruck._Mylast>ecx)
 			mov		eax, [ecx]
 			.if (eax)
@@ -1185,13 +1183,10 @@ CScriptGameObject@@item_in_ruck proc uses esi edi number:dword
 				mov		edi, [eax].CInventoryItem@m_object ; inventory_item -> CGameObject
 				call	CGameObject__lua_game_object
 				ASSUME	eax:nothing
-				jmp		exit
 			.endif
 		.endif
 		ASSUME	esi:nothing, edi:nothing
 	.endif
-	xor		eax, eax
-exit:
 	ret
 CScriptGameObject@@item_in_ruck endp
 
@@ -1846,68 +1841,38 @@ CScriptGameObject@@ChangeBleedingSpeed proc uses edi bleeding_delta:dword
 	ret
 CScriptGameObject@@ChangeBleedingSpeed endp
 
+;"get_hud_bone_pos"
 align_proc
-CScriptGameObject@@SetCalibratingVector proc param_vector:dword
-	mov		edx, param_vector
-	ASSUME	edx:ptr Fvector, ecx:ptr Fvector
-	mov		ecx, offset g_test_vector
-	Fvector_set	[ecx], [edx].x, [edx].y, [edx].z
-	ASSUME	edx:nothing, ecx:nothing
-	ret
-CScriptGameObject@@SetCalibratingVector endp
-align 4
-g_test_vector dd 0.0, 0.0, 0.0
-
-align_proc
-CScriptGameObject@@hud_bone_position proc uses esi edi bone_name:dword, result_vector:dword
-local test_vector111:Fvector
-	mov		edi, [ecx+4]
-	ASSUME	edx:ptr Fvector
-	Fvector_set	[edx], 0, 0, 0
-	ASSUME	edx:nothing
-	smart_cast	CHudItem, CGameObject, edi
+CScriptGameObject@@hud_bone_position proc uses esi edi ebx result_vector:dword, bone_name:dword
+local matrix:Fmatrix4
+	mov		ebx, result_vector
+	ASSUME	edi:ptr CWeaponHUD, esi:ptr CKinematics, ebx:ptr Fvector
+	Fvector_set	[ebx], 0, 0, 0
+	smart_cast	CHudItem, CGameObject, [ecx+4]
 	.if (eax)
-		ASSUME	eax:ptr CHudItem, edx:ptr CWeaponHUD, esi:ptr CKinematics
-		mov		edx, [eax].m_pHUD
-		.if ([edx].m_bHidden)
-			mov		eax, [edx].m_shared_data.p_
-			ASSUME	eax:ptr weapon_hud_value
-			mov		ecx, [eax].m_animations		; CKinematicsAnimated*
-			ASSUME	eax:nothing, edx:nothing
+		;CWeaponHUD*	wpn_hud = obj->GetHUD;
+		mov		edi, [eax].CHudItem.m_pHUD
+		.if (![edi].m_bHidden)
+			mov		eax, [edi].m_shared_data.p_
+			mov		ecx, [eax].weapon_hud_value.m_animations		; CKinematicsAnimated*
 			.if (ecx)
-				smart_castV	CKinematics, IRender_Visual, ecx
-				.if (eax)
-					mov		esi, eax
-					push	bone_name
-					mov		ecx, esi ; this == ecx
-					call	ds:CKinematics__LL_BoneID
-					movzx	eax, ax
-					.if (ax!=-1)
-						imul	ecx, eax, 160
-						add		ecx, [esi].bone_instances ; eax = bone xform
-						;PRINT_MATRIX "bone_xform", ecx
-						lea		eax, test_vector111
-						push	eax
-						push	result_vector
-						call	matrix_transform_tiny_2args_internal
-						;PRINT_UINT "bone_xform=%x", eax
-						mov		eax, result_vector
-						;PRINT_VECTOR "2nd", eax
-						smart_cast	CWeapon, edi
-						.if (eax)
-							ASSUME	eax:ptr CWeapon, edx:ptr CWeaponHUD
-							mov		edx, [eax].m_pHUD
-							lea		ecx, [edx].m_Transform		; this = Fmatrix
-							push	result_vector
-							call	matrix_transform_tiny_1arg_internal
-							ASSUME	eax:nothing, edx:nothing, esi:nothing
-						.endif
-					.endif
+				mov		esi, ecx
+				;bone_id	= K->LL_BoneID(bone_name);
+				push	bone_name
+				call	ds:CKinematics__LL_BoneID
+				movzx	eax, ax		;=bone_id
+				.if (ax!=-1)
+					;matrix.mul_43(wpn_hud->Transform(), K->LL_GetTransform(bone_id));
+					imul	ecx, eax, sizeof CBoneInstance
+					add		ecx, [esi].bone_instances
+					Fmatrix4@mul_43	matrix, [edi].m_Transform, [ecx].CBoneInstance.mTransform
+					Fvector_set	[ebx], matrix.c_
 				.endif
 			.endif
 		.endif
 	.endif
-	mov		eax, result_vector
+	ASSUME	edi:nothing, esi:nothing, ebx:nothing
+	mov		eax, ebx
 	ret
 CScriptGameObject@@hud_bone_position endp
 
@@ -1917,6 +1882,7 @@ CScriptGameObject@@GetSpecificProfile proc
 	push	eax
 	;input: eax - game id (uint)
 	call	ch_info_get_from_id				;get CSE_ALifeTraderAbstract by id
+	add		esp, 4
 	;output: eax - CSE_ALifeTraderAbstract
 	mov		eax, [eax+3Ch]
 	add		eax, 12
@@ -1925,40 +1891,20 @@ CScriptGameObject@@GetSpecificProfile proc
 	ret
 CScriptGameObject@@GetSpecificProfile endp
 
+;убираем лишние действия при выключении уже выключенной инфопорции
 align_proc
-disable_info_portion_fix proc	; ЧТО ЭТА ЖОПА ТУТ ДЕЛАЕТ?
-arg_0			= dword ptr	 4
-	;PRINT "disable_info_portion_fix. start"
-	mov		eax, [esp+arg_0]
-	push	ecx
-	push	edi
-	push	esi
-	;PRINT_UINT "disable_info_portion_fix. s=%s", eax
-	push	eax
-	call	CScriptGameObject__HasInfo
-	and		eax, 0FFh
-	;PRINT_UINT "disable_info_portion_fix. dis=%d", eax
-	pop		esi
-	pop		edi
-	pop		ecx
-	test	eax, eax ; если инфопорция есть, то будем забирать. Продолжаем как обычно
-	jnz		just_continue
-	;а иначе, просто выходим из функции, поскольку делать нечего
-	;PRINT "disable_info_portion_fix. do nothing"
-	xor		al, al
-	;pop	 edi
-	;pop	 esi
-	retn	4
-just_continue:
-	; делаем то, что вырезали
-	push	esi
+CScriptGameObject@@disable_info_portion_fix proc uses esi info_id:dword
 	mov		esi, ecx
-	push	edi
-	mov		edi, [esi+4]
-	test	edi, edi
-	; идём обратно
-	jmp back_from_disable_info_portion_fix
-disable_info_portion_fix endp
+	push	info_id
+	call	CScriptGameObject@@HasInfo
+	.if (al) ; если инфопорция есть, то будем забирать. Продолжаем как обычно
+		;а иначе, просто выходим из функции, поскольку делать нечего
+		mov		ecx, esi
+		push	info_id
+		call	CScriptGameObject@@DisableInfoPortion
+	.endif
+	ret
+CScriptGameObject@@disable_info_portion_fix endp
 
 align_proc
 CScriptGameObject@@ProjectorOn proc uses esi
@@ -2315,14 +2261,13 @@ CScriptGameObject@@UpdateCondition proc uses ebx esi edi
 	ret
 CScriptGameObject@@UpdateCondition endp
 
-align 4
-g_hud_animation_channel			dd 0
-g_hud_animation_callback_param	dd 0
-g_use_hud_animation_callback	db 0
+static_int	g_hud_animation_channel			, 0
+static_int	g_hud_animation_callback_param	, 0
+static_byte	g_use_hud_animation_callback	, 0
+
 align_proc
 CScriptGameObject@@SetHudAnimationChannel proc channel:dword
-	mov		eax, channel
-	mov		[g_hud_animation_channel], eax
+	mrm		g_hud_animation_channel, channel
 	ret
 CScriptGameObject@@SetHudAnimationChannel endp
 
@@ -2330,7 +2275,7 @@ align_proc
 CScriptGameObject@@SetHudAnimationCallbackParam proc param_dword:dword
 	mov		eax, param_dword
 	PRINT_UINT "set anim callback param: %d", eax
-	mov		[g_hud_animation_callback_param], eax
+	mov		g_hud_animation_callback_param, eax
 	ret
 CScriptGameObject@@SetHudAnimationCallbackParam endp
 
@@ -2338,7 +2283,7 @@ align_proc
 CScriptGameObject@@SetUseHudAnimationCallback proc param_byte:byte
 	movzx	eax, param_byte
 	PRINT_UINT "set use anim: %d", eax
-	mov		[g_use_hud_animation_callback], al
+	mov		g_use_hud_animation_callback, al
 	ret
 CScriptGameObject@@SetUseHudAnimationCallback endp
 
@@ -2349,12 +2294,8 @@ on_animation_end_callback proc B:dword
 	mov		eax, [eax+38h]
 	PRINT_UINT "value: %d", eax
 	; вызываем колбек
-;	push	edx
-;	push	ecx
 	mov		eax, B
 	CALLBACK__INT_INT	g_Actor, 157, [eax+38h], eax
-;	pop		ecx
-;	pop		edx
 	ret
 on_animation_end_callback endp
 
@@ -2497,10 +2438,10 @@ CScriptGameObject@@EnableCarPanel proc is_visible:byte
 	ret
 CScriptGameObject@@EnableCarPanel endp
 
-_static		g_vector_arg_1 Vector3 {0.0, 0.0, 0.0}
-_static		g_vector_arg_2 Vector3 {0.0, 0.0, 0.0}
-_static		g_vector_arg_3 Vector3 {0.0, 0.0, 0.0}
-_static		g_vector_arg_4 Vector3 {0.0, 0.0, 0.0}
+_static		g_vector_arg_1 Fvector {0.0, 0.0, 0.0}
+_static		g_vector_arg_2 Fvector {0.0, 0.0, 0.0}
+_static		g_vector_arg_3 Fvector {0.0, 0.0, 0.0}
+_static		g_vector_arg_4 Fvector {0.0, 0.0, 0.0}
 
 align_proc
 CScriptGameObject@@SetVectorGlobalArg1 proc pvector:dword
@@ -2891,12 +2832,10 @@ CStalkerAnimationManager@@restart endp
 align_proc
 CScriptGameObject@@SetLSFSpeed proc param:dword
 	smart_cast	CHangingLamp, CGameObject, [ecx+4]
+	ASSUME	eax:ptr CHangingLamp, edx:ptr light
 	.if (eax)
-		ASSUME	eax:ptr CHangingLamp;, ecx:ptr 
-		mov		edx, param
-		mov		ecx, [eax].light_render.p_	;resptr_core<IRender_Light,resptrcode_light>
-		mov		[ecx+278h], edx				;не существует такого члена по этому смещению
-		ASSUME	eax:nothing, ecx:nothing
+		mov		edx, [eax].light_render.p_	;resptr_core<IRender_Light,resptrcode_light>
+		mrm		[edx].m_fLSFSpeed, param				;
 	.endif
 	ret
 CScriptGameObject@@SetLSFSpeed endp
@@ -2905,11 +2844,8 @@ align_proc
 CScriptGameObject@@SetLSFAmount proc param:dword
 	smart_cast	CHangingLamp, CGameObject, [ecx+4]
 	.if (eax)
-		ASSUME	eax:ptr CHangingLamp;, ecx:ptr 
-		mov		edx, param
-		mov		ecx, [eax].light_render.p_
-		mov		[ecx+27Ch], edx
-		ASSUME	eax:nothing, ecx:nothing
+		mov		edx, [eax].light_render.p_
+		mrm		[edx].m_fLSFAmount, param
 	.endif
 	ret
 CScriptGameObject@@SetLSFAmount endp
@@ -2918,11 +2854,8 @@ align_proc
 CScriptGameObject@@SetLSFSMAPJitter proc param:dword
 	smart_cast	CHangingLamp, CGameObject, [ecx+4]
 	.if (eax)
-		ASSUME	eax:ptr CHangingLamp
-		mov		edx, param
-		mov		ecx, [eax].light_render.p_
-		mov		[ecx+280h], edx
-		ASSUME	eax:nothing, ecx:nothing
+		mov		edx, [eax].light_render.p_
+		mrm		[edx].m_fLSFSMAPJitter, param
 	.endif
 	ret
 CScriptGameObject@@SetLSFSMAPJitter endp
@@ -2932,11 +2865,10 @@ CScriptGameObject@@GetLSFSpeed proc
 	smart_cast	CHangingLamp, CGameObject, [ecx+4]
 	fldz
 	.if (eax)
-		ASSUME	eax:ptr CHangingLamp
-		mov		ecx, [eax].light_render.p_
-		fld		dword ptr [ecx+278h]
-		ASSUME	eax:nothing
+		mov		edx, [eax].light_render.p_
+		fld		[edx].m_fLSFSpeed
 	.endif
+	ASSUME	eax:nothing, edx:nothing
 	ret
 CScriptGameObject@@GetLSFSpeed endp
 ;-------------------------------------------------------
@@ -3220,8 +3152,8 @@ CScriptGameObject@@GetHudAnimationRemainingTime proc
 		mov		ecx, [eax].m_pHUD
 		.if (ecx && [ecx].m_bStopAtEndAnimIsRunning)
 			mov		eax, [ecx].m_dwAnimEndTime
-			mov		ecx, ds:Device
-			sub		eax, dword ptr [ecx+204h] ; dwTimeGlobal
+			mov		edx, ds:Device
+			sub		eax, [edx].CRenderDevice.dwTimeGlobal
 		.endif
 		ASSUME	eax:nothing, ecx:nothing
 	.endif
@@ -3267,12 +3199,14 @@ CScriptGameObject@@HasHudAnimation endp
 align_proc
 CScriptGameObject@@GetHudAnimationLength proc name_anim:dword, dword_param:dword
 local motion_ID:word
+	mov		esi, ecx
 	call	CScriptGameObject@@GetHudVisual
 	mov		ecx, eax
 	push	name_anim
 	lea		eax, motion_ID
 	push	eax
 	call	ds:CKinematicsAnimated__ID_Cycle
+	xor		eax, eax
 	.if (motion_ID!=-1)
 		smart_cast	CHudItem, CGameObject, [esi+4]
 		ASSUME	eax:ptr CHudItem, ecx:ptr CWeaponHUD
@@ -3445,7 +3379,6 @@ CScriptGameObject@@SetNotDropWeaponDeath proc	not_drop_wpn_at_death:byte
 		ASSUME	eax:ptr CAI_Stalker
 		mov		cl, not_drop_wpn_at_death
 		mov		[eax].m_not_drop_wpn_death, cl
-		ASSUME	eax:nothing
 	.endif
 	ret
 CScriptGameObject@@SetNotDropWeaponDeath endp
@@ -3454,7 +3387,6 @@ align_proc
 CScriptGameObject@@GetNotDropWeaponDeath proc
 	smart_cast CAI_Stalker, [ecx+4]
 	.if (eax)
-		ASSUME	eax:ptr CAI_Stalker
 		; return (stalker->m_not_drop_wpn_death);
 		mov		al, [eax].m_not_drop_wpn_death
 		ASSUME	eax:nothing
@@ -3464,10 +3396,10 @@ CScriptGameObject@@GetNotDropWeaponDeath endp
 
 align_proc
 CScriptGameObject@@calc_future_position proc uses esi edi ebx velocity_target:dword, res_pos_target:dword
-local dir:Fvector, pos:Fvector, speed_bull:dword, k_air:dword
+local dir:Fvector, pos:Fvector
 ; esi - CAI_Stalker*
 ; edi - CWeaponMagazined
-; ebx - this CGameObject*
+; ebx - CGameObject*
 	mov		ebx, [ecx+4]
 	; это сталкер или актор с оружием в руках
 	; CAI_Stalker*	stalker = smart_cast<CAI_Stalker*>(&object());
@@ -3499,9 +3431,6 @@ local dir:Fvector, pos:Fvector, speed_bull:dword, k_air:dword
 			smart_cast CWeaponMagazined, CGameObject, eax
 			ASSUME	edi:ptr CWeaponMagazined
 			mov		edi, eax	; weapon
-			;PRINT_UINT "CWeaponMagazined - %d", eax
-			;mov		eax, [edi+iAmmoElapsed]
-			;PRINT_UINT "iAmmoElapsed - %d", eax
 			xor		eax, eax
 			.if (edi && [edi].iAmmoElapsed>0)
 				; CEntity(stalker)->g_fireParams(weapon, pos, dir);
@@ -3521,9 +3450,7 @@ local dir:Fvector, pos:Fvector, speed_bull:dword, k_air:dword
 				ASSUME	eax:ptr CCartridge, edx:ptr CShootingObject
 				mov		ecx, [eax-sizeof CCartridge].m_kAirRes
 				lea		edx, [edi].CShootingObject@vfptr	; 2C8h CWeaponMagazined -> CShootingObject
-				;mov		eax, [edx].m_fStartBulletSpeed
-				;PRINT_FLOAT "m_fStartBulletSpeed - %f", eax
-				invoke	calc_future_position, addr pos, [edx].m_fStartBulletSpeed, ecx, velocity_target, res_pos_target
+				calc_future_position(&pos, [edx].m_fStartBulletSpeed, ecx, velocity_target, res_pos_target)
 			.endif
 			ASSUME	edx:nothing, edi:nothing, eax:nothing
 		.endif
@@ -3534,13 +3461,10 @@ local dir:Fvector, pos:Fvector, speed_bull:dword, k_air:dword
 	.if (eax)
 		ASSUME	ecx:ptr CCartridge, esi:ptr CCarWeapon, eax:ptr CCar
 		; если ли оружия в машине?
-		mov		eax, [eax].m_car_weapon	; CCarWeapon* = CShootingObject*
-		.if (eax)
-			mov		esi, eax
+		mov		esi, [eax].m_car_weapon	; CCarWeapon* = CShootingObject*
+		.if (esi)
 			mov		ecx, [esi].m_Ammo	; CCartridge
-			PRINT_FLOAT "m_fStartBulletSpeed = %f", [esi].m_fStartBulletSpeed
-			PRINT_FLOAT "m_kAirRes = %f", [ecx].m_kAirRes
-			invoke	calc_future_position, addr [esi].m_fire_pos, [esi].m_fStartBulletSpeed, [ecx].m_kAirRes, velocity_target, res_pos_target
+			calc_future_position(&[esi].m_fire_pos, [esi].m_fStartBulletSpeed, [ecx].m_kAirRes, velocity_target, res_pos_target)
 		.endif
 		ASSUME	ecx:nothing, esi:nothing, eax:nothing
 		jmp		exit
@@ -3553,7 +3477,7 @@ local dir:Fvector, pos:Fvector, speed_bull:dword, k_air:dword
 		lea		edx, [eax].m_CurrentAmmo			; CCartridge*
 		lea		esi, [eax].m_fire_pos				; Fvector*
 		ASSUME	ecx:ptr CShootingObject, edx:ptr CCartridge
-		invoke	calc_future_position, esi, [ecx].m_fStartBulletSpeed, [edx].m_kAirRes, velocity_target, res_pos_target
+		calc_future_position(esi, [ecx].m_fStartBulletSpeed, [edx].m_kAirRes, velocity_target, res_pos_target)
 		ASSUME	ecx:nothing, edx:nothing
 		jmp		exit
 	.endif
@@ -3565,7 +3489,7 @@ local dir:Fvector, pos:Fvector, speed_bull:dword, k_air:dword
 		lea		edx, [eax].m_CurrentAmmo			; CCartridge*
 		lea		esi, [eax].fire_pos					; Fvector*
 		ASSUME	ecx:ptr CShootingObject, edx:ptr CCartridge
-		invoke	calc_future_position, esi, [ecx].m_fStartBulletSpeed, [edx].m_kAirRes, velocity_target, res_pos_target
+		calc_future_position(esi, [ecx].m_fStartBulletSpeed, [edx].m_kAirRes, velocity_target, res_pos_target)
 		ASSUME	ecx:nothing, edx:nothing, eax:nothing
 	.endif
 exit:

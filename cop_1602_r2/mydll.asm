@@ -1,13 +1,11 @@
 .686
 .XMM
 
-.model flat,  C
+.model flat,  stdcall
 
 include addr.inc
 
-_code segment byte public 'CODE' use32
-	assume cs:_code
-	assume ds:_code
+.code
 ; заглушка для линковшика
 LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD 
     ret
@@ -30,7 +28,6 @@ include smap_size_macro.asm
 include new_smap_sizes.asm
 include sun_near_fix.asm
 	
-_code ENDS
 
 end LibMain
 

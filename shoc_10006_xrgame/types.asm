@@ -4,164 +4,6 @@ FALSE				equ 0
 NULL				= dword ptr 0
 
 
-Vector3			struc
-x				dd ?
-y				dd ?
-z				dd ?
-Vector3			ends
-
-Matrix4x4		struc
-i				Vector3 <>
-_14_			dd ?
-j				Vector3 <>
-_24_			dd ?
-k				Vector3 <>
-_34_			dd ?
-c_				Vector3 <>
-_44_			dd ?
-Matrix4x4		ends
-
-g_value_aux dd ?
-
-PUT_FLOAT MACRO val:REQ
-	;lea	eax, val
-	;PRINT_UINT "%x", eax
-	mov		eax, val
-	mov		[g_value_aux], eax
-	sub		esp, 8
-	fld		[g_value_aux]
-	fstp	QWORD ptr [esp]
-ENDM
-
-PRINT_MATRIX_ MACRO title_:REQ, val:REQ
-LOCAL lab1_
-LOCAL a_msg1
-LOCAL a_msg2
-LOCAL a_msgi
-LOCAL a_msgj
-LOCAL a_msgk
-LOCAL a_msgc
-LOCAL a_msg_14
-LOCAL a_msg_24
-LOCAL a_msg_34
-LOCAL a_msg_44
-	jmp		lab1_
-a_msg1 db title_, 0
-a_msg2 db "%7.2f %7.2f %7.2f %7.2f", 0
-a_msgi db "i",0
-a_msgj db "j",0
-a_msgk db "k",0
-a_msgc db "c",0
-a_msg_14 db "14",0
-a_msg_24 db "24",0
-a_msg_34 db "34",0
-a_msg_44 db "44",0
-lab1_:
-	pusha
-	mov		edi, val
-	;PRINT_UINT "edi=%x", edi
-	push	offset a_msg1
-	call	Msg
-	add		esp, 04h
-	;PRINT "test0"
-
-	ASSUME	edi:PTR Matrix4x4
-	lea ecx, [edi].i
-	push ecx
-	push offset a_msgi
-	call Log_vector3
-	add		esp, 08h
-	
-	push [edi]._14_
-	push offset a_msg_14
-	call Log_float
-	add		esp, 08h
-	
-	lea ecx, [edi].j
-	push ecx
-	push offset a_msgj
-	call Log_vector3
-	add		esp, 08h
-	
-	push [edi]._24_
-	push offset a_msg_24
-	call Log_float
-	add		esp, 08h
-	
-	lea ecx, [edi].k
-	push ecx
-	push offset a_msgk
-	call Log_vector3
-	add		esp, 08h
-	
-	push [edi]._34_
-	push offset a_msg_34
-	call Log_float
-	add		esp, 08h
-	
-	lea ecx, [edi].c_
-	push ecx
-	push offset a_msgc
-	call Log_vector3
-	add		esp, 08h
-	
-	push [edi]._44_
-	push offset a_msg_44
-	call Log_float
-	add		esp, 08h
-	ASSUME	edi:nothing
-	popa
-ENDM
-test_vector dd 1.0, 2.0, 3.0
-
-PRINT_MATRIX MACRO title_:REQ, val:REQ
-LOCAL lab1_
-LOCAL a_msg1
-LOCAL a_msg2
-	jmp		lab1_
-a_msg1 db title_, 0
-a_msg2 db "%7.2f %7.2f %7.2f %7.2f", 0
-lab1_:
-	pusha
-	mov		edi, val
-	push	offset a_msg1
-	call	Msg
-	add		esp, 04h
-
-	ASSUME	edi:PTR Matrix4x4
-	PUT_FLOAT [edi]._14_
-	PUT_FLOAT [edi].i.z
-	PUT_FLOAT [edi].i.y
-	PUT_FLOAT [edi].i.x
-	push offset a_msg2
-	call Msg
-	add		esp, 24h
-	
-	PUT_FLOAT [edi]._24_
-	PUT_FLOAT [edi].j.z
-	PUT_FLOAT [edi].j.y
-	PUT_FLOAT [edi].j.x
-	push offset a_msg2
-	call Msg
-	add		esp, 24h
-	PUT_FLOAT [edi]._34_
-	PUT_FLOAT [edi].k.z
-	PUT_FLOAT [edi].k.y
-	PUT_FLOAT [edi].k.x
-	push offset a_msg2
-	call Msg
-	add		esp, 24h
-	PUT_FLOAT [edi]._44_
-	PUT_FLOAT [edi].c_.z
-	PUT_FLOAT [edi].c_.y
-	PUT_FLOAT [edi].c_.x
-	push offset a_msg2
-	call Msg
-	add		esp, 24h
-	ASSUME	edi:nothing
-	popa
-ENDM
-
 ; enum ERelationType {
 ALife__eRelationTypeFriend			= dword ptr 0
 ALife__eRelationTypeNeutral			= dword ptr 1
@@ -253,8 +95,226 @@ mcSprint							= dword ptr (1 shl 12)	; 4096		спринт
 mcLLookout							= dword ptr (1 shl 13)	; 8192		наклон влево
 mcRLookout							= dword ptr (1 shl 14)	; 16384		наклон вправо
 mcAnyMove							= dword ptr (mcFwd or mcBack or mcLStrafe or mcRStrafe)
-mcAnyAction 						= dword ptr (mcAnyMove or mcJump or mcFall or mcLanding or mcLanding2) ;//mcTurn or 
+mcAnyAction							= dword ptr (mcAnyMove or mcJump or mcFall or mcLanding or mcLanding2) ;//mcTurn or 
 mcAnyState							= dword ptr (mcCrouch or mcAccel or mcClimb or mcSprint)
 mcLookout							= dword ptr (mcLLookout or mcRLookout)
 ;=================================================};
 
+;enum	GAME_TYPE {
+GAME_UNKNOWN			= 0
+GAME_SINGLE				= 1
+GAME_DEATHMATCH			= 2
+GAME_TEAMDEATHMATCH		= 3
+GAME_ARTEFACTHUNT		= 4
+GAME_END_LIST			= 5
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;DIK_keys {
+DIK_0				= 11		;
+DIK_1				= 2			;
+DIK_2				= 3			;
+DIK_3				= 4			;
+DIK_4				= 5			;
+DIK_5				= 6			;
+DIK_6				= 7			;
+DIK_7				= 8			;
+DIK_8				= 9			;
+DIK_9				= 10		;
+DIK_A				= 30		;
+DIK_ADD				= 78		;
+DIK_APOSTROPHE		= 40		;
+DIK_APPS			= 221		;
+DIK_AT				= 145		;
+DIK_AX				= 150		;
+DIK_B				= 48		;
+DIK_BACK			= 14		;
+DIK_BACKSLASH		= 43		;
+DIK_C				= 46		;
+DIK_CAPITAL			= 58		;
+DIK_CIRCUMFLEX		= 144		;
+DIK_COLON			= 146		;
+DIK_COMMA			= 51		;
+DIK_CONVERT			= 121		;
+DIK_D				= 32		;
+DIK_DECIMAL			= 83		;
+DIK_DELETE			= 211		;
+DIK_DIVIDE			= 181		;
+DIK_DOWN			= 208		;
+DIK_E				= 18		;
+DIK_END				= 207		;
+DIK_EQUALS			= 13		;
+DIK_ESCAPE			= 1			;
+DIK_F				= 33		;
+DIK_F1				= 59		;
+DIK_F10				= 68		;
+DIK_F11				= 87		;
+DIK_F12				= 88		;
+DIK_F13				= 100		;
+DIK_F14				= 101		;
+DIK_F15				= 102		;
+DIK_F2				= 60		;
+DIK_F3				= 61		;
+DIK_F4				= 62		;
+DIK_F5				= 63		;
+DIK_F6				= 64		;
+DIK_F7				= 65		;
+DIK_F8				= 66		;
+DIK_F9				= 67		;
+DIK_G				= 34		;
+DIK_GRAVE			= 41		;
+DIK_H				= 35		;
+DIK_HOME			= 199		;
+DIK_I				= 23		;
+DIK_INSERT			= 210		;
+DIK_J				= 36		;
+DIK_K				= 37		;
+DIK_KANA			= 112		;
+DIK_KANJI			= 148		;
+DIK_L				= 38		;
+DIK_LBRACKET		= 26		;
+DIK_LCONTROL		= 29		;
+DIK_LEFT			= 203		;
+DIK_LMENU			= 56		;
+DIK_LSHIFT			= 42		;
+DIK_LWIN			= 219		;
+DIK_M				= 50		;
+DIK_MINUS			= 12		;
+DIK_MULTIPLY		= 55		;
+DIK_N				= 49		;
+DIK_NEXT			= 209		;
+DIK_NOCONVERT		= 123		;
+DIK_NUMLOCK			= 69		;
+DIK_NUMPAD0			= 82		;
+DIK_NUMPAD1			= 79		;
+DIK_NUMPAD2			= 80		;
+DIK_NUMPAD3			= 81		;
+DIK_NUMPAD4			= 75		;
+DIK_NUMPAD5			= 76		;
+DIK_NUMPAD6			= 77		;
+DIK_NUMPAD7			= 71		;
+DIK_NUMPAD8			= 72		;
+DIK_NUMPAD9			= 73		;
+DIK_NUMPADCOMMA		= 179		;
+DIK_NUMPADENTER		= 156		;
+DIK_NUMPADEQUALS	= 141		;
+DIK_O				= 24		;
+DIK_P				= 25		;
+DIK_PAUSE			= 197		;
+DIK_PERIOD			= 52		;
+DIK_PRIOR			= 201		;
+DIK_Q				= 16		;
+DIK_R				= 19		;
+DIK_RBRACKET		= 27		;
+DIK_RCONTROL		= 157		;
+DIK_RETURN			= 28		;
+DIK_RIGHT			= 205		;
+DIK_RMENU			= 184		;
+DIK_RSHIFT			= 54		;
+DIK_RWIN			= 220		;
+DIK_S				= 31		;
+DIK_SCROLL			= 70		;
+DIK_SEMICOLON		= 39		;
+DIK_SLASH			= 53		;
+DIK_SPACE			= 57		;
+DIK_STOP			= 149		;
+DIK_SUBTRACT		= 74		;
+DIK_SYSRQ			= 183		;
+DIK_T				= 20		;
+DIK_TAB				= 15		;
+DIK_U				= 22		;
+DIK_UNDERLINE		= 147		;
+DIK_UNLABELED		= 151		;
+DIK_UP				= 200		;
+DIK_V				= 47		;
+DIK_W				= 17		;
+DIK_X				= 45		;
+DIK_Y				= 21		;
+DIK_YEN				= 125		;
+DIK_Z				= 44		;
+MOUSE_1				= 256		;
+MOUSE_2				= 512		;
+MOUSE_3				= 1024		;
+;};
+
+;key_bindings {
+kLEFT					= 0
+kRIGHT					= 1
+kUP						= 2
+kDOWN					= 3
+kJUMP					= 4
+kCROUCH					= 5
+kCROUCH_TOGGLE			= 6
+kACCEL					= 7
+kSPRINT_TOGGLE			= 8
+kFWD					= 9
+kBACK					= 10
+kL_STRAFE				= 11
+kR_STRAFE				= 12
+kL_LOOKOUT				= 13
+kR_LOOKOUT				= 14
+kENGINE					= 15
+kCAM_1					= 16
+kCAM_2					= 17
+kCAM_3					= 18
+kCAM_4					= 19
+kCAM_ZOOM_IN			= 20
+kCAM_ZOOM_OUT			= 21
+kTORCH					= 22
+kNIGHT_VISION			= 23
+kWPN_1					= 24
+kWPN_2					= 25
+kWPN_3					= 26
+kWPN_4					= 27
+kWPN_5					= 28
+kWPN_6					= 29
+kARTEFACT				= 30
+kWPN_NEXT				= 31
+kWPN_FIRE				= 32
+kWPN_ZOOM				= 33
+kWPN_ZOOM_INC			= 34
+kWPN_ZOOM_DEC			= 35
+kWPN_RELOAD				= 36
+kWPN_FUNC				= 37
+kWPN_FIREMODE_PREV		= 38
+kWPN_FIREMODE_NEXT		= 39
+kPAUSE					= 40
+kDROP					= 41
+kUSE					= 42
+kSCORES					= 43
+kCHAT					= 44
+kCHAT_TEAM				= 45
+kSCREENSHOT				= 46
+kQUIT					= 47
+kCONSOLE				= 48
+kINVENTORY				= 49
+kBUY					= 50
+kSKIN					= 51
+kTEAM					= 52
+kACTIVE_JOBS			= 53
+kMAP					= 54
+kCONTACTS				= 55
+kEXT_1					= 56
+kVOTE_BEGIN				= 57
+kVOTE					= 58
+kVOTEYES				= 59
+kVOTENO					= 60
+kNEXT_SLOT				= 61
+kPREV_SLOT				= 62
+kSPEECH_MENU_0			= 63
+kSPEECH_MENU_1			= 64
+kSPEECH_MENU_2			= 65
+kSPEECH_MENU_3			= 66
+kSPEECH_MENU_4			= 67
+kSPEECH_MENU_5			= 68
+kSPEECH_MENU_6			= 69
+kSPEECH_MENU_7			= 70
+kSPEECH_MENU_8			= 71
+kSPEECH_MENU_9			= 72
+kUSE_BANDAGE			= 73
+kUSE_MEDKIT				= 74
+kQUICK_SAVE				= 75
+kQUICK_LOAD				= 76
+kLASTACTION				= 77
+kNOTBINDED				= 78
+kFORCEDWORD				= -1
+;}

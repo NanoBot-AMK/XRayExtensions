@@ -10,6 +10,10 @@ bullet_info struct
 	sqr_min_dist_target		real4 ?
 	bullet_speed			real4 ?
 	threshold_vel_x			real4 ?
+	m_type_ballistic		byte ?
+							byte ? ; undefined
+							byte ? ; undefined
+							byte ? ; undefined
 bullet_info ends
 
 ; Пуля вылетает из pos_start со скоростью start_bullet_speed в точку pos_target 
@@ -17,9 +21,15 @@ bullet_info ends
 ; и так же возвращает булеву true если цель достижима, или false если нет.
 ;bool calc_bullet(const Fvector4& pos_start, const Fvector4& pos_target, const bullet_info* bullet, float& h_line_throw, float& time_bullet)
 align_proc
-calc_bullet proc pos_start:ptr, pos_target:ptr, bullet:ptr, h_line_throw:ptr, time_bullet:ptr
-local bullet_dir:Fvector4	;, bullet_pos:Fvector4, bullet_pos_last:Fvector4, time_bull:dword
+calc_bullet proc uses ebx pos_start:ptr, pos_target:ptr, bullet:ptr, h_line_throw:ptr, time_bullet:ptr
+local bullet_dir:Fvector4, const_1p0:Fvector4	;, bullet_pos:Fvector4, bullet_pos_last:Fvector4, time_bull:dword
 local h_line_throw_target:dword, dist_target:dword
+	;const_1p0.set(1.0, 1.0, 0.0, 0.0);
+	xorps	xmm0, xmm0
+	movups	const_1p0, xmm0
+	movflt	eax, 1.0
+	mov		const_1p0.x, eax
+	mov		const_1p0.y, eax
 	; Fvector4	xmm3 = bullet_pos = pos_target
 	mov		ecx, pos_target
 	mov		eax, pos_start
@@ -31,14 +41,14 @@ local h_line_throw_target:dword, dist_target:dword
 	subps	xmm0, xmm1	; 
 	movaps	xmm4, xmm0
 	;movups	bullet_dir, xmm4
-	; dist =pos_target.sub(bullet_pos).magnitude()	// вычислим длину вектора xmm0
+	; dist_xz =pos_target.sub(bullet_pos).magnitude_xz()	// вычислим длину вектора xmm0
 	mulps	xmm0, xmm0
 	movss	xmm1, xmm0
 	shufps	xmm0, xmm0, 11100110b	; 3212t		копируем 2-й элемент в 0-й элемент
 	addss	xmm0, xmm1				; xmm0 = z + xmm1
 	sqrtss	xmm0, xmm0
 	movss	dist_target, xmm0	; dist
-	movss	xmm4, xmm0	; bullet_dir.x = dist
+	movss	xmm4, xmm0	; bullet_dir.x = dist_xz
 	shufps	xmm4, xmm4, 11110100b	; 3310t
 	; bullet_dir.set_length(start_bullet_speed);
 	movaps	xmm0, xmm4
@@ -63,12 +73,9 @@ local h_line_throw_target:dword, dist_target:dword
 	xorps	xmm7, xmm7
 	movss	xmm7, [edx].delta_time_sec
 	shufps	xmm7, xmm7, 11110000b	; 3300t
-	; Ktrn_delta_time = 1.0-bullet.k_air_res*delta_time_sec;
-	movss	xmm0, [edx].k_air_res
+	; Ktrn_delta_time = 1.0-bullet.k_air_res;
 	xorps	xmm6, xmm6
-	mulps	xmm0, xmm7
-	movss	xmm6, FP4(1.0)
-	subss	xmm6, xmm0
+	movss	xmm6, [edx].k_air_res
 	shufps	xmm6, xmm6, 11110000b	; 3300t
 	; gravi_delta_time.set(0, 0, m_fGravityConst*delta_time_sec, 0);
 	xorps	xmm5, xmm5
@@ -85,27 +92,42 @@ local h_line_throw_target:dword, dist_target:dword
 	divss	xmm2, xmm0
 	mulss	xmm2, dist_target
 	movss	h_line_throw_target, xmm2	; 
-	; time_bull = 0;
-	xorps	xmm2, xmm2
+	; time_it = 0;
+	xor		ebx, ebx
+	mov		cl, [edx].m_type_ballistic
 	align 16
 	.repeat
 		;// изменить положение пули
 		; bullet_pos_last.mad(bullet_pos, bullet_dir, delta_time_sec);	85.1021
 		movaps	xmm0, xmm4
-		movaps	xmm1, xmm3
+		movaps	xmm2, xmm3	;bullet_pos_last
 		mulps	xmm0, xmm7
-		addps	xmm1, xmm0
+		addps	xmm2, xmm0
 		; if(bullet_pos_last.x>=dist_target) break;
 		mov		al, true
-		.break .if (xmm1 >= dist_target)
+		.break .if (xmm2 >= dist_target)
 		;bullet_dir.mul(Ktrn_delta_time)
-		mulps	xmm4, xmm6
-		; time_bull += delta_time_sec;
-		addss	xmm2, xmm7
+		.if (cl!=0)	; мультиплейер или неоригинальная баллистика.
+			movaps	xmm1, xmm4
+			mulps	xmm1, xmm1
+			movss	xmm0, xmm1
+			shufps	xmm1, xmm1, 11100101b	; 3211v
+			addss	xmm1, xmm0
+			sqrtss	xmm1, xmm1
+			movss	xmm0, const_1p0
+			mulss	xmm1, xmm6
+			subss	xmm0, xmm1
+			shufps	xmm0, xmm0, 11100000b	; 3200v
+		.else
+			movups	xmm0, const_1p0
+			subps	xmm0, xmm6
+		.endif
+		mulps	xmm4, xmm0
+		inc		ebx		;time_it++;
 		; bullet_dir.y -= m_fGravityConst*delta_time_sec;
 		subps	xmm4, xmm5
 		; bullet_pos.set(bullet_pos_last);
-		movaps	xmm3, xmm1
+		movaps	xmm3, xmm2
 		; if (bullet_dir.x<threshold_vel_x) break;
 		mov		al, false
 	.until (xmm4 < [edx].threshold_vel_x)	; контролируем горизонтальную скорость
@@ -114,9 +136,10 @@ local h_line_throw_target:dword, dist_target:dword
 		movss	xmm1, dist_target
 		subss	xmm1, xmm3
 		divss	xmm1, xmm4
-		; time_bullet* = time_bull + d_time;
-		;movss	xmm0, time_bull
+		; time_bullet* = (float)time_it*delta_time_sec + d_time;
 		mov		ecx, time_bullet
+		cvtsi2ss xmm2, ebx
+		mulss	xmm2, [edx].delta_time_sec
 		addss	xmm2, xmm1
 		movss	real4 ptr [ecx], xmm2
 		;// уточним падение относительно линии бросания
@@ -189,7 +212,24 @@ local h_line_throw:dword, time_bullet:dword, bullet:bullet_info
 	movss	bullet.delta_time_sec, xmm0
 	; bullet.gravi_const = Level().BulletManager().m_fGravityConst;
 	mrm		bullet.gravi_const, [ecx].m_fGravityConst	; gravity_const
-	mrm		bullet.k_air_res, k_air_res
+;	.if([ecx].m_type_ballistic==0)
+;		mov		eax, [ecx].m_fAirResistanceK
+;	.else
+;		mov		eax, k_air_res
+;	.endif
+;	mov		bullet.k_air_res, eax
+	mov		dl, [ecx].m_type_ballistic
+	mov		bullet.m_type_ballistic, dl
+	.if (dl==0)	; синглплейер
+		mulss	xmm0, [ecx].m_fAirResistanceK
+	.elseif (dl==1)	; мультиплейер
+		mulss	xmm0, k_air_res
+		divss	xmm0, bullet_speed
+	.else	; type == 2
+		mulss	xmm0, k_air_res
+		mulss	xmm0, float_0p001	;/=1000
+	.endif
+	movss	bullet.k_air_res, xmm0
 	mrm		bullet.bullet_speed, bullet_speed
 	xor		esi, esi
 	.repeat
@@ -243,31 +283,3 @@ local h_line_throw:dword, time_bullet:dword, bullet:bullet_info
 	ret
 calc_future_position endp
 
-		; .if (esi>200)
-			; sqrtss	xmm0, xmm0
-			; movss	dist, xmm0
-			; ;movups	
-			; lea		eax, pos_start
-			; PRINT_VECTOR "calc_future_position() цикл зациклился! pos_start ", eax
-			; mov		eax, dist
-			; PRINT_FLOAT "dist - %f", eax
-			; lea		eax, bullet_pos
-			; PRINT_VECTOR "bullet_pos ", eax
-			; lea		eax, future_pos_target
-			; PRINT_VECTOR "future_pos_target ", eax
-			; lea		eax, result_pos_target
-			; PRINT_VECTOR "result_pos_target ", eax
-			; mov		eax, velocity_target
-			; PRINT_VECTOR "velocity_target ", eax
-			; lea		eax, start_pos_target
-			; PRINT_VECTOR "start_pos_target ", eax
-			; mov		eax, bullet_speed
-			; PRINT_FLOAT "bullet_speed - %f", eax
-			; mov		eax, h_line_throw
-			; PRINT_FLOAT "h_line_throw - %f", eax
-			; mov		eax, time_bullet
-			; PRINT_FLOAT "time_bullet - %f", eax
-			; xor		eax, eax
-			; pop		esi
-			; ret
-		; .endif

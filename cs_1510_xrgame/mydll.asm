@@ -1,13 +1,11 @@
 .686
 .XMM
 
-.model flat,  C
+.model flat,  stdcall
 
 include addr.inc
 
-_CODE segment public 'CODE' use32
-	assume cs:_CODE
-	assume ds:_CODE
+.code
 ; заглушка для линковшика
 LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD 
     ret
@@ -74,7 +72,7 @@ include game_object_fix.asm
 include cuiwindow_fix.asm
 include weapon_fix.asm
 include car_fix.asm
-_CODE ENDS
+
 
 end LibMain
 

@@ -26,6 +26,15 @@ align 4
 .code
 ENDM
 
+const_static_str$ MACRO any_text:VARARG
+LOCAL txtname
+.const
+align 4
+txtname		db any_text, 0
+.code
+EXITM <offset txtname>
+ENDM
+
 static_str$ MACRO any_text:VARARG
 LOCAL txtname
 .data
@@ -39,6 +48,13 @@ static_float MACRO name_param:REQ, param:VARARG
 .data
 align 4
 name_param		REAL4	param
+.code
+ENDM
+
+static_xmm4 MACRO name_param:REQ, param:VARARG
+.data
+align 16
+name_param		dd	param
 .code
 ENDM
 
@@ -63,15 +79,29 @@ name_param		byte	param, 0
 .code
 ENDM
 
-;type_variable	name_variable = value
-;STATIC MACRO params:VARARG
-;LOCAL name_variable, type_variable, value
+const_static_str MACRO name_param:REQ, param:VARARG
+.const
+align 4
+name_param		byte	param, 0
+.code
+ENDM
 
-;.data
-;align 4
-;name_variable	type_variable value
-;_CODE SEGMENT
-;ENDM
+registred_virtual_tbl	MACRO list:VARARG
+LOCAL count, virtual_tbl
+.const
+align 4
+count = 0
+FOR arg,<list>
+	IF count EQ 1
+virtual_tbl	dd offset &arg&
+	ELSE
+	dd offset &arg&
+	ENDIF
+	count = count+1
+ENDM
+.code
+EXITM <offset virtual_tbl>
+ENDM
 
 ; найти в списке строк номер совпадающей строки, если не нашли - то возвращает ноль
 @SearchStr MACRO str1:req, params:VARARG
@@ -88,6 +118,55 @@ LOCAL i, num
 	EXITM <num>
 ENDM
 
+PUT_FLOAT MACRO val:REQ
+	push	val
+	fld		dword ptr [esp]
+	push	ecx
+	fstp	qword ptr [esp]
+ENDM
+
+PRINT_MATRIX MACRO title_:REQ, val:REQ
+LOCAL a_msg1, a_msg2
+const_static_str	a_msg1, title_
+const_static_str	a_msg2, "%.6f, %.6f, %.6f, %.6f"
+	pusha
+	mov		edi, val
+	push	offset a_msg1
+	call	Msg
+	add		esp, 4
+	ASSUME	edi:PTR Fmatrix
+	PUT_FLOAT [edi]._14_
+	PUT_FLOAT [edi].i.z
+	PUT_FLOAT [edi].i.y
+	PUT_FLOAT [edi].i.x
+	push	offset a_msg2
+	call	Msg
+	add		esp, 24h
+	PUT_FLOAT [edi]._24_
+	PUT_FLOAT [edi].j.z
+	PUT_FLOAT [edi].j.y
+	PUT_FLOAT [edi].j.x
+	push	offset a_msg2
+	call	Msg
+	add		esp, 24h
+	PUT_FLOAT [edi]._34_
+	PUT_FLOAT [edi].k.z
+	PUT_FLOAT [edi].k.y
+	PUT_FLOAT [edi].k.x
+	push	offset a_msg2
+	call	Msg
+	add		esp, 24h
+	PUT_FLOAT [edi]._44_
+	PUT_FLOAT [edi].c_.z
+	PUT_FLOAT [edi].c_.y
+	PUT_FLOAT [edi].c_.x
+	push	offset a_msg2
+	call	Msg
+	add		esp, 24h
+	ASSUME	edi:nothing
+	popa
+ENDM
+
 PRINT_STR MACRO val_txt:REQ
 	pusha
 	push	val_txt
@@ -98,7 +177,7 @@ ENDM
 
 PRINT MACRO msg_txt:REQ
 	pusha
-	push	static_str$(msg_txt)
+	push	const_static_str$(msg_txt)
 	call	Msg
 	add		esp, 04h
 	popa
@@ -107,7 +186,7 @@ ENDM
 PRINT_UINT MACRO fmt_txt:REQ, val:REQ
 	pusha
 	push	val
-	push	static_str$(fmt_txt)
+	push	const_static_str$(fmt_txt)
 	call	Msg
 	add		esp, 08h
 	popa
@@ -119,7 +198,7 @@ PRINT_FLOAT MACRO fmt_txt:REQ, val:REQ
 	fld		dword ptr [esp]
 	push	ecx
 	fstp	qword ptr [esp]
-	push	static_str$(fmt_txt)
+	push	const_static_str$(fmt_txt)
 	call	Msg
 	add		esp, 12
 	popa
@@ -144,7 +223,7 @@ ENDM
 PRINT_VECTOR MACRO fmt_txt:REQ, val:REQ
 	pusha
 	push	val
-	push	static_str$(fmt_txt)
+	push	const_static_str$(fmt_txt)
 	call	Log_vector3
 	add		esp, 8
 	popa
@@ -472,6 +551,17 @@ Fvector@normalize MACRO vec_this:req
 	add		esp, 16
 ENDM
 
+Fvector4@magnitude MACRO vec_this:req
+	movaps	xmm0, vec_this
+	mulps	xmm0, xmm0
+	movss	xmm1, xmm0				; xmm1.x = x
+	shufps	xmm0, xmm0, 11100101b	; 3211t		копируем 1-й элемент в 0-й элемент
+	addss	xmm1, xmm0				; xmm1 = x + y
+	shufps	xmm0, xmm0, 11100110b	; 3212t		копируем 2-й элемент в 0-й элемент
+	addss	xmm0, xmm1				; xmm0 = z + xmm1
+	sqrtss	xmm0, xmm0
+ENDM
+
 ;ICF	void	transform_tiny(Tvector &dest, const Tvector &v)	const // preferred to use
 ;{
 ;	dest.x = v.x*this.i.x + v.y*this.j.x + v.z*this.k.x + this.c.x;
@@ -508,6 +598,7 @@ ENDM
 ;	dest.y = v.x*this.i.y + v.y*this.j.y + v.z*this.k.y;
 ;	dest.z = v.x*this.i.x + v.y*this.j.x + v.z*this.k.x;
 ;}
+;matrix_this:Fmatrix4, vec_result:Fvector4, vec:Fvector
 Fmatrix4@transform_dir MACRO matrix_this:req, vec_result:req, vec:req
 	xorps	xmm0, xmm0
 	xorps	xmm1, xmm1
@@ -527,7 +618,21 @@ Fmatrix4@transform_dir MACRO matrix_this:req, vec_result:req, vec:req
 	addps	xmm0, xmm1
 	movups	vec_result, xmm0
 ENDM
-	
+
+Fmatrix4@identity MACRO matrix_this:req
+	xorps	xmm0, xmm0
+	movups	matrix_this.i, xmm0
+	movups	matrix_this.j, xmm0
+	movups	matrix_this.k, xmm0
+	movups	matrix_this.c_, xmm0
+	movflt	xmm0, 1.0
+	movss	matrix_this.i.x, xmm0
+	movss	matrix_this.j.y, xmm0
+	movss	matrix_this.k.z, xmm0
+	movss	matrix_this.c_.w, xmm0
+	EXITM <>
+ENDM
+
 ;209 bytes
 Fmatrix4@mul_43 MACRO matrix_this:req, A:req, B:req
 	; заполняем регистры
@@ -604,6 +709,122 @@ Fmatrix4@mul_43 MACRO matrix_this:req, A:req, B:req
 	; xmm0.add(A.c)
 	addps	xmm0, xmm7
 	movups	matrix_this.c_, xmm0
+ENDM
+
+;ICF	SelfRef	mul(const Self &A, const Self &B){
+;	VERIFY	((this!=&A)&&(this!=&B));
+;	i.x = A.i.x * B.i.x + A.j.x * B.i.y + A.k.x * B.i.z + A.c.x * B.i.w;
+;	i.y = A.i.y * B.i.x + A.j.y * B.i.y + A.k.y * B.i.z + A.c.y * B.i.w;
+;	i.z = A.i.z * B.i.x + A.j.z * B.i.y + A.k.z * B.i.z + A.c.z * B.i.w;
+;	i.w = A.i.w * B.i.x + A.j.w * B.i.y + A.k.w * B.i.z + A.c.w * B.i.w;
+;
+;	j.x = A.i.x * B.j.x + A.j.x * B.j.y + A.k.x * B.j.z + A.c.x * B.j.w;
+;	j.y = A.i.y * B.j.x + A.j.y * B.j.y + A.k.y * B.j.z + A.c.y * B.j.w;
+;	j.z = A.i.z * B.j.x + A.j.z * B.j.y + A.k.z * B.j.z + A.c.z * B.j.w;
+;	j.w = A.i.w * B.j.x + A.j.w * B.j.y + A.k.w * B.j.z + A.c.w * B.j.w;
+;
+;	k.x = A.i.x * B.k.x + A.j.x * B.k.y + A.k.x * B.k.z + A.c.x * B.k.w;
+;	k.y = A.i.y * B.k.x + A.j.y * B.k.y + A.k.y * B.k.z + A.c.y * B.k.w;
+;	k.z = A.i.z * B.k.x + A.j.z * B.k.y + A.k.z * B.k.z + A.c.z * B.k.w;
+;	k.w = A.i.w * B.k.x + A.j.w * B.k.y + A.k.w * B.k.z + A.c.w * B.k.w;
+;
+;	c.x = A.i.x * B.c.x + A.j.x * B.c.y + A.k.x * B.c.z + A.c.x * B.c.w;
+;	c.y = A.i.y * B.c.x + A.j.y * B.c.y + A.k.y * B.c.z + A.c.y * B.c.w;
+;	c.z = A.i.z * B.c.x + A.j.z * B.c.y + A.k.z * B.c.z + A.c.z * B.c.w;
+;	c.w = A.i.w * B.c.x + A.j.w * B.c.y + A.k.w * B.c.z + A.c.w * B.c.w;
+;	return *this;
+;}
+Fmatrix4@mul MACRO matrix_this:req, A:req, B:req
+	movups	xmm4, A.i
+	movups	xmm5, A.j
+	movups	xmm6, A.k
+	movups	xmm7, A.c_
+	;
+	movups	xmm3, B.i
+	movaps	xmm0, xmm3
+	shufps	xmm0, xmm0, 00000000b	; 0000v
+	mulps	xmm0, xmm4
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 01010101b	; 1111v
+	mulps	xmm2, xmm5
+	addps	xmm0, xmm2
+	movaps	xmm1, xmm3
+	shufps	xmm1, xmm1, 10101010b	; 2222v
+	mulps	xmm1, xmm6
+	addps	xmm0, xmm1
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 11111111b	; 3333v
+	mulps	xmm2, xmm7
+	addps	xmm0, xmm2
+	movups	matrix_this.i, xmm0
+	;
+	movups	xmm3, B.j
+	movaps	xmm0, xmm3
+	shufps	xmm0, xmm0, 00000000b	; 0000v
+	mulps	xmm0, xmm4
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 01010101b	; 1111v
+	mulps	xmm2, xmm5
+	addps	xmm0, xmm2
+	movaps	xmm1, xmm3
+	shufps	xmm1, xmm1, 10101010b	; 2222v
+	mulps	xmm1, xmm6
+	addps	xmm0, xmm1
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 11111111b	; 3333v
+	mulps	xmm2, xmm7
+	addps	xmm0, xmm2
+	movups	matrix_this.j, xmm0
+	;
+	movups	xmm3, B.k
+	movaps	xmm0, xmm3
+	shufps	xmm0, xmm0, 00000000b	; 0000v
+	mulps	xmm0, xmm4
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 01010101b	; 1111v
+	mulps	xmm2, xmm5
+	addps	xmm0, xmm2
+	movaps	xmm1, xmm3
+	shufps	xmm1, xmm1, 10101010b	; 2222v
+	mulps	xmm1, xmm6
+	addps	xmm0, xmm1
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 11111111b	; 3333v
+	mulps	xmm2, xmm7
+	addps	xmm0, xmm2
+	movups	matrix_this.k, xmm0
+	;
+	movups	xmm3, B.c_
+	movaps	xmm0, xmm3
+	shufps	xmm0, xmm0, 00000000b	; 0000v
+	mulps	xmm0, xmm4
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 01010101b	; 1111v
+	mulps	xmm2, xmm5
+	addps	xmm0, xmm2
+	movaps	xmm1, xmm3
+	shufps	xmm1, xmm1, 10101010b	; 2222v
+	mulps	xmm1, xmm6
+	addps	xmm0, xmm1
+	movaps	xmm2, xmm3
+	shufps	xmm2, xmm2, 11111111b	; 3333v
+	mulps	xmm2, xmm7
+	addps	xmm0, xmm2
+	movups	matrix_this.c_, xmm0
+ENDM
+
+Fbox4@point_in_box MACRO this_box:req, point:req
+	;;point>box_min
+	movaps	xmm0, point
+	cmpnleps xmm0, this_box.min		; 10 > 20 = 0FFFFFFFFh  20 <= 10 = 0
+	movmskps eax, xmm0
+	;;point<box_max
+	movaps	xmm0, point
+	cmpltps xmm0, this_box.max		; 10 < 20 = 0FFFFFFFFh  20 <= 10 = 0
+	movmskps edx, xmm0
+	and		eax, edx
+	cmp		eax, 111b
+	EXITM <zero?>
 ENDM
 
 ; сохраняем и читаем в стеке регистры XMM
@@ -778,6 +999,15 @@ Fvector_set MACRO vec_this:req, vec0:req, vec1, vec2
 		float_set	vec_this.y, vec0.y
 		float_set	vec_this.z, vec0.z
 	ENDIF
+ENDM
+
+Fvector_set1 MACRO vec_this:req, vec0:req
+	mov		eax, vec0.x
+	mov		edx, vec0.y
+	mov		ecx, vec0.z
+	mov		vec_this.x, eax
+	mov		vec_this.y, edx
+	mov		vec_this.z, ecx
 ENDM
 
 float_fchs MACRO flt_this:req, param:req
@@ -962,15 +1192,51 @@ xr_vector@pop MACRO this_vector:req, param:req, class_vector
 	mov		param, this_vector._Mylast[0-sizeof class_vector]
 ENDM
 
+ret_type_reg MACRO
+	IF @LastReturnType EQ 0
+        EXITM <al>
+    ELSEIF @LastReturnType EQ 0x40
+        EXITM <al>
+    ELSEIF @LastReturnType EQ 1
+        EXITM <ax>
+    ELSEIF @LastReturnType EQ 0x41
+        EXITM <ax>
+    ELSEIF @LastReturnType EQ 2
+        EXITM <eax>
+    ELSEIF @LastReturnType EQ 0x42
+        EXITM <eax>
+	ELSEIF @LastReturnType EQ 3
+        EXITM <rax>
+    ELSEIF @LastReturnType EQ 0x43
+        EXITM <rax>
+    ELSEIF @LastReturnType EQ 0xc3
+        EXITM <rax>
+    ELSEIF @LastReturnType EQ 6
+        EXITM <xmm0>
+    ELSEIF @LastReturnType EQ 7
+        EXITM <ymm0>
+    ELSEIF @LastReturnType EQ 8
+        EXITM <zmm0>
+    ELSEIF @LastReturnType EQ 0x22
+        EXITM <xmm0>
+    ELSEIF @LastReturnType EQ 0x23
+        EXITM <xmm0>
+    ELSE
+        EXITM <eax>
+	ENDIF
+ENDM
+
 return MACRO result
+LOCAL type_reg
 	IFNB <result>
-		IFIDNI <result>,<NULL>
-			xor		eax, eax
+		type_reg equ ret_type_reg()
+	%	IF result EQ 0
+			xor		type_reg, type_reg
 		ELSE
 			IF @InStr(1, <&result>, <&>) EQ 1
-				lea		eax, @SubStr(<&result>, 2)
+				lea		eax, @SubStr(<&result>, 2)	;; возвращаем указатель
 			ELSE
-				mov		eax, result
+				mov		type_reg, result
 			ENDIF
 		ENDIF
 	ENDIF
@@ -1074,6 +1340,24 @@ ENDM
 	mov		ecx, dword ptr[eax]
 	call	ds:r_float
 	EXITM <>
+ENDM
+
+@R_U32 MACRO name_sect:req, name_param:req
+	@push2mem (name_param)
+	@push2mem (name_sect)
+	mov		eax, ds:pSettings			; CInifile const * const pSettings
+	mov		ecx, dword ptr[eax]
+	call	ds:r_u32
+	EXITM <eax>
+ENDM
+
+@R_U8 MACRO name_sect:req, name_param:req
+	@push2mem (name_param)
+	@push2mem (name_sect)
+	mov		eax, ds:pSettings			; CInifile const * const pSettings
+	mov		ecx, dword ptr[eax]
+	call	ds:r_u8
+	EXITM <al>
 ENDM
 
 ;		value equ @SubStr(<&expression>, num+2)

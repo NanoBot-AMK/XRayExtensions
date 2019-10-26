@@ -1,3 +1,5 @@
+
+align_proc
 inventory_box_fix proc
 	; делаем то, что вырезали
 	call    xr_vector_u16___push_back
@@ -13,15 +15,8 @@ inventory_box_fix proc
 	call    ds:CObject__setEnabled
 	; вызываем колбек дл€ €шика
 	mov     edi, esi ; item
-	call    CGameObject__lua_game_object ; аргумент в edi
-	push    eax
-	
-	push    151 ; type = ???
-	mov     ecx, ebx ; box
-	call    CGameObject__callback ; eax = callback
-	push    eax ; callback
-	call    script_use_callback
-	
+	call    CGameObject__lua_game_object
+	CALLBACK__GO	ebx, 151, eax
 	; идЄм обратно
 	jmp back_from_inventory_box_fix
 inventory_box_fix endp

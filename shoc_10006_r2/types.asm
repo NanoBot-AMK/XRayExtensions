@@ -1,7 +1,5 @@
-FixedMAP_float_MatrixItemS struc
-nodes   dd ?
-pool    dd ?
-limit   dd ?
-FixedMAP_float_MatrixItemS ends
 
-sun_far dd 300.0
+TRUE				equ 1
+FALSE				equ 0
+NULL				= dword ptr 0
+

@@ -27,17 +27,19 @@ CEntity@@SetVisualName				PROTO NewVisual:dword
 CGameObject@@GetTexture				PROTO n_child:dword, n_texture:dword
 CGameObject@@Get_ref_texture		PROTO n_child:dword, n_texture:dword
 ;calc_bullet							PROTO (byte) pos_start:ptr, pos_target:ptr, bullet:ptr, h_line_throw:ptr, time_bullet:ptr
+matrix_transform_tiny_2args			PROTO pVecRes:dword, pVec:dword
+matrix_transform_tiny_1args			PROTO pVecRes:dword
 
 
+include types.asm
 include macroses.asm
+include structures.asm
 ; вставки из целевой либы
 include xrgame_stubs.asm
 
 ; позиция в том месте, где в целевой DLL начинается наша секция
 org sec1_sec2_dist
 
-include structures.asm
-include types.asm
 include defines.asm
 include utils.asm
 include actor_input_fix.asm
@@ -117,6 +119,7 @@ include turrel.asm
 include level_explosive.asm
 include anomaly.asm
 include physics_fix.asm
+include vector_fix.asm
 
 
 end LibMain

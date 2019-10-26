@@ -114,35 +114,13 @@ org 1020CFD1h - shift
 ;.text:1020CFD5					add		dword ptr [esi+2004h], 2
 org 1020CFDCh - shift
 back_from_CInventoryOwner__OnEvent_dbg_fix:
-;.text:1020CFDC					lea		edi, [esp+0Ch+this] ; str
-;.text:1020CFE0					mov		[esp+0Ch+this], 0
-;.text:1020CFE8					call	NET_Packet__r_stringZ
-;.text:1020CFED					mov		eax, [esi+2004h]
-;.text:1020CFF3					mov		cl, [eax+esi]
-;.text:1020CFF6					add		eax, 1
 
-
-
-;.text:103EDCE0 ; int __stdcall CUICustomItem__Render(int, int, int, float)
-
-org 103EDEE6h - shift
-	jmp CUICustomItem__Render_fix
-;.text:103EDEE6					call	ui_core__is_16_9_mode
-;.text:103EDEEB					test	al, al
-;.text:103EDEED					jz		short loc_103EDEF9
-;.text:103EDEEF					movss	xmm1, ds:dword_104D2630
-;.text:103EDEF7					jmp		short loc_103EDF01
-;.text:103EDEF9 loc_103EDEF9:
-;.text:103EDEF9					movss	xmm1, ds:float_10459718__1_0
-;.text:103EDF01 loc_103EDF01:
-org 103EDF01h - shift
-back_from_CUICustomItem__Render_fix:
-;.text:103EDF01					movss	xmm6, ds:dword_104D23E4
-
-
+;фикс для исправления соотношения сторон CUIStatic
+org 103EDEEFh - shift	; 8 bytes
+	movss   xmm1, ds:g_static_rescale_correction
 
 org 10459718h - shift
-float_10459718__1_0 dd ?
+float_1p0		dd ?
 
 org 103B8C70h - shift
 ui_core__is_16_9_mode:
@@ -1426,7 +1404,7 @@ org 101E2FC5h - shift
 org 10458FBCh - shift
 IPureClient__timeServer dd ?
 org 1045A260h - shift
-flt_1045A260	dd 0.001 
+float_0p001	dd 0.001 
 
 org 10458A70h - shift
 CCameraManager__Update0 dd ? ; public: void __thiscall CCameraManager::Update(_vector3<float> const &, _vector3<float> const &, _vector3<float> const &, float, float, float, uint)
@@ -1735,9 +1713,9 @@ org 102178A0h - shift
 CShootingObject__Light_Render:
 ;.text:1021846A					push	eax
 ;.text:1021846B					call	CShootingObject__Light_Render
-org 1021846Bh - shift
-	jmp CShootingObject__RenderLight_dbg_fix2
-back_from_CShootingObject__RenderLight_dbg_fix2:
+;org 1021846Bh - shift
+;	jmp CShootingObject__RenderLight_dbg_fix2
+;back_from_CShootingObject__RenderLight_dbg_fix2:
 ;.text:10218470
 
 
@@ -1747,14 +1725,12 @@ org 101B02FDh - shift
 register_level__float__str_int_bool_str:
 
 ; тестовый фикс CWeapon__UpdateFireDependencies_internal
-;.text:102196BE					mov		eax, [ebx+298h] ; eax = hud
-;.text:102196C4					mov		edx, [eax+48h]
-org 102196C7h - shift
-	jmp CWeapon__UpdateFireDependencies_internal_dbg_fix2
+;org 102196C7h - shift
+;	jmp CWeapon__UpdateFireDependencies_internal_dbg_fix2
 ;.text:102196C7					movzx	ecx, word ptr [edx+0Ch] ; ecx = fire_bone
 ;.text:102196CB					movss	xmm0, dword ptr [edx+14h]
-org 102196D0h - shift
-back_from_CWeapon__UpdateFireDependencies_internal_dbg_fix2:
+;org 102196D0h - shift
+;back_from_CWeapon__UpdateFireDependencies_internal_dbg_fix2:
 ;.text:102196D0					movss	xmm1, dword ptr [edx+10h]
 
 
@@ -1798,7 +1774,7 @@ org 10101033h - shift
 ; там же изменение строки
 ;.text:1010104E					push	eax
 org 1010104Fh - shift
-	push	offset aErrorInStalker_new
+	push	const_static_str$("! visual's error in stalker with name %s")	;offset aErrorInStalker_new
 ; добавить в список правок строку: 0x1010104F 5 ; push	  offset aErrorInStalker_new
 ;.text:1010104F					push	offset aErrorInStalker ; "! error in stalker with visual %s"
 ;.text:10101054					call	ds:?Msg@@YAXPBDZZ ; Msg(char const *,...)
@@ -2007,24 +1983,13 @@ CProjector__TurnOn: ; this = esi
 org 10253E70h - shift
 CProjector__TurnOff: ; this = esi
 
-;.text:10146D00 CScriptGameObject__DisableInfoPortion proc near
-;.text:10146D00 arg_0			= dword ptr	 4
+;
+org 101562D5h - shift	;  bytes
+	mov     [esp+64h-48h], offset CScriptGameObject@@disable_info_portion_fix
 org 10146D00h - shift
-	jmp disable_info_portion_fix
-;.text:10146D00					push	esi
-;.text:10146D01					mov		esi, ecx
-;.text:10146D03					push	edi
-;.text:10146D04					mov		edi, [esi+4]
-;.text:10146D07					test	edi, edi
-org 10146D09h - shift
-back_from_disable_info_portion_fix:
-;.text:10146D09					jz		short loc_10146D10
-;.text:10146D0B					call	CGameObject__lua_game_object
-
-
-
+CScriptGameObject@@DisableInfoPortion:
 org 10146F80h - shift
-CScriptGameObject__HasInfo:
+CScriptGameObject@@HasInfo:
 
 ;.text:103C9110 CUITalkDialogWnd__Hide proc near		; DATA XREF: .rdata:104C3640o
 ;.text:103C9110					push	esi
@@ -2093,49 +2058,20 @@ aSpeed			db 'speed',0 ; внести в патч 6 байт
 ;.text:10412EB0 CUIScrollView__ScrollToBegin proc near
 org 10412EB0h - shift
 jmp scroll_vew_fix
-;.text:10412EB0					push	ecx
-;.text:10412EB1					push	esi
-;.text:10412EB2					push	edi
-;.text:10412EB3					mov		edi, ecx
 org 10412EB5h - shift
 back_from_scroll_vew_fix:
-;.text:10412EB5					test	byte ptr [edi+8Ch], 2
-;.text:10412EBC					jz		short loc_10412EC8
-;.text:10412EBE					mov		eax, [edi]
-;.text:10412EC0					mov		edx, [eax+88h]
-;.text:10412EC6					call	edx
-
 
 
 org 1013A56Ch - shift
-register__matrix_div_number:
+register_matrix__this_float:
+org 10139E96h - shift
+register_matrix__this_float_float_float:
 
 
-;.text:1013967D CScriptFmatrix__script_register proc near ; CODE XREF: sub_1019000A+10p
-
-;.text:101398A9					call	sub_1013A439
-;.text:101398AE					mov		ecx, eax
-;.text:101398B0					xor		eax, eax
-;.text:101398B2					lea		edi, [ebp+var_14]
-;.text:101398B5					stosb
-;.text:101398B6					push	[ebp+var_14]
-;.text:101398B9					lea		edi, [ebp+var_10]
-;.text:101398BC					stosb
-;.text:101398BD					push	[ebp+var_10]
-;.text:101398C0					lea		eax, [ebp+var_C]
-;.text:101398C3					push	eax
-;.text:101398C4					push	esi
-;.text:101398C5					push	ecx
-;.text:101398C6					mov		[ebp+var_C], offset sub_10139BCE
 org 101398CDh - shift
 jmp matrix_fix
-;.text:101398CD					call	sub_1013A56C
 org 101398D2h - shift
 back_from_matrix_fix:
-;.text:101398D2					push	[ebp+var_18]
-;.text:101398D5					mov		[ebp+var_14], offset sub_10139660
-;.text:101398DC					push	offset sub_10139BEA
-;.text:101398E1					push	offset aSetxyzi ; "setXYZi"
 
 
 org 10451920h - shift
@@ -4138,9 +4074,10 @@ loc_101407F9:
 ; =========================================================================================
 ; измененная анимация безоружного ГГ ("_torso_0_aim_0" -> "_torso_5_aim_0")
 org 101D922Bh - shift
-	push	offset a_torso_5_aim_0
+	push	const_static_str$("_torso_5_aim_0")	;offset a_torso_5_aim_0
 ; =========================================================================================
 ; увеличение дистанции диалога (3.0 -> 150.0)
+static_float	TALK_DIST, 150.0
 org 103CAD20h - shift
 	fld		ds:TALK_DIST
 ; =========================================================================================
@@ -4179,7 +4116,7 @@ org 1022B847h - shift ; CWeaponMagazinedWGrenade::PlayAnimModeSwitch()
 ; =========================================================================================
 ; замена текстуры трассера ("fx\fx_tracer" -> "effects\bullet_tracer")
 org 101BB9B7h - shift
-	push	offset aTracerTexture
+	push	const_static_str$("effects\bullet_tracer")	;offset aTracerTexture
 ; =========================================================================================
 ; ======================================= END =============================================
 ; =========================================================================================
@@ -4220,25 +4157,20 @@ create_cell_item_changed:
 org 103FAD40h - shift
 	mov		eax, offset CUIFrameWindow__GetTitleStatic_fix
 
-org 103F0D18h - shift
+org 103F0D18h - shift	; 6 bytes
 	jmp		CUIStatic__OnFocusRecieve_callback
-org 103F0D1Eh - shift
+	nop
 CUIStatic__OnFocusRecieve_callback_back:
 
-org 103F0D50h - shift
+org 103F0D50h - shift	; 5 bytes
 	jmp		CUIStatic__OnFocusLost_callback
-org 103F0D55h - shift
 CUIStatic__OnFocusLost_callback_back:
-
-org 1055DE9Ch - shift
-??_R0?AVCUICellItem@@@8 dd ?
-org 1054FA5Ch - shift
-??_R0?AVCUIStatic@@@8 dd ?
 
 org 1006A189h - shift
 	jmp		after_save_callback
 
 ; замена шейдера прицелов
+const_static_str	aSh,	"hud\scope"
 org 10227C07h - shift
 	push	offset aSh
 org 10227D2Dh - shift
@@ -4273,9 +4205,8 @@ org 1024BF05h - shift
 back_from_armor_piercing_fix:
 
 ; затычка от вылета в деструкторе CGameObject
-org 101E6505h - shift
-	jmp game_object_destructor_fix
-org 101E650Ah - shift
+org 101E6505h - shift	; 5 bytes
+	jmp		game_object_destructor_fix
 back_from_game_object_destructor_fix:
 
 ; исправление неотключения света при выключении аномалии
@@ -4288,10 +4219,9 @@ org 1019EF50h - shift
 sub_1019EF50:
 
 ; экспорт состояния включенности для источника света фонаря актора
-org 101DE0A2h - shift
-	jmp	actor_torch_light
-org 101DE0A7h - shift
-back_from_actor_torch_light:
+org 101DE0A2h - shift	; 9 bytes
+	jmp		actor_torch_light
+	db		4 dup (0CCh)
 
 ; фикс сброса положения скролла при перекладывании вещей
 org 103CBEE0h - shift
@@ -4396,12 +4326,12 @@ org 103D590Eh - shift	; 5 bytes
 ; фикс вылета there is no proper graph point neighbour
 org 100563A5h - shift
 db	0EBh			; this is jmp rel8 opcode
-org 10056920h - shift
-	jmp game_graph__distance_fix
+org 10056920h - shift	; 5 bytes
+	jmp		game_graph__distance_fix
+back_from_game_graph__distance_fix:
 org 100569C9h - shift
 loc_100569C9: 
-org 10056925h - shift
-back_from_game_graph__distance_fix:
+
 
 ; отключение движкового удаления патронов из неписей после смерти
 org 100FA371h - shift
@@ -4528,9 +4458,6 @@ __alloca_probe dd ?
 
 org 1004FD6Dh - shift
 sub_1004FD6D dd ?
-
-org 1053C5ACh - shift
-flt__2f dd ?		; 2.0f
 
 org 10458B0Ch - shift
 section_exist dd ?
@@ -4704,7 +4631,10 @@ org 1054CA34h - shift
 _AVCAI_Dog:
 org 1053835Ch - shift
 _AVCInventoryOwner:
-
+org 1055DE9Ch - shift
+_AVCUICellItem:
+org 1054FA5Ch - shift
+_AVCUIStatic:
 
 ;-----??????-----
 org 105507CCh - shift
@@ -5058,39 +4988,61 @@ script_callback__u32_u32:
 org 100F6B60h - shift
 script_callback__void:
 ;-----------------------------------------------------------------------------------
-;	Новая баллистика
-;оптимизация тупокода (с) НаноБот
-;	bullet->speed = bullet->dir.magnitude();
-;	VERIFY(_valid(bullet->speed));
-;	VERIFY(!fis_zero(bullet->speed));
-;	//вместо normalize(),	 чтоб не считать 2 раза magnitude()
-;#pragma todo("а как насчет bullet->speed==0")
-;	bullet->dir.x /= bullet->speed;
-;	bullet->dir.y /= bullet->speed;
-;	bullet->dir.z /= bullet->speed;
-org 101B7F80h - shift
-	db		52 dup (90h)
-org 101B7F80h - shift	; 52 bytes
-;xmm3 = dotproduct bullet->dir
-	ASSUME	esi:ptr SBullet
-	sqrtss	xmm3, xmm3
-	movflt	[esp], 1.0
-	movss	xmm0, dword ptr [esp]
-	divss	xmm0, xmm3
-	movups	xmm1, oword ptr [esi].dir
-	shufps	xmm0, xmm0, 0
-	mulps	xmm0, xmm1
-	add		esp, 4
-	movups	oword ptr [esi].dir, xmm0
-	movss	[esi].speed, xmm3	; 35 bytes
-	jmp		loc_101B7FB4
-	ASSUME	esi:nothing
-org 101B7FB4h - shift
-loc_101B7FB4:
+;===============!!! НОВАЯ БАЛЛИСТИКА !!!===============
+;Перепишем метод CBulletManager::CalcBullet
+org 104586B4h - shift
+;(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data, collide::test_callback* tb, CObject* ignore_object);
+_ds@CObjectSpace@@RayQuery	dd ?
+CObjectSpace@@RayQuery proc dest:ptr , rq:ptr , cb:ptr , user_data:ptr , tb:ptr , ignore_object:ptr
+CObjectSpace@@RayQuery endp
+org 101BA100h - shift
+CBulletManager@@test_callback proc
+CBulletManager@@test_callback endp
+org 101BA5F0h - shift
+CBulletManager@@firetrace_callback proc
+CBulletManager@@firetrace_callback endp
+org 1053C5ACh - shift
+m_fMinBulletSpeed		dd ?		; 2.0f
+
+org 101B7C30h - shift	; 928 bytes 
+	db		928 dup (0CCh)		; затрём старую функцию
+org 101B7C30h - shift	; 928 bytes
+include new_ballistic.asm		; а в этом файле её перепишем!
+;если тип баллистики не равно 0, то хит засчитывается пропорциональна квадрату скорости пули.
+org 104D248Ch - shift
+float_m0p00001			dd ?
+org 101BB225h - shift	; 70 bytes 
+	db		70 dup (090h)		; 
+org 101BB225h - shift	; 70 bytes 
+	;-----врезка 17 байт-----
+	;if (m_type_ballistic!=0) speed_factor *= speed_factor;
+	mov		eax, [esp+30h+4]				;this	CBulletManager*
+	.if ([eax].CBulletManager.m_type_ballistic!=0)
+		mulss	xmm0, xmm0
+	.endif
+	;-----далее оптимизируем код, и у нас есть ещё 3 байта в запасе. :)
+	mulss	xmm1, xmm0
+	movss	[esp+30h-20h], xmm1				;var_20
+	movss	xmm1, dword ptr [ebp+28h]
+	mulss	xmm2, xmm1
+	subss	xmm1, ds:float_1p0
+	mulss	xmm2, xmm0
+	movss	[esp+30h-10h], xmm0				;R
+	movss	dword ptr [esp+30h-14h], xmm2	;target_material
+	comiss  xmm1, ds:float_m0p00001			; if (mtl->fShootFactor >= -0.00001)
+	nop3
+;загрузим параметры.
+org 101B778Ah - shift	; 8 bytes
+	jmp		CBulletManager@@Load_ext
+	db		3 dup (0CCh)
+;тест быстродействия баллистики.
+org 101B8570h - shift
+CBulletManager@@CommitRenderSet:
+org 101A4B63h - shift	; 5 bytes
+	call	CBulletManager@@TestBullet
 ;===================================================================================
 ;Взрывной объект в пространстве Level. 
 ; Нужен для снарядов, для быстрого спавна большого количества взрывных объектов.
-m_pBulletManager				= dword ptr 17980	; CBulletManager*
 
 org 101D2710h - shift
 CActor@@net_Relcase:
@@ -5432,11 +5384,7 @@ org 101B72A9h - shift	; 33 bytes
 	mov		[esi+4], dx				; 4
 	mov		word ptr [esi+60h], 0	; 6
 	jmp		SBullet__Init_callback	; 5
-return_SBullet__Init_callback:
-	pop		edi						; 1
-	pop		ebp						; 1
-	pop		ebx						; 1
-	retn	24h						; 3
+	db		6 dup (0CCh)
 ;====================================================================================================
 ; Турель на основе класса CCar
 org 1026BA90h - shift
@@ -5542,7 +5490,6 @@ org 10269120h - shift	; 578 bytes
 	movss	xmm0, [esi].yaw
 	angle_normalize_signed__xmm0
 	movss	[esi].yaw, xmm0
-	db		10 dup (90h)
 	movzx	esi, [edi].m_car_panel_visible
 	ASSUME	esi:nothing, edi:nothing
 	jmp		CCar__VisualUpdate_ENDIF
@@ -5774,17 +5721,39 @@ register_go_vector__void:
 ;--------------------------------------------------------------------
 ; Фикс для колбека "хит по вертолёту"
 ; В оригинале для вредителя: вертолёт, или БТР, хит не вызывается, сейчас будет вызыватся для любого объекта.
-; if (pHDS->who/*&&
-; ( pHDS->who->CLS_ID==CLSID_OBJECT_ACTOR	||
-; smart_cast<CAI_Stalker*>(pHDS->who)		||
-; smart_cast<CCustomZone*>(pHDS->who) )*/
-; ){
-	; callback(GameObject::eHelicopterOnHit)(pHDS->damage(),pHDS->impulse,pHDS->hit_type,pHDS->who->ID());
-; }
-org 1027E439h - shift	; 2 bytes
-	jmp		loc_1027E46C
-org 1027E46Ch - shift	; 
-loc_1027E46C:
+;if (pHDS->who){
+;	callback(GameObject::eHelicopterOnHit)(pHDS->damage(), pHDS->impulse, pHDS->hit_type, pHDS->who->ID());
+;	if(m_flCallbackKey & eCallbackAllHit){
+;		CGameObject*	wpn = smart_cast<CGameObject*>(Level().Objects.net_Find(pHDS->weaponID));
+;		callback(GameObject::eAllHitObjects)(wpn->lua_game_object(), pHDS->damage(), pHDS->dir, pHDS->who->lua_game_object(), pHDS->boneID);
+;	}
+;}
+org 1027E43Ch - shift	; 131 bytes
+;edi - this			CHelicopter*
+;esi - pHDS			SHit*
+;ecx - pHDS->who	CGameObject*
+	ASSUME	esi:ptr SHit, edi:ptr CGameObject
+	.if (ecx)
+		;callback(GameObject::eHelicopterOnHit)(pHDS->damage(),pHDS->impulse,pHDS->hit_type,pHDS->who->ID());
+		movzx	edx, [ecx].CGameObject.ID
+		mov		ebp, [esi].power
+		CALLBACK__FLOAT_FLOAT_INT_u32	edi, GameObject__eHelicopterOnHit, ebp, [esi].impulse, [esi].hit_type, edx
+		.if ([edi].m_flCallbackKey & eCallbackAllHit)
+			Level__Objects_net_Find	[esi].weaponID
+			mov		ecx, eax
+			call	CGameObject@@lua_game_object
+			mov		ebx, eax	; оружие вредителя
+			mov		ecx, [esi].who
+			call	CGameObject@@lua_game_object
+			mov		ecx, eax
+			CALLBACK__GO_FLOAT_VECTOR_GO_u16	edi, eAllHitObjects, ebx, ebp, [esi].dir, ecx, [esi].boneID
+		.endif
+	.endif
+	xor		ecx, ecx
+	add		edi, 812
+	mov		cl, 18
+	rep movsd
+	ASSUME	esi:nothing, edi:nothing
 ;----------------------------------------------------------------
 ; блокировать использования оружие НПСом
 org 1021C170h - shift
@@ -5846,4 +5815,13 @@ org 104BE5E8h - shift	; 4 bytes
 org 101EC088h - shift	; 18 bytes
 	jmp		CPhysicsShellHolder__Hit_chank
 	db		13 dup (0CCh)
-;
+;----------------------------------------------------------------
+;Дополнительные скриптовые методы в пространстве vector
+org 1013D835h - shift
+scriptprototype__float__void:
+org 1013CB85h - shift
+scriptprototype__this__void:
+org 1013C175h - shift	; 5 bytes
+	jmp		vector_script_fix
+return_vector_script_fix:
+;----------------------------------------------------------------

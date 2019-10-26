@@ -1,17 +1,19 @@
 .686
 .XMM
 
-.model flat,  C
+.model flat,  stdcall
 
 include addr.inc
 
-_CODE segment byte public 'CODE' use32
-	assume cs:_CODE
-	assume ds:_CODE
+.code
 ; заглушка для линковшика
 LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD 
     ret
 LibMain ENDP
+
+include types.asm
+include structures.asm
+include macroses.asm
 
 ; вставки из целевой либы
 include xrrender_r2_stubs.asm
@@ -19,8 +21,6 @@ include xrrender_r2_stubs.asm
 ; позиция в том месте, где в целевой DLL начинается наша секция
 org sec1_sec2_dist
 
-include misc.asm
-include types.asm
 include detail_radius_fix.asm	; радиус отрисовки травы
 include detail_density_fix.asm	; плотность травы
 include sun_details_fix.asm		; тени травы
@@ -45,7 +45,6 @@ include detail_blink_fix.asm
 include sun_near_fix.asm
 include hemi_update_fix.asm
 
-_code ENDS
 
 end LibMain
 

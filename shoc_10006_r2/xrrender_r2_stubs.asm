@@ -5,14 +5,14 @@
 
 
 ; увеличиваем размер объекта light
-org 10004BB6h - shift
-push    278h ; вместо 270h - 5 байт
-org 1002FD32h - shift
-push    278h
-org 100300D0h - shift
-push    278h
-org 100301BAh - shift
-push    278h
+org 10004BB6h - shift	; 5 bytes
+	push	sizeof light ;+8 вместо 270h - 5 байт
+org 1002FD32h - shift	; 5 bytes
+	push	sizeof light
+org 100300D0h - shift	; 5 bytes
+	push	sizeof light
+org 100301BAh - shift	; 5 bytes
+	push	sizeof light
 
 org 1000ABB1h - shift
 	jmp      loc_1000AEB3
@@ -23,65 +23,73 @@ loc_1000AEB3:
 
 
 ;light::light
-;.text:1002E768                 mov     eax, [esi+3Ch]
-;.text:1002E76B                 mov     dword ptr [esi+0Ch], 2
-;.text:1002E772                 lea     edi, [esi+114h]
-;.text:1002E778                 lea     ebp, [esi+118h]
-org 1002E77Eh - shift
-	jmp light__light_fix
-;.text:1002E77E                 and     eax, 0FFFFFF81h
-;.text:1002E781                 or      eax, 1
-;.text:1002E784                 mov     [esi+3Ch], eax
-org 1002E787h - shift
-back_from_light__light_fix:
-;.text:1002E787                 movss   dword ptr [esi+40h], xmm0
+org 1002E787h - shift	; 5 bytes
+	jmp		light__light_fix
+return_light__light_fix:
 
+org 1006E4ACh - shift
+float_0p01		dd ?
+org 1007981Ch - shift
+float_1p0		dd ?
+org 1006E3E8h - shift
+float_0p5		dd ?
+org 1000D380h - shift
+_tan:
 
-
+static_float	tan_shift_point, 0.2007
+static_float	tan_shift_spot,  0.0611
+var_28			= dword ptr -28h
 ; CLight_Compute_XFORM_and_VIS::compute_xf_spot
-;.text:100337E2                 fdivrp  st(1), st
-org 100337F2h - shift
-	jmp CLight_Compute_XFORM_and_VIS__compute_xf_spot_fix
-;.text:100337F2                 movss   dword ptr [edi+1DCh], xmm2
-;.text:100337FA                 movaps  xmm0, xmm1
-;.text:100337FD                 subss   xmm0, ds:SMAP_near_plane
-;.text:10033805                 divss   xmm1, xmm0
-;.text:10033809                 xorps   xmm0, xmm0
-;.text:1003380C                 movss   dword ptr [edi+1B4h], xmm0
-;.text:10033814                 movss   dword ptr [edi+1B8h], xmm0
-;.text:1003381C                 movss   dword ptr [edi+1BCh], xmm0
-;.text:10033824                 movss   dword ptr [edi+1C0h], xmm0
-;.text:1003382C                 movss   dword ptr [edi+1C8h], xmm0
-;.text:10033834                 movss   dword ptr [edi+1CCh], xmm0
-;.text:1003383C                 movss   dword ptr [edi+1D0h], xmm0
-;.text:10033844                 movss   dword ptr [edi+1D4h], xmm0
-;.text:1003384C                 movss   dword ptr [edi+1E0h], xmm0
-;.text:10033854                 movss   dword ptr [edi+1E4h], xmm0
-;.text:1003385C                 movss   dword ptr [edi+1ECh], xmm0
-;.text:10033864                 movss   dword ptr [edi+1D8h], xmm1
-;.text:1003386C                 mulss   xmm1, ds:dword_1006E5F0
-org 10033874h - shift
-back_from_CLight_Compute_XFORM_and_VIS__compute_xf_spot_fix:
-;.text:10033874                 movss   dword ptr [edi+1E8h], xmm1
-
-
-;.text:100337C5                 addss   xmm0, ds:__real@3d7a35dd
 org 100337C0h - shift
-;	addss   xmm0, dword ptr [tan_shift]
-	jmp light_blink_fix
-org 100337CDh - shift
-back_from_light_blink_fix:
-	
+	db		188 dup(090h)
+org 100337C0h - shift	; 188 bytes
+	ASSUME	edi:ptr light
+	movss	xmm0, [edi].cone
+	.if ([edi].flags & 1)
+		addss	xmm0, ds:tan_shift_point
+	.else
+		addss	xmm0, ds:tan_shift_spot
+	.endif
+	mulss   xmm0, ds:float_0p5
+	push    ecx             ; float
+	movss   dword ptr [esp], xmm0
+	call	_tan	;fptan
+	fld1
+	fdivrp  st(1), st
+	movss   xmm1, [esp+54h+var_28]
+	xorps	xmm0, xmm0
+	movups	[edi].X.S.project.i, xmm0
+	movups	[edi].X.S.project.j, xmm0
+	movups	[edi].X.S.project.k, xmm0
+	movups	[edi].X.S.project.c_, xmm0
+	movss	xmm3, [edi].m_f270h
+	movss	xmm4, ds:float_0p01
+	.if (xmm3>=xmm4)
+		movss	xmm5, [edi].m_f274h
+	.else
+		movss	xmm5, FP4(-0.01)
+		movss	xmm3, xmm4
+	.endif
+	movss	xmm2, ds:float_1p0
+	movss	[edi].X.S.project._34_, xmm2
+	movaps	xmm0, xmm1
+	subss	xmm0, xmm3		;ds:float_0p1
+	divss	xmm1, xmm0
+	movss   [edi].X.S.project.k.z, xmm1
+	mulss   xmm1, xmm5		;ds:float_m0p1
+	movss   [edi].X.S.project.c_.z, xmm1
+	ASSUME	edi:nothing
+	nop6
 ;light::export
-;.text:1002FD41                 mov     esi, eax
-org 1002FD43h - shift
-	jmp light__export_fix
-;.text:1002FD43                 call    light__light
-;.text:1002FD48                 jmp     short loc_1002FD4C
-org 1002FD4Ch - shift
-loc_1002FD4C:
 org 1002E6F0h - shift
 light__light:
+org 1002FD3Dh - shift	; 17 bytes
+	mov		esi, eax
+	call	light__light
+	mov		[edi], eax
+	jmp		light__export_fix
+	nop3
+return_light__export_fix:
 
 
 org 1000D27Eh - shift
@@ -116,7 +124,7 @@ back_from_CRender__Render_hud_emissive_fix:
 ;.text:1000D1E4                 push    ecx
 ;.text:1000D1E5                 push    ebx
 
-org 1007AB24h - shift - 019ch
+org 1007AB24h - shift - 019Ch
 RI dd ?
 
 org 1007AB28h - shift
@@ -812,7 +820,7 @@ org 1006E564h - shift
 __real@bf400000 dd 0.0
 org 10030515h - shift
 	subss   xmm0, ds:__real@bf400000
-	
+static_float	sun_far, 300.0
 org 1003048Ch - shift
 	movss   xmm3, ds:sun_far
 	
@@ -927,3 +935,9 @@ org 100350ADh - shift
 	jmp hemi_smooth_fix
 org 100350B5h - shift
 back_from_hemi_smooth_fix:
+
+; Вывод стартового адреса xrGame.dll в логе
+org 10002DC0h - shift	; 7 bytes
+	call	StartAdress_xrGame_log__DllMain
+	nop
+	nop

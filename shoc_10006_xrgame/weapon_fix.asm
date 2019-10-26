@@ -101,11 +101,6 @@ CWeapon__UseScopeTexture_fix endp
 ;								(c) NanoBot
 ;=================================================================================
 
-iAmmoElapsed		= dword ptr	 1404
-m_DefaultCartridge	= dword ptr	 1472
-m_ammoType			= dword ptr	 1444
-m_iCurFireMode		= dword ptr	 1928
-
 ; колбек на выстрел, вызывается в объекте оружия
 align_proc
 CShootingObject__FireBulletCallback proc
@@ -132,62 +127,6 @@ cartridge		= dword ptr 10h
 	jmp		return_CShootingObject__FireBulletCallback
 CShootingObject__FireBulletCallback endp
 ;--------------------------------------------------------------------------
-
-; Колбек на старт пули.
-align_proc
-SBullet__Init_callback proc
-;esi - *bullet
-	ASSUME	esi:ptr SBullet, edi:ptr CCartridge, ebx:ptr CBulletManager
-	;========================================
-	mov		ecx, ds:g_pGameLevel
-	mov		eax, [ecx]	; CLevel
-	mov		ebx, [eax+m_pBulletManager]
-	; bullet->m_dwID = g_dwTotalShots++
-	mov		eax, [ebx].m_dwTotalShots
-	inc		eax
-	mov		[esi].m_dwID, eax
-	mov		[ebx].m_dwTotalShots, eax
-	; bullet->flags.callback_on = cartridge.m_flags.test(CCartridge::cfCallbackOn);
-	.if ([edi].m_flags & cfCallbackOn)
-		or		[esi].flags, bull_callback_on
-		; CObject	*weapon = Level().Objects.net_Find(bullet->weapon_id);
-		movzx	ecx, [esi].weapon_id
-		Level__Objects_net_Find	 ecx
-		.if (eax)
-			; weapon->callback(eWeaponStartBullet)(cartridge, bullet);
-			CALLBACK__INT_INT	eax, eWeaponStartBullet, edi, esi
-		.endif
-	.endif
-	.if ([edi].m_flags & cfShellExplosive)
-		mov		edx, ds:pSettings ; CInifile * pSettings
-		push	offset aSect_explosive	; "sect_explosive"
-		mov		eax, [edi].m_ammoSect
-		add		eax, 12
-		push	eax
-		mov		ecx, [edx]
-		call	ds:r_string
-		movzx	edx, [esi].weapon_id
-		mov		ecx, ebx
-		invoke	CBulletManager@@CreateExplosive, eax, edx
-		.if (ax!=0FFFFh)
-			;explosive_id = explo_id;
-			mov		[esi].explosive_id, ax
-			;flags.set(shell_explosive, TRUE);
-			or		[esi].flags, shell_explosive
-			;	movzx	eax, ax
-			;	PRINT_UINT "explosive_id = %d", eax
-			;	PRINT_UINT "m_dwID = %d", [esi].m_dwID
-		.endif
-	.endif
-	mov		al, [edi].m_tracer_width
-	mov		[esi].m_tracer_width, al
-	ASSUME	esi:nothing, edi:nothing, ebx:nothing
-	pop		edi
-	pop		ebp
-	pop		ebx
-	retn	24h
-;	jmp		return_SBullet__Init_callback
-SBullet__Init_callback endp
 
 ; колбек на удаления пули, вызывается в объекте оружия
 align_proc
@@ -326,8 +265,8 @@ CCartridge__Load_callback proc
 		pop		eax
 	.else
 		mov		ecx, ds:g_pGameLevel
-		mov		eax, [ecx]	; CLevel
-		mov		edx, [eax+m_pBulletManager]
+		mov		eax, [ecx]	; 
+		mov		edx, [eax].CLevel.m_pBulletManager
 		movss	xmm0, [edx].m_fTracerWidth
 	.endif
 	float@clamp xmm0, 0.0, 1.0

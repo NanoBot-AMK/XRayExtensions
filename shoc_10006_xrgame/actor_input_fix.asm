@@ -7,20 +7,6 @@
 ; Рефакторинг (с) НаноБот		3.08.2017	27.09.2018
 ;============================================================================================
 
-DIK_LMENU			equ 56
-DIK_RMENU			equ 184
-DIK_F4				equ 62
-DIK_1				equ 2
-DIK_2				equ 3
-DIK_3				equ 4
-DIK_4				equ 5
-DIK_5				equ 6
-DIK_6				equ 7
-DIK_7				equ 8
-DIK_8				equ 9
-DIK_9				equ 10
-DIK_0				equ 11
-
 eOnKeyPress							= dword ptr 123
 eOnKeyRelease				 		= dword ptr 124
 eOnKeyHold					 		= dword ptr 125
