@@ -259,3 +259,22 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# целевые файлы
+xrRender_R1.dll
+xrRender_R2.dll
+xrRender_R3.dll
+xrRender_R4.dll
+xrCore.dll
+XR_3DA.exe
+xrGame.dll
+
+# промежуточные файлы
+mydll.obj
+mydll.dll
+mydll.exp
+mydll.lib
+src.obj
+src.exe
+src.exp
+src.lib
