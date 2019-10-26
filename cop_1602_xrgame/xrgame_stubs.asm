@@ -142,13 +142,13 @@ back_to_global_space_ext:
 ;.text:1024A75F                 add     esp, 18h
 
 org 10241611h - shift
-object_by_id_register: 
+register_level__go__void: 
 
 ; функция регистрирующая в пространстве имён level функцию с прототипом:
 ; float fun(void);
 ; ссылку см. ниже
 org 1024177Dh - shift
-get_snd_volume_register: 
+register_level__float__void: 
 
 ; метод CLevel::script_register
 ; ищем по ссылке на строку "get_snd_volume"
@@ -424,10 +424,310 @@ g_Actor  dd ?
 ; функция регистрирующая в пространстве имён level функцию с прототипом:
 ; int fun(void)
 org 1024199Fh - shift
-get_time_days_register: 
+register_level__uint__void: 
 
 ; функция регистрирующая в пространстве имён level функцию с прототипом:
 ; void fun(float)
 org 1024188Eh - shift
-set_snd_volume_register: 
+register_level__void__float: 
 
+org 10512514h - shift
+CObjectSpace__RayPick dd ?
+
+;---rev231---
+; Вывод начального адреса xrGame.dll
+org 1034A990h - shift	; 7 bytes
+	call	StartAdress_xrGame_log__DllMain
+	nop
+	nop
+
+; фикс вылета 'смерть актора в машине'.
+org 104E3310h - shift	; 8 bytes
+	jmp		die_actor_holder_fix
+	nop
+	nop
+	nop
+back_from_die_actor_holder_fix:
+org 104E3030h - shift	; 
+CCharacterPhysicsSupport__KillHit:
+org 10348400h - shift
+smart_cast_CActor:
+; часть 2
+org 104E37A7h - shift	; 9 bytes
+	jmp		die_actor_holder_fix2
+	nop
+	nop
+	nop
+	nop
+back_from_die_actor_holder_fix2:
+org 104E2190h - shift	; 
+CCharacterPhysicsSupport__ActivateShell:
+;---rev232---
+org 10241AB0h - shift	; 
+register_level__uint__uint_vector_float:
+org 10241A55h - shift	; 
+register_level__float__uint_vector:
+org 101FF277h - shift	; 
+register_level__bool__void:
+org 1024166Ch - shift	; 
+register_level__str__void:
+org 10241B0Bh - shift	; 
+register_level__vector__uint:
+
+org 10512BDCh - shift
+g_pGameLevel dd ?
+
+org 105124F4h - shift
+GetStaticVerts dd ?
+
+org 1051252Ch - shift
+GetStaticTris dd ?
+
+org 102504E0h - shift	; Вычисления нормали
+mknormal:
+
+org 10512FE4h - shift
+_ElementCenter dd ?
+
+org 105B79A8h - shift
+const_1f dd ?
+
+org 10549C0Ch - shift
+const_1e_7 dd ?
+
+org 10514A0Ch - shift
+const_minus dd ?
+
+org 10634450h - shift
+off_10634450 dd ?
+
+org 106196A8h - shift
+off_106196A8 dd ?
+
+org 10512BF4h - shift
+GetMaterialByIdx dd ?
+
+org 10512BD4h - shift
+GMLib dd ?
+
+org 102C3260h - shift	; 5 bytes
+	jmp		CWeapon__CallbackOnShoot
+back_from_CWeapon__CallbackOnShoot:
+
+;org 102D065Ch - shift	; 6 bytes
+;	jmp		test_adr_weapon
+;	nop
+;back_from_test_adr_weapon:
+
+org 10512BCCh - shift	; CRenderDevice Device
+Device 		dd ?
+org 105127A0h - shift
+r_string 	dd ?
+org 105127E8h - shift
+pSettings	dd ?
+
+org 102A57C0h - shift
+script_callback_str_uint:
+org 1032DBD0h - shift
+script_callback_float_vector_int2:
+org 1032E2D0h - shift
+script_callback_float_vector_int:
+
+; возможность использовать скрипты в мультиплеере (включение биндеров)
+org 100C172Eh - shift	; 2 bytes
+	nop
+	nop
+
+org 101EC1D3h - shift	; 5 bytes
+	jmp		game_object_fix
+back_from_game_object_fix:
+
+org 101D3D20h - shift
+register__bool__void:
+org 101D3990h - shift
+register__uint__void:
+org 101D3F90h - shift
+register__void__go:
+org 101D3B70h - shift
+register__float__void:
+org 101D45C0h - shift
+register__str__void:
+org 101D3C60h - shift
+register__void__float:
+org 101D41D0h - shift
+register__void__str_bool:
+org 101D4500h - shift
+register__bool__str:
+
+; 
+org 1061842Ch - shift
+off_1061842C:
+org 10619C60h - shift
+off_10619C60:
+org 1062CD94h - shift
+off_1062CD94:
+org 1062CD38h - shift
+off_1062CD38:
+org 1062D2DCh - shift
+off_1062D2DC:
+org 10628D10h - shift
+off_10628D10:
+org 1062CD54h - shift
+off_1062CD54:
+org 1062CC74h - shift
+off_1062CC74:
+org 1061844Ch - shift
+off_1061844C:
+org 1062CC90h - shift
+off_1062CC90:
+org 10637320h - shift
+off_10637320:
+org 10635EF0h - shift
+off_10635EF0:
+org 106376D8h - shift
+off_106376D8:
+org 10637720h - shift
+off_10637720:
+org 10637748h - shift
+off_10637748:
+org 10636A7Ch - shift
+off_10636A7C:
+org 10637578h - shift
+off_10637578:
+org 10637590h - shift
+off_10637590:
+org 1062CD70h - shift
+off_1062CD70:
+org 10637380h - shift
+off_10637380:
+org 10637398h - shift
+off_10637398:
+org 106373B0h - shift
+off_106373B0:
+org 106375A8h - shift
+off_106375A8:
+org 1061AD4Ch - shift
+off_1061AD4C:
+org 106375C0h - shift
+off_106375C0:
+
+org 101D8378h - shift	; 5 bytes
+	call    register__void__go
+
+org 101C1887h - shift	; 7 bytes
+	jmp		CScriptGameObject_explode_fix
+	nop
+	nop
+back_from_CScriptGameObject_explode_fix:
+
+org 1004B8B0h - shift
+CVisualMemoryManager__object_luminocity:
+
+org 10512BF0h - shift
+ROS	dd ?
+
+org 105127A4h - shift
+line_exist	dd ?
+
+org 103483F0h - shift
+smart_cast_CEntityAlive:
+org 10348420h - shift
+smart_cast_CWeapon:
+org 10348450h - shift
+smart_cast_CWeaponMagazined:
+org 103483C0h - shift
+smart_cast_IKinematics:
+
+org 10512D10h - shift
+IGame_Level__CurrentEntity dd ?
+
+org 10512BE8h - shift
+g_dedicated_server dd ?
+
+org 10232E20h - shift
+CLevel__IsServer:
+
+org 10232E50h - shift
+CLevel__IsClient:
+
+org 10515A60h - shift
+float_60 dd ?
+
+org 102CE2E0h - shift	; 6 bytes
+	call	CWeapon__Callback_SwitchMode
+	nop
+org 102CE340h - shift	; 6 bytes
+	call	CWeapon__Callback_SwitchMode
+	nop
+
+; callback  UpdateAddonsVisibility
+org 102BDB77h - shift	; 9 bytes
+	jmp		UpdateAddonsVisibility_fix
+back_from_UpdateAddonsVisibility_fix:
+	pop     edi
+	pop     esi
+	pop     ebx
+	retn
+; callback  HUDUpdateAddonsVisibility
+org 102BC34Bh - shift	; 6 bytes
+	jmp		UpdateHUDAddonsVisibility_fix
+	nop
+back_from_UpdateHUDAddonsVisibility_fix:
+org 102F97A0h - shift
+CHudItem__HudItemData:
+
+org 102F9C80h - shift
+CHudItem__GetHUDmode:
+
+;================================================================
+; Возможность стрелять картечью из подствольного гранатомёта.
+;================================================================
+org 102D2C83h - shift	; 5 bytes
+	call    shotgun_gl
+; при дробовым патроне для ПГ ракета не спавнится.
+org 102CC6F9h - shift	; 9 bytes
+	jz      no_spawn_rocket
+	add     eax, 10h
+org 102CC877h - shift
+no_spawn_rocket:
+;org 102D13C7h - shift	; 2 bytes
+;	nop
+;	nop
+	
+org 102C3080h - shift
+CWeapon__FireTrace:
+org 102D0350h - shift
+CWeaponMagazined__state_Fire:
+org 102D1350h - shift
+CWeaponMagazinedWGrenade__OnShot:
+org 102CC650h - shift
+CRocketLauncher__getRocketCount:
+org 102CC660h - shift
+CRocketLauncher__getCurrentRocket:
+org 102CC680h - shift
+CRocketLauncher__dropCurrentRocket:
+org 102C2D50h - shift
+CWeapon__StartFlameParticles2:
+org 102D3E40h - shift
+CWeaponMagazinedWGrenade__Load:
+
+;org 102BEFA0h - shift
+;sub_102BEFA0:
+
+; перезарядка параметров: подствол. - основной ствол.
+org 102D3A52h - shift	; 5 bytes
+	jmp		switshGL_params
+back_from_switshGL_params:
+
+org 105561CCh - shift
+aGrenade_laun_0 dd ?
+org 102BAE10h - shift
+CShootingObject__LoadFireParams:
+;================================================================
+
+; Подствольный гранатомёт: смена ракеты при смене типа боеприпаса.
+org 102D1FE9h - shift	; 7 bytes
+	jmp		reload_GL
+	nop
+	nop
+back_from_reload_GL:

@@ -23,3 +23,9 @@ CUIPdaWnd__SetActiveSubdialog_chunk proc
 	pop     esi
 	retn    4
 CUIPdaWnd__SetActiveSubdialog_chunk endp
+
+
+;CUIPdaWnd__Show_ex proc
+	
+;	jmp		back_from_CUIPdaWnd__Show_ex
+;CUIPdaWnd__Show_ex endp

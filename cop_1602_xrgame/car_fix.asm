@@ -86,3 +86,53 @@ arg_0           = dword ptr  4
 	add     esp, 14h
 	retn
 SmartDynamicCast__CSmartMatcher_CCar_CHolderCustom___smart_cast_ endp
+;---rev231---
+; Фикс вылета "смерть актора в машине".
+; Вылет происходит при попытке создать физ. оболочку актора, когда актор гибнет в машине.
+; Тут мы определяем: что объект(m_EntityAlife) это актор и он в машине, и при его смерти, физ. оболочку не создаём,
+; как это происходит в ТЧ.
+; (с) НаноБот
+; 10.09.2015 г.
+
+die_actor_holder_fix proc
+; CEntityAlive    ebp = &m_EntityAlife
+	cmp     dword ptr [ebp+88h], 0 			; if( m_eType == etActor )
+	jnz     not_actor
+		mov     eax, [ebp+94h]
+		push    eax
+		call    smart_cast_CActor				; smart_cast<CActor*>( &m_EntityAlife );
+		add     esp, 4
+		mov     ecx, eax        			; CActor* ecx = A
+;		mov		eax, [ecx+4C4h]
+;		PRINT_UINT	"ecx->Holder - %x", eax
+		cmp     dword ptr [ecx+4C4h], 0 	; if( ecx->Holder() );
+		jnz		back_from_die_actor_holder_fix	; актор внутри машины. Обходим функцию KillHit(H) и не создаём физ. оболочку актора.
+not_actor:
+	push    ebx
+	mov     ecx, ebp
+	call    CCharacterPhysicsSupport__KillHit
+	jmp		back_from_die_actor_holder_fix
+die_actor_holder_fix endp
+
+die_actor_holder_fix2 proc
+; CEntityAlive    esi = &m_EntityAlife
+	cmp     dword ptr [esi+88h], 0 			; if( m_eType == etActor )
+	jnz     not_actor
+		mov     eax, [esi+94h]
+		push    eax
+		call    smart_cast_CActor				; smart_cast<CActor*>( &m_EntityAlife );
+		add     esp, 4
+		mov     ecx, eax        			; CActor* ecx = A
+;		mov		eax, [ecx+4C4h]
+;		PRINT_UINT	"ecx->Holder - %x", eax
+		cmp     dword ptr [ecx+4C4h], 0 	; if( ecx->Holder() );
+		jnz		back_from_die_actor_holder_fix2	; актор внутри машины. Обходим функцию ActivateShell(NULL) и не создаём физ. оболочку актора.
+not_actor:
+	push    0
+	mov     ecx, esi
+	call    CCharacterPhysicsSupport__ActivateShell
+	jmp		back_from_die_actor_holder_fix2
+die_actor_holder_fix2 endp
+
+
+

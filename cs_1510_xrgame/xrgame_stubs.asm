@@ -523,3 +523,67 @@ org 10181BE0h - shift
 sub_10181BE0:
 org 10181C20h - shift
 sub_10181C20:
+;---rev231---
+; для функции вылета
+org 104DA864h - shift
+Debug dd ?
+org 104DA86Ch - shift
+xrDebug__fail dd ?
+
+; 
+org 102BE730h - shift
+script_callback_flt_vec_int:
+
+org 102BE840h - shift
+script_callback_flt_vec_const:
+;
+org 102A3790h - shift
+script_callback_str_uint:
+
+org 1013BAA0h - shift
+script_callback_hit2:
+
+; колбек на выстрел, запускается в объекте оружия. (c) NanoBot
+org 1025674Bh - shift	; 6 bytes
+	jmp		CWeapon__CallbackOnShoot
+	nop
+back_from_CWeapon__CallbackOnShoot:
+
+; Для без проблемного открывания фейковых дверей в классе CCar
+org 102A6D7Ah - shift
+ret_true_CCar__Enter:
+org 102A6CEAh - shift	; 6 bytes
+	jnz		ret_true_CCar__Enter
+
+;org 10216E40h - shift
+;	jmp CEntityAlive__Hit_fix
+
+; Вывод начального адресса xrGame.dll
+org 102DB8F0h - shift	; 4 bytes
+	jmp		label1__DllMain
+	nop
+	nop
+back_from_label1__DllMain:
+
+org 102DB922h - shift	; 11 bytes
+label1__DllMain:
+	call	StartAdress_xrGame_log__DllMain
+	; делаем что вырезали
+	mov     eax, [esp+8]
+	jmp		back_from_label1__DllMain
+
+; фикс вылета 'смерть актора в машине'.
+org 103DEC14h - shift	; 7 bytes
+	jmp		die_actor_holder_fix
+	nop
+	nop
+back_from_die_actor_holder_fix:
+org 103DE940h - shift
+CCharacterPhysicsSupport__KillHit:
+; part 2
+org 103E0FB8h - shift	; 5 bytes
+	jmp		die_actor_holder_fix2
+back_from_die_actor_holder_fix2:
+org 103DF470h - shift
+CCharacterPhysicsSupport__ActivateShell:
+;-------------------------------------

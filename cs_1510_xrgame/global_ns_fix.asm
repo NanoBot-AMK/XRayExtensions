@@ -135,4 +135,17 @@ _flags      = dword ptr  4
 	mov     eax, [extensions_flags]
 	retn
 get_extensions_flags endp
-
+;---rev231---
+first_start_log 	db 1
+StartAdress_xrGame_log__DllMain proc
+	cmp		[first_start_log], 0
+	jz		lab1
+		mov		eax, [esp]
+		sub		eax, 002DB927h
+		PRINT_UINT	"xrGame.dll Start adress: %x", eax
+		mov		[first_start_log], 0
+lab1:
+	retn
+StartAdress_xrGame_log__DllMain endp
+	
+	

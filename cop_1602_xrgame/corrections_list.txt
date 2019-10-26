@@ -13,3 +13,24 @@
 0x10237545 5 ; jmp level_input_fix
 0x104AEA5C 5 ; jmp cuilistbox_fix1
 0x104AEAF3 5 ; jmp cuilistbox_fix2
+0x1034A990 7 ; Вывод начального адреса xrGame.dll
+0x104E3310 8 ; фикс вылета 'смерть актора в машине' часть 1
+0x104E37A7 9 ; -->>--	часть 2
+0x102C3260 5 ; колбек на выстрел
+0x100C172E 2 ; возможность использовать скрипты в мультиплеере (включение биндеров)
+0x101EC1D3 5 ; jmp game_object_fix
+; 
+0x101D8378 5
+0x101C1887 7 
+;
+0x102CE2E0 6 ; callback  CWeapon__Callback_SwitchMode (1)
+0x102CE340 6 ; callback  CWeapon__Callback_SwitchMode (2)
+;
+0x102BDB77 9 ; callback  UpdateAddonsVisibility
+0x102BC34B 6 ; callback  UpdateHUDAddonsVisibility
+; стрельба из подствола дробью
+0x102CC6F9 9 ; 
+0x102D2C83 5
+0x102D3A52 5
+; правка подствольного гранатомёта.
+0x102D1FE9 7

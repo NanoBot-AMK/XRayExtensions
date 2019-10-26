@@ -64,3 +64,19 @@ my_log_fun      endp
 
 aF_4 db "%f", 0
 aS_4 db "%s", 0
+;---rev231---
+first_start_log 	db 1
+StartAdress_xrGame_log__DllMain proc
+fdwReason	= dword ptr  8
+	cmp		[first_start_log], 0
+	jz		lab1
+		mov		eax, [esp]
+		sub		eax, 0034A995h
+		PRINT_UINT	"xrGame.dll Start adress: %x", eax
+		mov		[first_start_log], 0
+lab1:
+	; делаем что вырезали
+	mov		eax, [esp+4+fdwReason]
+	sub		eax, 1
+	retn
+StartAdress_xrGame_log__DllMain endp
