@@ -194,15 +194,20 @@ back_to_level_ns_ext_2: ; расстояние 8 байт, хватает, чтобы вставить 5 байт врез
 ; игнорировать проверку на живость актора. Колбек будет вызываться всегда. Для актора
 ; в сингле это по большому счёту фиолетово.
 
-org 10260120h - shift
+org 10260120h - shift	; 6 bytes
 	jmp CActor_HitSignal_ext
-;.text:10260120					xorps	xmm5, xmm5
-;.text:10260123					sub		esp, 0Ch
-org 10260126h - shift
-back_to_CActor_HitSignal:
-;.text:10260126					push	edi
-;.text:10260127					mov		edi, ecx
-;.text:10260129					mov		eax, [edi+200h]
+	nop
+back_to_CActor_HitSignal:	
+
+; расширенный хит колбек вешаем на все объекты.
+org 102798FBh - shift	; 16 bytes
+	push	edi
+	mov		ecx, esi
+	call	CEntityHitCallback
+	pop		edi
+	pop		esi
+	add		esp, 76
+	retn	4
 
 ; -----------------------------------------------------------------------------
 ; Метод класса CGameObject, который возвращает для него скриптовый объект game_object
@@ -1252,3 +1257,9 @@ org 10564330h - shift	; 4 bytes
 org 10564920h - shift	; 4 bytes
 	dd		CWeaponMagazined__switch2_Fire			; в место CWeaponShotgun::switch2_Fire
 ;------------------------------------------------
+
+; при переходе в онлайн кондишен объекта не устанавливается в 1		CGameObject::spawn_supplies
+org 10280547h - shift	; 2 bytes
+	jmp		loc_10280554
+org 10280554h - shift
+loc_10280554:

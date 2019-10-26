@@ -54,4 +54,25 @@ cfCanBeUnlimited		= byte ptr 4
 cfExplosive				= byte ptr 8
 cfMagneticBeam			= byte ptr 16
 ;-----------
-	
+
+SHit	struc 					; sizeof 72 bytes
+	Time			dd ? 		; u32		  	// 0
+	PACKET_TYPE		dw ? 		; u16		  	// 4
+	DestID			dw ? 		; u16		  	// 6
+	power			dd ? 		; float			// 8
+	dir				Fvector <>	;			  	// 12
+	who				dd ? 		; CObject 		// 24
+	whoID			dw ?		; u16			// 28
+	weaponID		dw ?		; u16			// 30
+	boneID			dw ?		; u16			// 32
+	p_in_bone_space Fvector <>	;			  	// 34
+	align 4
+	impulse			dd ? 		; float			// 48
+	hit_type		dd ? 		; ALife::EHitType // 52
+	armor_piercing	dd ? 		; float			// 56
+	add_wound		db ?		; bool			// 60
+	aim_bullet		db ? 		; bool			// 61
+	align 4
+	BulletID		dd ? 		; u32			// 64
+	SenderID		dd ? 		; u32			// 68
+SHit	ends
