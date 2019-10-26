@@ -55,7 +55,7 @@ level_ns_extension_1:
 	pop		ecx
 	mov		eax, esp
 	push	offset RayPickSetParams2
-	push	offset aRayPickSetParams2 ; "raypick_set_ignoreobjid_pos"
+	push	offset aRayPickSetParams2 ; "raypick_set_ignore_pos"
 	push	eax
 	call	register_level__float__uint_vector ; регистрируем функцию
 ;--------------------------------------
@@ -131,6 +131,14 @@ level_ns_extension_1:
 	push	eax
 	call	register_level__uint__void
 ;--------------------------------------
+	pop		ecx
+	pop		ecx
+	mov		eax, esp
+	push	offset RayPickGetTransparencyFactor
+	push	offset aRayPickGetTransparencyFactor ; "raypick_get_transparency_factor"
+	push	eax
+	call	register_level__float__void
+;--------------------------------------
 ;	---===RayPick===---
 	pop		ecx
 	pop		ecx
@@ -148,6 +156,22 @@ level_ns_extension_1:
 	push	eax
 	call	register_level__bool__void
 ;--------------------------------------
+	pop		ecx
+	pop		ecx
+	mov		eax, esp
+	push	offset Level__OnClient
+	push	offset aOnClient ; "on_client"
+	push	eax
+	call	register_level__bool__void
+;--------------------------------------
+	pop		ecx
+	pop		ecx
+	mov		eax, esp
+	push	offset Level__OnDedicatedServer
+	push	offset aOnDedicatedServer ; "on_dedicated_server"
+	push	eax
+	call	register_level__bool__void
+;--------------------------------------
 	jmp back_to_level_ns_ext_1
 	
 aGet_target_dist db "get_target_dist", 0
@@ -156,21 +180,24 @@ aGet_actor_body_state db "get_actor_body_state", 0
 aSet_fov db "set_fov", 0
 aGet_fov db "get_fov", 0
 ;	---===RayPick===---
-aRayPickSetParams1		db "raypick_set_flags_dir_dist", 0
-aRayPickSetParams2		db "raypick_set_ignore_pos", 0
-aRayPickQuery			db "raypick_query", 0
-aRayPickGetObject		db "raypick_get_object", 0
-aRayPickGetDist			db "raypick_get_distance", 0
-aRayPickGetElement		db "raypick_get_element", 0
-aRayPickGetNameBone		db "raypick_get_name_bone", 0
-aRayPickGetNormal		db "raypick_get_normal", 0
-aRayPickGetEndPoint		db "raypick_get_end_point", 0
-aRayPickGetShootFactor	db "raypick_get_shoot_factor", 0
-aRayPickGetFlags 		db "raypick_get_flags", 0
+aRayPickSetParams1				db "raypick_set_flags_dir_dist", 0
+aRayPickSetParams2				db "raypick_set_ignore_pos", 0
+aRayPickQuery					db "raypick_query", 0
+aRayPickGetObject				db "raypick_get_object", 0
+aRayPickGetDist					db "raypick_get_distance", 0
+aRayPickGetElement				db "raypick_get_element", 0
+aRayPickGetNameBone				db "raypick_get_name_bone", 0
+aRayPickGetNormal				db "raypick_get_normal", 0
+aRayPickGetEndPoint				db "raypick_get_end_point", 0
+aRayPickGetShootFactor			db "raypick_get_shoot_factor", 0
+aRayPickGetFlags 				db "raypick_get_flags", 0
+aRayPickGetTransparencyFactor 	db "raypick_get_transparency_factor", 0
 
 ;	---===RayPick===---
 aCurrentEntity 			db "current_actor", 0
 aOnServer 				db "on_server", 0
+aOnClient 				db "on_client", 0
+aOnDedicatedServer 		db "on_dedicated_server", 0
 
 level_ns_extension_2: ; здесь надо добавлять столько раз   "mov ecx, eax" + "call esi", сколько добавляли функций
 ; делаем то, что вырезали
@@ -228,11 +255,20 @@ level_ns_extension_2: ; здесь надо добавлять столько раз   "mov ecx, eax" + "cal
 	; для RayPickGetFlags
 	mov		ecx, eax
 	call	esi
+	; для RayPickGetTransparencyFactor
+	mov		ecx, eax
+	call	esi
 ;	---===RayPick===---
 	; для Level__CurrentEntity
 	mov		ecx, eax
 	call	esi
 	; для Level__OnServer
+	mov		ecx, eax
+	call	esi
+	; для Level__OnClient
+	mov		ecx, eax
+	call	esi
+	; для Level__OnDedicatedServer
 	mov		ecx, eax
 	call	esi
 ; идём обратно
@@ -513,7 +549,7 @@ end_if:
 				fstp	st
 				ja		else_
 					fsqrt
-					movss	xmm0, ds:const_1f				; 1.0f
+					movss	xmm0, ds:float_1				; 1.0f
 					fstp	[esp+size_variables+8+len]
 					divss	xmm0, [esp+size_variables+8+len]
 					movaps	xmm4, xmm0
@@ -663,6 +699,47 @@ zero:
 	xor		eax, eax
 	retn
 RayPickGetFlags endp
+
+RayPickGetTransparencyFactor proc
+	mov		eax, [rq_res.O]
+	test	eax, eax
+	jz		static
+		mov		eax, [eax+90h]		; IRenderVisual vis* = Obj->Visual()
+		test	eax, eax
+		jz		zero
+			mov		ecx, [eax]
+			mov		edx, [ecx+0Ch]
+			push	eax
+			call	edx					; IKinematics *IK = smart_cast<IKinematics*>(vis)
+			mov		ecx, [eax]
+			mov		edx, [ecx+28h]
+			push	[rq_res.element]	; u16 BoneID
+			push	eax
+			call	edx					; CBoneData eax = bone_data = IK->LL_GetData(BoneID)
+			movzx	eax, word ptr [eax+13Ch]	; bone_data.game_mtl_idx
+		jmp		end_if
+static:
+	test	[rq_res.element], -1
+	jz		zero
+		mov		ecx, ds:g_pGameLevel		; IGame_Level * g_pGameLevel
+		mov		eax, [ecx]
+		lea		ecx, [eax+40094h]
+		call	ds:GetStaticTris			; CObjectSpace::GetStaticTris(void)
+		mov		edx, [rq_res.element]
+		shl		edx, 4
+		add		eax, edx
+		movzx	eax, word ptr [eax+0Ch]
+		and		eax, 0FFFF3FFFh				; u16 eax = tgt_material
+end_if:
+	mov		ecx, ds:GMLib				; CGameMtlLibrary GMLib
+	push	eax							; tgt_material
+	call	ds:GetMaterialByIdx			; CGameMtlLibrary::GetMaterialByIdx(ushort)
+	fld		dword ptr [eax+38h]
+	retn
+zero:
+	fld1
+	retn
+RayPickGetTransparencyFactor endp
 ;	---===RayPick===---
 
 Level__CurrentEntity proc
@@ -684,3 +761,17 @@ Level__OnServer proc
 	movzx	eax, al
 	retn
 Level__OnServer endp
+
+Level__OnClient proc
+	mov     eax, ds:g_pGameLevel				; IGame_Level * g_pGameLevel
+	mov     ecx, [eax]
+	call    CLevel__IsClient
+	movzx	eax, al
+	retn
+Level__OnClient endp
+
+Level__OnDedicatedServer proc
+	mov     eax, ds:g_dedicated_server
+	movzx	eax, byte ptr [eax]
+	retn
+Level__OnDedicatedServer endp

@@ -10,8 +10,9 @@ eWeaponStartBullet					= dword ptr 182		; колбек на старт пули
 eWeaponStopBullet					= dword ptr 183		; колбек на стоп пули
 eWeaponSwitchMode					= dword ptr 184		; колбек на переключения режима огня
 
-m_dwTotalShots dd 0						; для генератора айдишника пуль.		GLOBAL
-aCallback_on db "callback_on", 0		; название булевого параметра в конфиге патрона для включения колбеков для старта и стопа пули.
+m_dwTotalShots 	dd 0					; для генератора айдишника пуль.		GLOBAL
+aCallback_on 	db "callback_on", 0		; название булевого параметра в конфиге патрона для включения колбеков для старта и стопа пули.
+aGrenadeAny		db "missile_0", 0
 
 ; колбек на выстрел, вызывается в объекте оружия
 CWeapon__CallbackOnShoot proc
@@ -38,16 +39,12 @@ z							= dword ptr	 8
 	;========================================
 	; callback(eWeaponOnShoot)(m_vStartDir);
 	push	0							; int
-	mov		ecx, [esi+m_vStartDir+z]
-	push	ecx							; 
-	mov		ecx, [esi+m_vStartDir+y]
-	push	ecx							; 
-	mov		ecx, [esi+m_vStartDir+x]
-	push	ecx							; 
+	push	[esi+m_vStartDir+z]			; 
+	push	[esi+m_vStartDir+y]			; 
+	push	[esi+m_vStartDir+x]			; 
 	push	0
 	push	offset eWeaponOnShoot		; константа - тип колбека
-	mov		ecx, esi					; this
-	add		ecx, 232
+	lea		ecx, [esi+232]				; this
 	call	CGameObject__callback		; eax = callback
 	mov		ecx, eax					; callback
 	call	script_callback_float_vector_int	;  
@@ -212,24 +209,46 @@ exit:
 	jmp		back_from_switshGL_params
 switshGL_params endp
 
-;reload_GL_2 proc
-;	PRINT "CWeaponMagazinedWGrenade::switch2_Reload()"
-;	; делаем что вырезали
-;	or		word ptr [esi+2F4h], 1
-;	jmp		back_from_reload_GL_2
-;reload_GL_2 endp
-
-reload_GL proc
 m_rockets					= dword ptr	 1976
 m_bGrenadeMode				= dword ptr	 2040
 iAmmoElapsed				= dword ptr	 1680
-
+m_magazine					= dword ptr	 1736	; sizeof 12 bytes
+reload_GL proc
+;----------------------------
 	push	ecx
 	PRINT "CWeaponMagazinedWGrenade::ReloadMagazine()"
 	cmp		byte ptr [esi+m_bGrenadeMode], 0
 	jz		exit
-;	CCustomRocket		cur_rock = getCurrentRocket()	
-	lea     ecx, [esi+m_rockets]
+	mov		ecx, esi
+	call	delete_rockets
+exit:
+	pop		ecx
+	; делаем что вырезали
+	cmp		dword ptr [esi+690h], 0
+	jmp		back_from_reload_GL
+reload_GL endp
+
+delete_rockets proc
+	
+	push	esi
+	push	ebx
+	push	edx
+	xor		ebx, ebx
+	mov		esi, ecx
+	push    0
+	push    offset off_106373E8
+	push    offset off_1061842C
+	push    0
+	push    esi
+	call    __RTDynamicCast
+	add     esp, 14h
+	PRINT_UINT "CRocketLauncher - %x", eax
+	test	eax, eax
+	jz		exit
+	mov		esi, eax	; esi - CRocketLauncher
+while_:
+;	lea		ecx, [esi+m_rockets]
+	mov		ecx, esi
 	call	CRocketLauncher__getCurrentRocket
 ;	if (cur_rock)	
 	test	eax, eax
@@ -244,12 +263,217 @@ iAmmoElapsed				= dword ptr	 1680
 	mov		ecx, eax
 	mov		eax, [edx+100h]
 	call	eax
-;	dropCurrentRocket();	};
-	lea     ecx, [esi+m_rockets]
-	call    CRocketLauncher__dropCurrentRocket
-exit:
+;	dropCurrentRocket();
+;	lea		ecx, [esi+m_rockets]
+	mov		ecx, esi
+	call	CRocketLauncher__dropCurrentRocket
+	inc		ebx
+	jmp		while_
+exit:	;	};
+	mov		eax, ebx
+	pop		edx
+	pop		ebx
+	pop		esi
+	retn
+delete_rockets endp
+
+spawn_rockets proc
+m_ammoSect					= dword ptr	 4	; shared_str
+; локальные переменные
+size_variables			= dword ptr	4+4	; размер поля локальных переменных
+_						= dword ptr	0		; float			sizeof 4 bytes
+fake_grenade_name		= dword ptr 4		; shared_str*	sizeof 4 bytes
+;--------------------------------------
+	sub		esp, size_variables
+	push	ebp
+	push	edx
+	push	esi
+	push	edi
+	mov		esi, ecx
+	mov		ecx, [esi+m_magazine+4]
+	sub		ecx, [esi+m_magazine]
+	mov		eax, 88888889h
+	imul	ecx
+	add		edx, ecx
+	sar		edx, 5
+	mov		ecx, edx
+	shr		ecx, 1Fh
+	xor		edi, edi
+	add		ecx, edx
+	jz		exit
+	push	ebx
+	xor		ebx, ebx
+	PRINT_UINT "Numbers - %d", ecx
+for_:
+	mov		edx, [esi+m_magazine]
+	mov		eax, dword ptr [ebx+edx+m_ammoSect]
+	test	eax, eax
+	jz		lab1
+	add		eax, 10h
+	PRINT_UINT "Number - %d", edi
+	PRINT_UINT "m_ammoSect - %s", eax
+lab1:
+	;------------------------------
+	push	ecx
+	push	edx
+	push	offset aFake_grenade_n			; "fake_grenade_name"
+	push	eax
+	mov		eax, ds:pSettings				; CInifile const * const pSettings
+	mov		ecx, [eax]
+	call	ds:r_string						; CInifile::r_string(char const *,char const *)
+;	PRINT_UINT "fake_grenade_name - %s", eax
+	lea     ecx, [esp+28+fake_grenade_name]
+;	PRINT_UINT "ecx - %x", ecx
+	push    eax
+	call    LPCSTR2shared_str
+	lea     eax, [esi+0E8h]
+	lea     ecx, [esp+28+fake_grenade_name]
+;	PRINT_UINT "ecx - %x", ecx
+	push	eax
+	push	ecx
+	lea		ecx, [esi+1976]
+	call    CRocketLauncher__SpawnRocket
+	pop		edx
 	pop		ecx
+	;------------------------------
+	mov		ecx, [esi+m_magazine+4]
+	sub		ecx, [esi+m_magazine]
+	mov		eax, 88888889h
+	imul	ecx
+	add		edx, ecx
+	sar		edx, 5
+	mov		ecx, edx
+	shr		ecx, 1Fh
+	add		edi, 1
+	add		ecx, edx
+	add		ebx, 3Ch
+	cmp		edi, ecx
+	jb		for_
+	mov		eax, edi
+	pop		ebx
+exit:						   
+	pop     edi
+	pop     esi
+	pop		edx
+	pop     ebp
+	add		esp, size_variables
+	retn
+spawn_rockets endp
+
+; Удаляем ракеты при разрядке CWeaponRG6, CWeaponRPG7, CWeaponMagazinedWGrenade.
+unload_delete_rockets proc
+	mov		ecx, ebp
+	push	eax
+	call	delete_rockets
+	pop		eax
 	; делаем что вырезали
-	cmp		dword ptr [esi+690h], 0
-	jmp		back_from_reload_GL
-reload_GL endp
+	mov     ecx, [ebp+6C8h]
+	jmp		back_from_unload_delete_rockets
+unload_delete_rockets endp
+
+; Реальные ракеты при заряжании. (Ракеты соотвествуют секции fake_grenade_name патрона)	CWeaponRPG7__ReloadMagazine
+CWeaponRPG7__RealReloadRockets proc
+; esi - CWeaponRPG7
+;---------------------------
+	mov		ecx, esi
+	call	delete_rockets		; удаляем старые ракеты
+	mov		ecx, esi
+	call	spawn_rockets		; спавним новые, которые соотвествуют патронам
+;	pop		ebx
+	pop     esi
+	pop     ecx
+	retn			; выходим из void CWeaponRPG7::ReloadMagazine()
+CWeaponRPG7__RealReloadRockets endp
+CWeaponRPG7__RealReloadRockets2 proc
+; esi - CWeaponRPG7
+;---------------------------
+	mov		ecx, esi
+	call	spawn_rockets
+	pop     esi
+	mov     eax, ebx
+	pop     ebx
+	retn    4		; выходим из BOOL CWeaponRPG7::net_Spawn
+CWeaponRPG7__RealReloadRockets2 endp
+
+; колбек на удар ножа, вызывается в объекте ножа
+CWeaponKnife__CallbackOnShoot proc
+; esi - CWeaponKnife
+fCurrentHit					= dword ptr	 1956
+x							= dword ptr	 0
+y							= dword ptr	 4
+z							= dword ptr	 8
+pos							= dword ptr	 4
+dir							= dword ptr	 8
+k_hit						= dword ptr	 0Ch
+;--------------------------------
+	;========================================
+	; callback(eWeaponOnShoot)(fCurrentHit*k_hit, dir, 0);
+	
+;	mov		ecx, [esp+4Ch+pos]
+;	mov		eax, [ecx+x]
+;	PRINT_FLOAT	"pos.x - %f", eax
+;	mov		eax, [ecx+y]
+;	PRINT_FLOAT	"pos.y - %f", eax
+;	mov		eax, [ecx+z]
+;	PRINT_FLOAT	"pos.z - %f", eax
+	
+	push	0							; int
+	mov		ecx, [esp+50h+dir]
+	mov		eax, [ecx+z]
+	push	eax							; 
+	mov		eax, [ecx+y]
+	push	eax							; 
+	mov		eax, [ecx+x]
+	push	eax							; 
+	movss	xmm0, [esp+5Ch+k_hit]
+	mulss	xmm0, [esi+fCurrentHit]
+	push	ecx
+	movss	dword ptr [esp], xmm0
+	push	offset eWeaponOnShoot		; константа - тип колбека
+	mov		ecx, esi					; this
+	add		ecx, 232
+	call	CGameObject__callback		; eax = callback
+	mov		ecx, eax					; callback
+	call	script_callback_float_vector_int	;  
+	;========================================
+	; делаем вырезанное
+	mov		ax, [esi+74Ch]		; 7 bytes
+	jmp		back_from_CWeaponKnife__CallbackOnShoot
+CWeaponKnife__CallbackOnShoot endp
+
+; блокировка автоперезарядки (перезарядка только кнопкой R)
+aAutoReload			db "auto_reload", 0
+
+LoadBoolAutoload proc
+; esi - CWeaponMagazined
+;---------------------------------------
+	; делаем вырезанное
+	mov		[esi+m_iPrefferedFireMode], eax
+	;------------
+;	m_bAutoReload	= READ_IF_EXISTS(pSettings, r_bool, section, "auto_reload", true);
+	mov		byte ptr [esi+m_bAutoReload], 1
+	push	offset aAutoReload			; "auto_reload"
+	push	ebx
+	mov		eax, ds:pSettings				; CInifile const * const pSettings
+	mov		ecx, [eax]
+	call	ds:line_exist					; CInifile::line_exist(char const *,char const *)
+	test	eax, eax
+	jz		exit
+		push	offset aAutoReload			; "auto_reload"
+		push	ebx
+		mov		eax, ds:pSettings			; CInifile const * const pSettings
+		mov		ecx, [eax]
+		call	ds:r_bool
+		mov		byte ptr [esi+m_bAutoReload], al
+exit:
+	jmp		back_from_LoadBoolAutoload
+LoadBoolAutoload endp
+
+BlockedRPG7 proc
+	xor		eax, eax
+	cmp		byte ptr [esi+m_bBlockRocket], 1
+	jz		exit
+	call	CRocketLauncher__getRocketCount
+exit:
+	retn
+BlockedRPG7 endp

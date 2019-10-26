@@ -5,83 +5,86 @@ game_object_fix proc
 ; делаем то, что вырезали 
 	call	register__bool__void
 ; добавляем своё
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsGameObject,			"is_game_object"
-	PERFORM_EXPORT_UINT__VOID CScriptGameObject__GetGameObject,			"cast_game_object"
-	PERFORM_EXPORT_UINT__VOID CScriptGameObject__CCar,					"cast_car"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsCar,					"is_car"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsHelicopter,			"is_helicopter"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsHolder,				"is_holder"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsEntityAlive,			"is_entity_alive"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsInventoryItem,		"is_inventory_item"
-	PERFORM_EXPORT_UINT__VOID CScriptGameObject__CInventoryItem,		"cast_inventory_item"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsInventoryOwner,		"is_inventory_owner"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActor,				"is_actor"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsCustomMonster,		"is_custom_monster"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeapon,				"is_weapon"
-	PERFORM_EXPORT_UINT__VOID CScriptGameObject__CWeapon,				"cast_weapon"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeaponGL,			"is_weapon_gl"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsInventoryBox,		"is_inventory_box"
-	PERFORM_EXPORT_UINT__VOID CScriptGameObject__CInventoryBox,			"cast_inventory_box"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsMedkit,				"is_medkit"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsEatableItem,			"is_eatable_item"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsAntirad,				"is_antirad"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsOutfit,				"is_outfit"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsScope,				"is_scope"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsSilencer,			"is_silencer"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsGrenadeLauncher,		"is_grenade_launcher"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeaponMagazined,		"is_weapon_magazined"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsSpaceRestrictor,		"is_space_restrictor"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsStalker,				"is_stalker"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsCustomZone,			"is_anomaly"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsBaseMonster,			"is_monster"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsExplosive,			"is_explosive"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsScriptZone,			"is_script_zone"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsProjector,			"is_projector"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsTrader,				"is_trader"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsHudItem,				"is_hud_item"
-	PERFORM_EXPORT_UINT__VOID CScriptGameObject__CHudItem,				"cast_hud_item"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsFoodItem,			"is_food_item"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsArtefact,			"is_artefact"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsAmmo,				"is_ammo"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsMissile,				"is_missile"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsPhysicsShellHolder,	"is_physics_shell_holder"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsGrenade,				"is_grenade"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsBottleItem,			"is_bottle_item"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsHangingLamp,			"is_hanging_lamp"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeaponKnife,			"is_knife"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeaponBinoculars,	"is_binoculars"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeaponPistol,		"is_weapon_pistol"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeaponShotgun,		"is_weapon_shotgun"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsWeaponAutoShotgun,	"is_weapon_autoshotgun"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsExploded,			"is_exploded"	; взрывной объект взорван? 
-	PERFORM_EXPORT_FLOAT__VOID CScriptGameObject__ObjectLuminocity,		"object_luminocity"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsGameObject,			"is_game_object"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__GetGameObject,			"cast_game_object"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__CCar,					"cast_car"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsCar,					"is_car"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsHelicopter,			"is_helicopter"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsHolder,				"is_holder"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsEntityAlive,			"is_entity_alive"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsInventoryItem,			"is_inventory_item"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__CInventoryItem,			"cast_inventory_item"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsInventoryOwner,		"is_inventory_owner"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActor,					"is_actor"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsCustomMonster,			"is_custom_monster"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeapon,				"is_weapon"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__CWeapon,					"cast_weapon"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponGL,				"is_weapon_gl"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsInventoryBox,			"is_inventory_box"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__CInventoryBox,			"cast_inventory_box"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsMedkit,				"is_medkit"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsEatableItem,			"is_eatable_item"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsAntirad,				"is_antirad"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsOutfit,				"is_outfit"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsScope,					"is_scope"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsSilencer,				"is_silencer"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsGrenadeLauncher,		"is_grenade_launcher"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponMagazined,		"is_weapon_magazined"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsSpaceRestrictor,		"is_space_restrictor"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsStalker,				"is_stalker"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsCustomZone,			"is_anomaly"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsBaseMonster,			"is_monster"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsExplosive,				"is_explosive"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsScriptZone,			"is_script_zone"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsProjector,				"is_projector"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsTrader,				"is_trader"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsHudItem,				"is_hud_item"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__CHudItem,				"cast_hud_item"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsFoodItem,				"is_food_item"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsArtefact,				"is_artefact"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsAmmo,					"is_ammo"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsMissile,				"is_missile"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsPhysicsShellHolder,	"is_physics_shell_holder"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsGrenade,				"is_grenade"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsBottleItem,			"is_bottle_item"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsHangingLamp,			"is_hanging_lamp"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponKnife,			"is_knife"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponBinoculars,		"is_binoculars"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponPistol,			"is_weapon_pistol"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponShotgun,			"is_weapon_shotgun"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponAutoShotgun,		"is_weapon_autoshotgun"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponRPG7,			"is_weapon_rpg7"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsWeaponRG6,				"is_weapon_rg6"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsRocketLauncher,		"is_rocket_launcher"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsCrow,					"is_crow"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsExploded,				"is_exploded"	; взрывной объект взорван? 
+	PERFORM_EXPORT_FLOAT__VOID			CScriptGameObject__ObjectLuminocity,		"object_luminocity"
 	; ACTOR STATES
 	; методы для оценки состояния актора
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorNormal,			"is_actor_normal"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorCrouch,			"is_actor_crouch"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorCreep,			"is_actor_creep"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorClimb,			"is_actor_climb"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorWalking,		"is_actor_walking"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorRunning,		"is_actor_running"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorSprinting,		"is_actor_sprinting"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorCrouching,		"is_actor_crouching"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorCreeping,		"is_actor_creeping"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsActorClimbing,		"is_actor_climbing"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorNormal,				"is_actor_normal"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorCrouch,				"is_actor_crouch"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorCreep,				"is_actor_creep"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorClimb,				"is_actor_climb"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorWalking,				"is_actor_walking"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorRunning,				"is_actor_running"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorSprinting,			"is_actor_sprinting"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorCrouching,			"is_actor_crouching"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorCreeping,				"is_actor_creeping"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsActorClimbing,				"is_actor_climbing"
 	;
-	PERFORM_EXPORT_UINT__VOID CScriptGameObject__CurrentFireMode,		"get_fire_mode"
-	PERFORM_EXPORT_STRING__VOID CScriptGameObject__DefaultAmmo,			"get_default_ammo_type"
-	PERFORM_EXPORT_STRING__VOID CScriptGameObject__GetAmmo,				"get_ammo_type"
-	PERFORM_EXPORT_FLOAT__VOID CScriptGameObject__GetRPM,				"get_rpm"
-	PERFORM_EXPORT_VOID__FLOAT CScriptGameObject__SetRPM,				"set_rpm"
-	PERFORM_EXPORT_BOOL__VOID CScriptGameObject__IsGrenadeMode,			"is_grenade_mode"
+	PERFORM_EXPORT_UINT__VOID			CScriptGameObject__CurrentFireMode,				"get_fire_mode"
+	PERFORM_EXPORT_STRING__VOID			CScriptGameObject__DefaultAmmo,					"get_default_ammo_type"
+	PERFORM_EXPORT_STRING__VOID			CScriptGameObject__GetAmmo,						"get_ammo_type"
+	PERFORM_EXPORT_FLOAT__VOID			CScriptGameObject__GetRPM,						"get_rpm"
+	PERFORM_EXPORT_VOID__FLOAT			CScriptGameObject__SetRPM,						"set_rpm"
+	PERFORM_EXPORT_BOOL__VOID			CScriptGameObject__IsGrenadeMode,				"is_grenade_mode"
 	;
-	PERFORM_EXPORT_VOID__STRING_BOOL CScriptGameObject__SetObjectBoneVisible,		"set_obj_bone_visible"
-	PERFORM_EXPORT_BOOL__STRING	 CScriptGameObject__GetObjectBoneVisible,			"get_obj_bone_visible"
-	PERFORM_EXPORT_VOID__STRING_BOOL CScriptGameObject__SetHUDObjectBoneVisible,	"set_hud_obj_bone_visible"
-	PERFORM_EXPORT_BOOL__STRING	 CScriptGameObject__GetHUDObjectBoneVisible,		"get_hud_obj_bone_visible"
-	
-	PERFORM_EXPORT_VOID__STRING_BOOL CScriptGameObject__VoidStrBool,	"void__str_bool"
-	PERFORM_EXPORT_BOOL__STRING	 CScriptGameObject__BoolStr,			"bool__str"
+	PERFORM_EXPORT_VOID__STRING_BOOL	CScriptGameObject__SetObjectBoneVisible,		"set_obj_bone_visible"
+	PERFORM_EXPORT_BOOL__STRING			CScriptGameObject__GetObjectBoneVisible,		"get_obj_bone_visible"
+	PERFORM_EXPORT_VOID__STRING_BOOL	CScriptGameObject__SetHUDObjectBoneVisible,		"set_hud_obj_bone_visible"
+	PERFORM_EXPORT_BOOL__STRING			CScriptGameObject__GetHUDObjectBoneVisible,		"get_hud_obj_bone_visible"
+	PERFORM_EXPORT_VOID__BOOL			CScriptGameObject__BlockedRocket,				"blocked_rocket_rpg"
+	PERFORM_EXPORT_BOOL__GO				CScriptGameObject__DirectVisibility,			"direct_visibility"
 	; идём обратно
 	jmp		back_from_game_object_fix
 game_object_fix endp
@@ -480,13 +483,13 @@ CScriptGameObject__DefaultAmmo proc
 	add		esp, 4
 	test	eax, eax
 	jz		exit_fail
-;	push    0
-;	push    offset off_10636A7C
-;	push    offset off_1061842C
-;	push    0
-;	push    eax
-;	call    __RTDynamicCast
-;	add     esp, 14h
+;	push	0
+;	push	offset off_10636A7C
+;	push	offset off_1061842C
+;	push	0
+;	push	eax
+;	call	__RTDynamicCast
+;	add		esp, 14h
 ;	test	eax, eax
 ;	jz		no_gl
 ;	cmp		byte ptr [eax + m_bGrenadeMode], 0
@@ -521,13 +524,13 @@ CScriptGameObject__GetAmmo proc
 	add		esp, 4
 	test	eax, eax
 	jz		exit_fail
-;	push    0
-;	push    offset off_10636A7C
-;	push    offset off_1061842C
-;	push    0
-;	push    eax
-;	call    __RTDynamicCast
-;	add     esp, 14h
+;	push	0
+;	push	offset off_10636A7C
+;	push	offset off_1061842C
+;	push	0
+;	push	eax
+;	call	__RTDynamicCast
+;	add		esp, 14h
 ;	test	eax, eax
 ;	jz		no_gl
 ;	cmp		byte ptr [eax + m_bGrenadeMode], 0
@@ -606,13 +609,13 @@ CScriptGameObject__IsGrenadeMode proc
 	add		esp, 4
 	test	eax, eax
 	jz		exit_fail
-	push    0
-	push    offset off_10636A7C
-	push    offset off_1061842C
-	push    0
-	push    eax
-	call    __RTDynamicCast
-	add     esp, 14h
+	push	0
+	push	offset off_10636A7C
+	push	offset off_1061842C
+	push	0
+	push	eax
+	call	__RTDynamicCast
+	add		esp, 14h
 	test	eax, eax
 	jz		exit_fail
 	movzx	eax, byte ptr [eax + m_bGrenadeMode]
@@ -629,9 +632,6 @@ visible	  = dword ptr 8
 	mov		eax, [ecx+4]
 	test	eax, eax
 	jz		exit_fail
-	;push	eax
-	;call	smart_cast_CWeapon
-	;add		esp, 4
 ;	visual = object().Visual()
 	mov		eax, [eax+90h]
 ;	if (!visual) return
@@ -691,7 +691,6 @@ CScriptGameObject__SetObjectBoneVisible endp
 
 CScriptGameObject__GetObjectBoneVisible proc
 bone_name = dword ptr 4
-	PRINT_UINT "GetObjectBoneVisible:  esp = %x", esp
 	push	esi
 	push	ebx
 ;-----------------------------------------
@@ -699,9 +698,6 @@ bone_name = dword ptr 4
 	PRINT_UINT "GetObjectBoneVisible:  eax = %x", eax
 	test	eax, eax
 	jz		exit_fail
-	;push	eax
-	;call	smart_cast_CWeapon
-	;add		esp, 4
 ;	visual = object().Visual()
 	mov		eax, [eax+90h]
 	PRINT_UINT "GetObjectBoneVisible:  visual eax = %x", eax
@@ -739,7 +735,6 @@ exit_fail:
 ;-----------------------------------------
 	pop		ebx
 	pop		esi
-	PRINT_UINT "GetObjectBoneVisible:  esp = %x", esp
 	retn	4
 CScriptGameObject__GetObjectBoneVisible endp
 
@@ -814,6 +809,7 @@ CScriptGameObject__GetHUDObjectBoneVisible proc
 bone_name = dword ptr 4
 	PRINT_UINT "GetObjectBoneVisible:  esp = %x", esp
 	push	esi
+	push	edi
 	push	ebx
 ;-----------------------------------------
 	mov		eax, [ecx+4]
@@ -864,22 +860,71 @@ exit_fail:
 	PRINT_UINT "GetObjectBoneVisible:  result = %d", eax
 ;-----------------------------------------
 	pop		ebx
+	pop		edi
 	pop		esi
 	PRINT_UINT "GetObjectBoneVisible:  esp = %x", esp
 	retn	4
 CScriptGameObject__GetHUDObjectBoneVisible endp
 
-CScriptGameObject__VoidStrBool proc
-	mov		eax, [esp+4]
-	PRINT_UINT "void__str_bool:	 str - %s", eax
-	movzx	eax, byte ptr [esp+8]
-	PRINT_UINT "void__str_bool:	 bool - %d", eax
-	retn	8
-CScriptGameObject__VoidStrBool endp
-
-CScriptGameObject__BoolStr proc
-	mov		eax, [esp+4]
-	PRINT_UINT "bool__str:	str - %s", eax
-	mov		eax, 10
+m_bBlockRocket		= dword ptr 1974
+CScriptGameObject__BlockedRocket proc
+block				= dword ptr 4
+	push	esi
+	mov		eax, [ecx+4]
+	test	eax, eax
+	jz		exit_fail
+	push	eax
+	call	smart_cast_CWeapon
+	add		esp, 4
+	test	eax, eax
+	jz		exit_fail
+	push	eax
+	call	smart_cast_CWeaponMagazined
+	add		esp, 4
+	test	eax, eax
+	jz		exit_fail
+	mov		esi, eax
+	; smart_cast_CWeaponRPG7
+	push	0
+	push	offset off_10637538
+	push	offset off_1061842C
+	push	0
+	push	eax
+	call	__RTDynamicCast
+	add		esp, 14h
+	test	eax, eax
+	jz		exit_fail
+	movzx	eax, byte ptr [esp+4+block]
+;	PRINT_UINT	"BlockRocketRPG7 - %d", eax
+	mov		byte ptr [esi+m_bBlockRocket], al
+exit_fail:
+	pop		esi
 	retn	4
-CScriptGameObject__BoolStr endp
+CScriptGameObject__BlockedRocket endp
+
+CScriptGameObject__DirectVisibility proc
+obj_vis				= dword ptr 4
+; свободны - eax, ecx, edx
+	push	esi
+	push	edi
+	push	ebx
+;------------------------------
+	mov		eax, [ecx+4]
+	test	eax, eax
+	jz		exit_fail
+	mov		ebx, [esp+12+obj_vis]
+	test	ebx, ebx
+	jz		exit_fail
+	mov		ebx, [ebx+4]
+	test	ebx, ebx
+	jz		exit_fail
+	
+	
+exit_fail:
+;------------------------------
+	pop		ebx
+	pop		edi
+	pop		esi
+	retn	4
+CScriptGameObject__DirectVisibility endp
+
