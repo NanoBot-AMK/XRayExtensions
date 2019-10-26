@@ -29,19 +29,16 @@ UpdateAddonsVisibility_fix proc
 	ASSUME	edi:ptr CWeapon
 	.if ([edi].m_flagsAddOnState & 040h)
 		;PRINT_UINT "UpdateAddonsVisibility_fix object: %x", edi
-		lea		eax, [edi].CGameObject@vfptr		;+216 CGameObject <- CWeapon
-		CALLBACK__VOID	eax, eUpdateAddonsVisibility
+		CALLBACK__VOID	&[edi].CGameObject@vfptr, eUpdateAddonsVisibility
 	.endif
-	;PRINT "UpdateAddonsVisibility_fix 2"
-	; делаем вырезанное
-	mov		ecx, esi ; <== это было
-	call	ds:CKinematics__CalculateBones_Invalidate ; <== вот эта команда будет испорчена релокацией, если врезаться здесь
+	;вырезанное
+	mov		ecx, esi
+	call	ds:CKinematics__CalculateBones_Invalidate
 	mov		eax, [esi]
 	mov		edx, [eax+40h]
 	push	0
 	mov		ecx, esi
 	call	edx
-	;PRINT "UpdateAddonsVisibility_fix 3"
 	pop		esi
 	pop		ebp
 	pop		ebx
@@ -50,34 +47,24 @@ UpdateAddonsVisibility_fix endp
 
 align_proc
 UpdateHUDAddonsVisibility_fix proc
-;	push	eax
 	;PRINT_UINT "UpdateHUDAddonsVisibility: %x", eax
 	.if ([edi].m_flagsAddOnState & 040h)
 		;PRINT "UpdateHUDAddonsVisibility 1"
-		lea		eax, [edi].CGameObject@vfptr		;+216 CGameObject <- CWeapon
-		CALLBACK__VOID	eax, eUpdateHudAddonsVisibility
+		CALLBACK__VOID	&[edi].CGameObject@vfptr, eUpdateHudAddonsVisibility
 	.endif
 	ASSUME	edi:nothing
-;	pop		eax
-	; делаем вырезанное
+	;вырезанное
 	push	ebx
 	push	edi
 	push	offset aWpn_scope ; "wpn_scope"
 	mov		ecx, esi
-	; идём обратно
 	jmp		return_UpdateHUDAddonsVisibility_fix
 UpdateHUDAddonsVisibility_fix endp
-
-;инлайн функция, использовать только в условных блоках .if, .while и т.д.
-IsGrenadeLauncherAttached MACRO this_wpn:req
-	mov		eax, this_wpn.m_eGrenadeLauncherStatus
-	EXITM <((eax==eAddonAttachable && this_wpn.m_flagsAddOnState & eWeaponAddonGrenadeLauncher) || eax==eAddonPermanent)>
-ENDM
 
 align_proc
 CWeaponMagazinedWGrenade__UseScopeTexture_fix proc
 	ASSUME	ecx:ptr CWeaponMagazinedWGrenade
-	.if ([ecx].m_flagsAddOnState & 080h || (IsGrenadeLauncherAttached([ecx]) && [ecx].m_bGrenadeMode))
+	.if ([ecx].m_flagsAddOnState & 080h || (IsGrenadeLauncherAttached([ecx]) && [ecx].m_bGrenadeMode && ![ecx].m_bCanScopeGrnMode))
 		xor		al, al	; return false
 		retn
 	.endif
@@ -103,7 +90,7 @@ align_proc
 CShootingObject__FireBulletCallback proc
 ;esi - CShootingObject
 ;edi - CGameObject*
-cartridge		= dword ptr 10h
+;cartridge		= dword ptr 10h
 	call	random_dir
 	smart_cast	CGameObject, CShootingObject, esi
 	.if (eax==NULL)	; это CCar	CCarWeapon = CShootingObject
@@ -116,7 +103,7 @@ cartridge		= dword ptr 10h
 			mov		eax, [eax].CWeaponMagazined.m_iCurFireMode	; тип режима огня
 			inc		eax
 		.endif
-		mov		edx, [esp+20h+cartridge]	; секция патрона
+		mov		edx, [esp+20h+10h];cartridge	; секция патрона
 		mov		ecx, [edx].CCartridge.m_ammoSect
 		add		ecx, 12		; str
 		CALLBACK__STR_u16	edi, eWeaponOnShoot, ecx, eax
@@ -177,8 +164,7 @@ CBulletManager@@RegisterEventCallback proc
 		.endif
 	.endif
 	.if ([edi].flags & shell_explosive)
-		;PRINT_UINT "m_dwID = %d", [edi].m_dwID
-		;PRINT_UINT "edi = %X", edi
+		;printf("m_dwID = %d, edi = %X", [edi].m_dwID, edi)
 		;Explode((int)explosive_id, &pos, &dir, (int)parent_id);
 		mov		edx, [esp+0B8h+20];end_point
 		mov		ecx, [esp+0B8h+4];this
@@ -291,177 +277,34 @@ CCartridge__Load_callback proc
 CCartridge__Load_callback endp
 ;=================================================================================
 
-
-;void			CRocketLauncher::DeleteRockets()
-;{
-;	xr_vector<CCustomRocket>::const_iterator	I = m_rockets.begin();
-;	xr_vector<CCustomRocket>::const_iterator	E = m_rockets.end();
-;	for( ; I != E; ++I)
-;		CCustomRocket*	rocket = *I;
-;		if(rocket->Local())
-;			rocket->DestroyObject();
-;	}
-;	m_rockets.();
-;}
-align_proc
-CRocketLauncher@@DeleteRockets proc uses esi edi ebx
-	mov		esi, ecx
-	ASSUME	esi:ptr CRocketLauncher
-	mov		edi, [esi].m_rockets._Myfirst	;I = m_rockets.begin();
-	mov		ebx, [esi].m_rockets._Mylast
-	.for (:edi!=ebx: edi+=4)
-		mov		ecx, [edi]
-		.if ([ecx].CCustomRocket.Props.flags & net_Local)	;rocket->Local()
-			;rocket->DestroyObject();
-			mov     edx, [ecx]
-			mov     eax, [edx+0E8h]
-			call	eax
-		.endif
-	.endfor
-	mrm		[esi].m_rockets._Mylast, [esi].m_rockets._Myfirst	;
-	ASSUME	esi:nothing
-	ret
-CRocketLauncher@@DeleteRockets endp
-
-;void			CRocketLauncher::SpawnRockets(xr_vector<CCartridge>& magazine)
-;{
-;	CGameObject*	obj = smart_cast<CGameObject*>(this);
-;	xr_vector<CCartridge>::const_iterator	I = magazine.begin();
-;	xr_vector<CCartridge>::const_iterator	E = magazine.end();
-;	for( ; I != E; ++I)
-;	{
-;		LPCSTR	ammo_sect = (*I).m_ammoSect.c_str();
-;		if(pSettings->line_exist(ammo_sect, "fake_grenade_name"))
-;			SpawnRocket(pSettings->r_string(ammo_sect, "fake_grenade_name"), obj);
-;		else if(smart_cast<CWeaponRPG7*>(this))	// RPG7
-;			SpawnRocket(pSettings->r_string(obj->cNameSect().c_str(), "rocket_class"), obj);
-;	}
-;}
-align_proc
-CRocketLauncher@@SpawnRockets proc uses esi edi ebx magazine:ptr xr_vector
-local E:dword
-;ecx	this CRocketLauncher*
-	smart_cast	CGameObject, CRocketLauncher, ecx
-	mov		esi, eax
-	mov		edx, magazine
-	mov		edi, [edx].xr_vector._Myfirst	;I = magazine.begin();
-	mrm		E, [edx].xr_vector._Mylast		;E = magazine.end();
-	.for (:edi!=E: edi += size CCartridge)
-		mov		edx, [edi].CCartridge.m_ammoSect.p_
-		lea		ebx, [edx].str_value.value
-		mov		eax, ds:pSettings
-		push	offset aFake_grenade_n
-		push	ebx
-		mov		ecx, [eax]
-		call	ds:line_exist		; CInifile::line_exist(char const *,char const *);
-		mov		edx, offset aFake_grenade_n
-		.if (!eax)
-			smart_cast	CWeaponRPG7, CGameObject, esi
-			.continue .if (!eax)
-			mov		eax, [esi].CGameObject.NameSection.p_
-			lea		ebx, [eax].str_value.value
-			mov		edx, offset aRocket_class
-		.endif
-		mov		eax, ds:pSettings
-		push	edx
-		push	ebx
-		mov		ecx, [eax]
-		call	ds:r_string
-		CRocketLauncher@@SpawnRocket(eax, esi)
-	.endfor
-	ret
-CRocketLauncher@@SpawnRockets endp
-;=================================================================================
+include weapon_RPG7_fix.asm
+include weapon_RG6_fix.asm
+include weapon_RL_fix.asm
 
 align_proc
-CWeapon@@FireTrace@update proc uses esi ebx P:ptr Fvector, D:ptr Fvector
+CWeapon@@FireTrace_fix proc uses esi ebx P:ptr Fvector, D:ptr Fvector
+local pos_start:Fvector4, dir_start:Fvector4
 ;edi	this CWeapon*
-	ASSUME	edi:ptr CWeaponMagazined
-	smart_cast CWeaponRPG7, CWeapon, edi
+	smart_cast	CRocketLauncher, CWeapon, edi
 	.if (eax)
-		mov		ecx, edi
-		CWeaponRPG7@@StartRocket()
-		jmp		exit
+		mov		ecx, eax
+		mov		edx, P
+		movups	xmm0, [edx].Fvector4
+		movups	pos_start, xmm0
+		and		pos_start.w, 0
+		mov		edx, D
+		movups	xmm0, [edx].Fvector4
+		movups	dir_start, xmm0
+		and		dir_start.w, 0
+		CRocketLauncher@@FireTraceRocket(ecx, &pos_start, &dir_start)
+		CWeapon@@FireTrace(&pos_start, &dir_start)
+	.else
+		CWeapon@@FireTrace(P, D)	;CWeapon *this@<edi>
 	.endif
-	smart_cast CWeaponRG6, CWeapon, edi
-	mov		edx, [edi].m_magazine._Mylast	;CCartridge
-	.if (eax && [edx-size CCartridge].CCartridge.m_flags & cfFakeGrenade)
-		mov		[edi].m_bBlockAutoAimRG, true
-		mov		ecx, [edi].Parent
-		.if (EQ_QWORD([ecx].CObject.CLS_ID, 'O_ACTOR '))	;H_Parent()->CLS_ID == CLSID_OBJECT_ACTOR
-			mov		[edi].m_bBlockAutoAimRG, false
-			mov		esi, const_static_str$("block_auto_aim_rg")
-			mov		ebx, [edi].NameSection.p_
-			.if (@LINE_EXIST(&[ebx].str_value.value, esi))
-				mov		[edi].m_bBlockAutoAimRG, @R_BOOL(&[ebx].str_value.value, esi)
-			.endif
-		.endif
-		lea		ecx, [edi].CShootingObject@vfptr
-		CWeaponRG6@@StartRocket()
-		jmp		exit
-	.endif
-	smart_cast CWeaponMagazinedWGrenade, CWeapon, edi
-	.if (eax && [eax].CWeaponMagazinedWGrenade.m_bGrenadeMode)
-		lea		ecx, [edi].CHudItem@vfptr
-		CWeaponMagazinedWGrenade@@StartRocket(0)
-	.endif
-exit:
-	CWeapon@@FireTrace(P, D)	;CWeapon *this@<edi>
-	ASSUME	edi:nothing
 	ret
-CWeapon@@FireTrace@update endp
+CWeapon@@FireTrace_fix endp
 ;----------------------------------------------------------------------
 
-align_proc
-CWeaponRG6@@ReloadMagazine proc uses esi ebx
-;ecx	this CWeapon*
-	mov		esi, ecx
-	ASSUME	esi:ptr CWeapon, eax:ptr CRocketLauncher
-	;размер магазина нельзя задавать больше 255!!!
-	mov		bl, true	;can_reload_rockets = true
-	.if (![esi].m_bTriStateReload && [esi].iAmmoElapsed==0);[eax].m_rockets._Myfirst 
-		mov		bl, false
-		;зарядим ракеты
-		mov		ecx, esi
-		CWeaponRG6@@AddCartridge([esi].iMagazineSize)
-	.endif
-	mov		ecx, esi
-	CWeaponMagazined@@ReloadMagazine()
-	.if (bl && [esi].iAmmoElapsed>0)
-		;зарядим ракеты которые соотвествуют патронам в m_magazine
-		lea		ecx, [esi-size CRocketLauncher]
-		CRocketLauncher@@SpawnRockets(&[esi].m_magazine)
-	.endif
-	ASSUME	esi:nothing, eax:nothing
-	ret
-CWeaponRG6@@ReloadMagazine endp
-
-align_proc
-CWeaponRG6@@UnloadMagazine proc uses esi spawn_ammo:byte
-;ecx	this CWeapon*
-	mov		esi, ecx
-	CWeaponMagazined@@UnloadMagazine(spawn_ammo)
-	;удалить ракеты
-	lea		ecx, [esi-size CRocketLauncher]
-	CRocketLauncher@@DeleteRockets()
-	ret
-CWeaponRG6@@UnloadMagazine endp
-
-align_proc
-CWeaponRG6@@AddCartridge_chank proc
-;esi	this	CWeaponRG6*
-;eax	*m_ammoTypes[m_ammoType]	LPCSTR
-	mov		edi, eax
-	.if (@LINE_EXIST(edi, &aFake_grenade_n)==0)
-		pop		edi
-		pop		esi
-		pop		ebx
-		retn	4
-	.endif
-	mov		eax, edi
-	jmp		return_CWeaponRG6@@AddCartridge_chank
-CWeaponRG6@@AddCartridge_chank endp
-;----------------------------------------------------------------------
 ;BOOL	CWeaponShotgun::net_Spawn(CSE_Abstract* DC)
 ;{
 ;	BOOL	res = inherited::net_Spawn(DC);
@@ -491,11 +334,171 @@ local res:dword, E:dword
 			mov		[esi].m_flags, 0	;cartidge.m_flags.zero();
 			movzx	edx, [ebx]			;u8 ammoType = E->m_AmmoIDs[i];
 			mov		ecx, [edi+edx*4]
-			lea		eax, [ecx].str_value.value
-			CCartridge@@Load(edx)
+			CCartridge@@Load(esi, &[ecx].str_value.value, edx)
 		.endfor
 		mov		eax, res
 	.endif
 	ASSUME	esi:nothing, edi:nothing, ebx:nothing
 	ret
 CWeaponShotgun@@net_Spawn endp
+;----------------------------------------------------------------------
+;Пули и ракеты вылетают из дула.
+align_proc
+CActor@@g_fireParamsWeapon proc uses esi edi ebx pHudItem:ptr CHudItem, pFire_pos:ptr Fvector, pFire_dir:ptr Fvector
+local max_range:real4, cam_active:dword, min_range:real4, dist_back:real4
+local fire_pos:Fvector4, fire_dir:Fvector4, cam_pos:Fvector4
+	mov		edi, ecx
+	mov		eax, pHudItem
+	dynamic_cast	CWeaponMagazined, CInventoryItem, [eax].CHudItem.CHudItem@m_item
+	.if (eax)
+		mov		esi, eax	;CWeaponMagazined
+		mrm		cam_active, [edi].CActor.cam_active
+		mov		ebx, pFire_pos
+		mov		edi, pFire_dir
+		ASSUME	edi:ptr Fvector, ebx:ptr Fvector, esi:ptr CWeapon
+		mov		ecx, CWeapon@@get_LastFP()
+		Fvector_set	fire_pos, [ecx].Fvector
+		and		fire_pos.w, 0
+		and		fire_dir.w, 0
+		.if (cam_active==eacFreeLook)
+			mov		ecx, CWeapon@@get_LastFD()
+			Fvector_set	fire_dir, [ecx].Fvector
+			movflt	dist_back, -0.5
+			;fire_pos.mad(fire_dir, dist_back-vLoadedFirePoint.z);	//для того чтобы пули не летели через стену.
+			movss	xmm1, dist_back
+			subss	xmm1, [esi].vLoadedFirePoint.z
+			movups	xmm2, fire_pos
+			movups	xmm0, fire_dir
+			shufps	xmm1, xmm1, 0
+			mulps	xmm0, xmm1
+			addps	xmm2, xmm0
+			movups	fire_pos, xmm2
+		.else
+			mov		min_range, 0.5	;минимальная дист. до цели от камеры
+			mov		max_range, 2.0	;= 2.5-0.5
+			mov		ecx, ds:Device
+			Fvector_set	fire_dir, [ecx].CRenderDevice.vCameraDirection
+			Fvector_set	cam_pos, [ecx].CRenderDevice.vCameraPosition
+			and		cam_pos.w, 0
+			;dist = HUD().GetCurrentRayQuery().range;
+			call	CCustomHUD__GetRQ
+			movss	xmm2, [eax].collide__rq_result.range
+			movss	xmm3, xmm2
+			subss	xmm3, min_range	;range = dist - 0.5f;
+			.if (xmm3<max_range)	;при близких дистанциях до цели, точку вылета пуль, плавно перемещаем в позицию камеры.
+				;fire_pos:add(cam_pos, vec:sub(cam_pos, fire_pos):mul(range/max_range))
+				divss	xmm3, max_range
+				shufps	xmm3, xmm3, 0
+				movups	xmm1, cam_pos
+				movups	xmm0, fire_pos
+				subps	xmm1, xmm0
+				mulps	xmm1, xmm3
+				movups	xmm0, cam_pos
+				addps	xmm0, xmm1
+				movups	fire_pos, xmm0
+			.endif
+			;Fvector	pos;
+			;pos.mad(cam_pos, fire_dir, dist);	//точка куда стреляем
+			;fire_dir.sub(pos, fire_pos).normalize();
+			shufps	xmm2, xmm2, 0
+			movups	xmm0, fire_dir
+			mulps	xmm0, xmm2
+			movups	xmm1, cam_pos
+			addps	xmm0, xmm1
+			movups	xmm1, fire_pos
+			subps	xmm0, xmm1
+			Fvector4@normalize	xmm0
+			movups	fire_dir, xmm0
+		.endif
+		Fvector_set	[ebx], fire_pos
+		Fvector_set	[edi], fire_dir
+		ASSUME	edi:nothing, ebx:nothing
+	.endif
+	ret
+CActor@@g_fireParamsWeapon endp
+
+align_proc
+CActor@@g_fireParams_fix proc
+;esi	this		CActor*
+;edi	fire_pos	Fvector*
+	mov     eax, [esp+8+4];pHudItem
+	mov		edx, [esp+8+12];fire_dir
+	mov		ecx, esi
+	CActor@@g_fireParamsWeapon(eax, edi, edx)
+;---------------------
+	pop		edi
+	pop		esi
+	retn	12
+CActor@@g_fireParams_fix endp
+
+;====================================================================
+const_static_str	eAuto_reload, "auto_reload"
+align_proc
+CWeaponMagazined@@Load_fix proc
+;edi	this	CWeaponMagazined*
+	ASSUME	edi:ptr CWeaponMagazined
+	mov		esi, [esp+2Ch+4];section
+	mov		[edi].m_bAutoReload, true
+	mov		ebx, offset eAuto_reload	;"auto_reload"
+	.if (@LINE_EXIST(esi, ebx))
+		mov		[edi].m_bAutoReload, @R_BOOL(esi, ebx)
+	.endif
+	.if (![edi].m_bHasDifferentFireModes)
+		and		[edi].m_iCurFireMode, 0
+	.endif
+;	printf("section='%s' m_bHasDifferentFireModes=%d, m_iCurFireMode=%d", esi, [edi].m_bHasDifferentFireModes, [edi].m_iCurFireMode)
+	ASSUME	edi:nothing
+;---------------------
+	pop		edi
+	pop		esi
+	pop		ebp
+	pop		ebx
+	add		esp, 1Ch
+	retn	4
+CWeaponMagazined@@Load_fix endp
+
+align_proc
+CWeaponMagazined@@FireEnd_fix proc
+;edi	this	CWeaponMagazined*
+	mov		eax, [edi]
+	mov		edx, [eax+178h]
+	mov		ecx, edi
+	pop		edi
+	pop		esi
+	jmp		edx		;Reload();
+CWeaponMagazined@@FireEnd_fix endp
+
+align_proc
+CWeaponMagazined@@SetQueueSize_fix proc
+;ecx	this	CWeaponMagazined
+;eax	size	int
+	push	edi
+	ASSUME	edi:ptr CWeaponMagazined
+	mov		edi, ecx
+	.if (sdword ptr eax<WEAPON_ININITE_QUEUE)
+		mov		eax, WEAPON_ININITE_QUEUE
+	.endif
+	xor		ecx, ecx	;i=0
+	mov		edx, 1		;size_queue=1
+	.if ([edi].m_bHasDifferentFireModes)
+		push	esi
+		.for (esi=[edi].m_aFireModes._Myfirst: esi!=[edi].m_aFireModes._Mylast: esi+=4, ecx++)
+			mov		edx, [esi]	;m_aFireModes[i];
+			.if ((eax<=edx && eax>=0) || edx==WEAPON_ININITE_QUEUE)
+				mov		edx, eax		;размер очереди может быть меньше или равным указаным в fire_modes
+				.break
+			.endif
+		.endfor
+		pop		esi
+	.endif
+	mov		[edi].m_iCurFireMode, ecx	;=i
+	mov		[edi].m_iQueueSize, edx
+	mov		ecx, edi
+	pop		edi
+	.if (eax==0 && edx)			;вероятно блокировка оружия
+		retn	4
+	.endif
+	mov		eax, edx
+	ASSUME	edi:nothing
+	jmp		return_CWeaponMagazined@@SetQueueSize_fix
+CWeaponMagazined@@SetQueueSize_fix endp

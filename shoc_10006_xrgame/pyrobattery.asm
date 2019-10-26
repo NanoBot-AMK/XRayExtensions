@@ -444,8 +444,7 @@ local tmp:real4, DEG90:real4, dir:Fvector4, vel:Fvector4, launch_matrix:Fmatrix4
 		CCustomRocket@@SetLaunchParams(&launch_matrix, &vel, &zero_vel)
 		.if (OnServer())
 			;u_EventGen(P, GE_LAUNCH_ROCKET, ID());
-			movzx	edx, [esi].ID
-			CGameObject@@u_EventGen(&P, GE_LAUNCH_ROCKET, edx)
+			CGameObject@@u_EventGen(&P, GE_LAUNCH_ROCKET, [esi].ID)
 			;P.w_u16(rocket->ID());
 			mov		edx, P.B.count
 			mrm		word ptr P.B.data[edx], [edi].ID

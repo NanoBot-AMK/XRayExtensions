@@ -713,27 +713,72 @@
 1022CC4Dh 9 	;парашют в ракете.
 1048F248h 4		;CExplosiveRocket::Explode()
 1022EA6Dh 5		;CExplosiveRocket::OnEvent(NET_Packet& P, u16 type)
+1022CD75h 25	;Задать силу сопротивления воздуха, линейную и угловую.
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
-;Переделка гранатомётов CWeaponRG6, CWeaponMagazinedWGrenade, CWeaponRPG7
-10237C46h 48  ;
-1022A8F8h 42
-10232438h 32
+;Переделка гранатомётов
+10226D7Eh 5 	;Перехват метода CWeapon::FireTrace
+10226D92h 5 	;-->>--
+10236ADEh 5  	;-->>--
+10236AEDh 5  	;-->>--
+10232420h 1072	;Т.к. метод CWeaponRPG7::switch2_Fire() удалён, на его место помещаем метод StartRocket
+;Чтобы освободить место, надо передвинуть некоторые данные.
+1048DE28h 7
+10490B48h 6
+10493CB0h 13
+10492C10h 16
+;поменяем ссылки.
+1022C114h 5
+10231068h 5
+10233468h 5
+10232993h 5
+10232BD8h 5
+;дополняем виртуальные таблицы
+1048DE24h 4
+10490B44h 4
+10493CACh 4
+10492C0Ch 4
+1049667Ch 4
+;---CWeaponRG6---
 10495BB8h 4		;переопределим виртуальный метод CWeapon::net_Spawn для CWeaponShotgun
 10496858h 4		;переопределим виртуальный метод ReloadMagazine для CWeaponRG6
 10496868h 4		;переопределим виртуальный метод CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
-102381C2h 11	;
-10237B2Ch 211	;
-10237ECAh 26	;
-10226D7Eh 5 
-10226D92h 5 
-10236ADEh 5 
-10236AEDh 5 
-10496BF4h 4 
-104927FCh 4 
-1048DD4Ch 4 
-10490A6Ch 4 
-10493BD4h 4 
+102381C2h 11	;доработка CWeaponRG6::AddCartridge
+10237B2Ch 211	;доработка CWeaponRG6::net_Spawn
+10496BF4h 4 	;уберём виртуальный метод CWeaponRG6::FireStart
+;---CWeaponMagazinedWGrenade---
+10230E74h 5		;больше места для CWeaponGroza
+10297256h 5		;-->>--
+10233294h 5		;больше места для CWeaponAK74
+10296996h 5		;-->>--
+10296856h 5		;больше места для CWeaponMagazinedWGrenade
+1048DA34h 4		;del CWeaponMagazinedWGrenade::SwitchState
+10490754h 4		;del CWeaponMagazinedWGrenade::SwitchState
+104938BCh 4		;del CWeaponMagazinedWGrenade::SwitchState
+1048DD4Ch 4 	;del CWeaponMagazinedWGrenade::state_Fire
+10490A6Ch 4		;del CWeaponMagazinedWGrenade::state_Fire
+10493BD4h 4		;del CWeaponMagazinedWGrenade::state_Fire
+102296EEh 5		;CWeaponMagazinedWGrenade@@CWeaponMagazinedWGrenade_fix
+10229E74h 25	;CWeaponMagazinedWGrenade@@Load_fix
+10229F11h 456	;CWeaponMagazinedWGrenade::net_Spawn
+1022A2E6h 45	;CWeaponMagazinedWGrenade::PerformSwitchGL
+1022A5B9h 7		;CWeaponMagazinedWGrenade@@PerformSwitchGL_fix
+1048DA40h 4		;CWeaponMagazinedWGrenade::UnloadMagazine
+10490760h 4		;CWeaponMagazinedWGrenade::UnloadMagazine
+104938C8h 4		;CWeaponMagazinedWGrenade::UnloadMagazine
+1022AEA9h 138	;CWeaponMagazinedWGrenade::ReloadMagazine
+1022AFBBh 31	;CWeaponMagazinedWGrenade::OnAnimationEnd
+1022B2CCh 16	;фикс бага при отсоединении ПГ
+1048DB04h 4		;OnH_A_Chield CWeaponMagazinedWGrenade
+10490824h 4		;OnH_A_Chield CWeaponGroza
+1049398Ch 4		;OnH_A_Chield CWeaponAK74
+;учёт веса патронов во втором стволе
+1048D8ECh 4		;Weight CWeaponMagazinedWGrenade
+1049060Ch 4		;Weight CWeaponGroza
+10493774h 4		;Weight CWeaponAK74
+1022BBB6h 16	;CWeaponMagazinedWGrenade@@save_fix
+1022BBE1h 16	;-->>--
+1022BC54h 6		;CWeaponMagazinedWGrenade@@load_fix
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
 ;Пиротехника
@@ -757,3 +802,100 @@
 10141738h 5		;фикс ошибки при взрыве ракеты методом explode(0)
 ;--------------------------------------------------------------
 1036FA52h 5		;расширение пространства имён CPhysicsShell, скриптовый класс physics_shell
+1036F882h 14
+103700BFh 5
+;--------------------------------------------------------------
+101D607Eh 6		;Пули и ракеты вылетают из дула.
+;--------------------------------------------------------------
+;Переделка класса CWeaponRPG7
+10296F36h 5		;больше места для CWeaponRPG7
+10232A75h 5
+102321DEh 13	;CWeaponRPG7@@Load_ext
+10232265h 121	;Многозарядный гранатомёт, Многотипозарядный гранатомёт.
+102322F6h 95	;BOOL	CWeaponRPG7::net_Spawn(CSE_Abstract *DC)
+102323A9h 73	;void	CWeaponRPG7::ReloadMagazine()
+10492B6Ch 4		;переопределим CWeaponRPG7@@OnAnimationEnd
+;удаляем виртуальные методы из класса CWeaponRPG7
+104927FCh 4 	;switch2_Fire
+10492854h 4		;GetCurrentFireMode
+10492BB0h 4		;FireEnd
+;--------------------------------------------------------------
+;удаляем виртуальные методы из класса CWeaponCustomPistol
+1048B854h 4		;switch2_Fire
+1048B8ACh 4		;GetCurrentFireMode
+1048BC08h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponPistol
+1048BF7Ch 4		;switch2_Fire
+1048BFD4h 4		;GetCurrentFireMode
+1048C330h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponWalther
+1048F4ECh 4		;switch2_Fire
+1048F544h 4		;GetCurrentFireMode
+1048F8A0h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponUSP45
+104917CCh 4		;switch2_Fire
+10491824h 4		;GetCurrentFireMode
+10491B80h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponSVU
+1049221Ch 4		;switch2_Fire
+10492274h 4		;GetCurrentFireMode
+104925D0h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponSVD
+1049363Ch 4		;OnAnimationEnd
+104932CCh 4		;switch2_Fire
+10493324h 4		;GetCurrentFireMode
+10493680h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponHPSA
+10494A04h 4		;switch2_Fire
+10494A5Ch 4		;GetCurrentFireMode
+10494DB8h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponPM
+10494FDCh 4		;switch2_Fire
+10495034h 4		;GetCurrentFireMode
+10495390h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponBinoculars
+104955C4h 4		;switch2_Fire
+1049561Ch 4		;GetCurrentFireMode
+10495978h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponShotgun
+10495C84h 4		;switch2_Fire
+10495CDCh 4		;GetCurrentFireMode
+10496048h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponFORT
+1049626Ch 4		;switch2_Fire
+104962C4h 4		;GetCurrentFireMode
+10496620h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponRG6
+10496834h 4		;switch2_Fire
+1049688Ch 4		;GetCurrentFireMode
+10496BF8h 4		;FireEnd
+;удаляем виртуальные методы из класса CWeaponBM16
+10496E7Ch 4		;switch2_Fire
+10496ED4h 4		;GetCurrentFireMode
+10497240h 4		;FireEnd
+;Удалим все ссылки на класс CWeaponCustomPistol
+10220255h 5		;CWeaponPistol
+10220507h 5
+10231BF3h 5		;CWeaponSVU
+10231D2Bh 5
+10231EA3h 5		;CWeaponRPG7
+1023209Dh 5
+10232D53h 5		;CWeaponSVD
+10232E8Bh 5
+10233E93h 5		;CWeaponBinoculars
+10234078h 5
+10236183h 5		;CWeaponShotgun
+102364A4h 5
+;Удаляем из таблиц RTTI наследников в классе CWeaponCustomPistol
+104F63D0h 28	;a0_CWeaponCustomPistol0
+104F96C4h 28	;a28_CWeaponCustomPistol0
+;--------------------------------------------------------------
+;Всё оружие(CWeaponMagazined) может стрелять очередями.
+10225200h 32	;CWeaponMagazined::GetCurrentFireMode()
+10225A25h 37	;CWeaponMagazined@@Load_fix
+102288E0h 128	;void	CWeaponMagazined::OnH_A_Chield()
+10228964h 9		;void	CWeaponMagazined::SetQueueSize(int size)
+;Блокировка автоперезарядки
+10225B39h 14	;void	CWeaponMagazined::FireEnd()
+10227070h 64	;void	CWeaponMagazined::switch2_Empty()
+;--------------------------------------------------------------

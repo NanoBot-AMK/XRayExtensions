@@ -821,19 +821,19 @@ SVehicleAnimCollection ends
 
 MAX_BONE_PARAMS			equ 4
 CBoneInstance struct ; sizeof 160 bytes
-	mTransform				Fmatrix4 <>		; 0		Fmatrix			// final x-form matrix (local to model)
-	mRenderTransform		Fmatrix4 <>		; 64	Fmatrix			// final x-form matrix (model_base -> bone -> model)
-	Callback				dword ?			; 128	BoneCallback
-	Callback_Param			dword ?			; 132	void*
-	Callback_overwrite		dword ?			; 136	BOOL			// performance hint - don't calc anims
-	param					dword MAX_BONE_PARAMS dup(?); 140	float
-	Callback_type			dword ?			; 156	u32				//
+	mTransform					Fmatrix4 <>		; 0		Fmatrix			// final x-form matrix (local to model)
+	mRenderTransform			Fmatrix4 <>		; 64	Fmatrix			// final x-form matrix (model_base -> bone -> model)
+	Callback					dword ?			; 128	BoneCallback
+	Callback_Param				dword ?			; 132	void*
+	Callback_overwrite			dword ?			; 136	BOOL			// performance hint - don't calc anims
+	param						dword MAX_BONE_PARAMS dup(?); 140	float
+	Callback_type				dword ?			; 156	u32				//
 CBoneInstance ends	; 160
 
 flRelativeLink			= dword ptr 1
 flPositionRigid			= dword ptr 2
 flDirectionRigid		= dword ptr 4
-CCameraBase struct ; 124 bytes
+CCameraBase struct ; (sizeof=124, align=4)
 	CCameraBase@vfptr		dword ?			; 0		виртуальная таблица
 	parent					dword ?			; 4		CObject*
 	bClampYaw				dword ?			; 8		BOOL
@@ -855,6 +855,20 @@ CCameraBase struct ; 124 bytes
 	f_aspect				dword ?			; 116	float
 	tag						dword ?			; 120	int
 CCameraBase ends							; 124
+
+CCameraLook struct ; (sizeof=140, align=4)
+	CCameraBase <>
+	lim_zoom					Fvector2 <>	;
+	dist						real4 ?
+	prev_d						real4 ?
+CCameraLook ends
+
+CCameraLook2 struct ; (sizeof=160, align=4)
+	CCameraLook <>
+	m_locked_enemy				dword ?					; CObject*
+	m_autoaim_inertion_yaw 		Fvector2 <>
+	m_autoaim_inertion_pitch	Fvector2 <>
+CCameraLook2 ends
 
 TEX_INFO struct ; (sizeof=20, align=4)
 	file					shared_str <>	; 0		shared_str
@@ -992,7 +1006,6 @@ CTracer ends											; 24
 xr_resource struct ; (sizeof=4, align=4)
 	dwReference					dword ?
 xr_resource ends
-
 
 CBulletManager struct ; (sizeof=200, align=4)
 	CBulletManager@vfptr		dword ?					; 0	offset
@@ -1652,16 +1665,16 @@ CPHElement struct ; (sizeof=460, align=4)
 	anonymous_1					byte 40 dup(?)			; 224
 	m_mass						dMass <>				; 264
 	m_body						dword ?					; 332	dBodyID
-	m_l_scale					dword ?					; 336
-	m_w_scale					dword ?					; 340
+	m_l_scale					real4 ?					; 336
+	m_w_scale					real4 ?					; 340
 	m_parent_element			dword ?					; 344	CPHElement*
 	m_shell						dword ?					; 348	CPHShell*
 	m_body_interpolation		CPHInterpolation <>		; 352
 	m_fratures_holder			dword ?					; 416	CPHFracturesHolder*
-	m_w_limit					dword ?					; 420
-	m_l_limit					dword ?					; 424
-	k_w							dword ?					; 428
-	k_l							dword ?					; 432
+	m_w_limit					real4 ?					; 420
+	m_l_limit					real4 ?					; 424
+	k_w							real4 ?					; 428
+	k_l							real4 ?					; 432
 	m_flags						byte ?					; 436	Flags8
 	gap1B5						byte 23 dup(?)			; 437
 CPHElement ends											; 460
@@ -2570,15 +2583,11 @@ SPPInfo@@SDuality struct ; (sizeof=0x8, align=4)
 	v										dword ?					; 
 SPPInfo@@SDuality ends
 
-; ---------------------------------------------------------------------------
-
 SPPInfo@@SNoise struct ; (sizeof=0xC, align=4)
 	intensity								dword ?					; 
 	grain									dword ?					; 
 	fps										dword ?					; 
 SPPInfo@@SNoise ends
-
-; ---------------------------------------------------------------------------
 
 SPPInfo@@SColor struct ; (sizeof=0xC, align=4)
 	r										dword ?					; 
@@ -2586,7 +2595,7 @@ SPPInfo@@SColor struct ; (sizeof=0xC, align=4)
 	b										dword ?					; 
 SPPInfo@@SColor ends
 
-SPPInfo			struct ; (sizeof=0x40, align=4)
+SPPInfo struct ; (sizeof=0x40, align=4)
 	blur									dword ?					; 0
 	gray									dword ?					; 4
 	duality									SPPInfo@@SDuality <>	; 8
@@ -2594,7 +2603,7 @@ SPPInfo			struct ; (sizeof=0x40, align=4)
 	color_base								SPPInfo@@SColor <>		; 
 	color_gray								SPPInfo@@SColor <>		; 
 	color_add								SPPInfo@@SColor <>		; 
-SPPInfo			ends
+SPPInfo ends
 
 SAttackEffector struct ; (sizeof=0x5C, align=4)
 	ppi										SPPInfo <>
@@ -3277,8 +3286,8 @@ CHudItem struct ; (sizeof=60, align=4)
 											byte ? ; undefined
 											byte ? ; undefined
 	m_animation_slot						dword ?				; 48
-	CHudItem@m_object						dword ?				; 52	offset*
-	CHudItem@m_item							dword ?				; 56	offset*
+	CHudItem@m_object						dword ?				; 52	CPhysicItem*
+	CHudItem@m_item							dword ?				; 56	CInventoryItem*
 CHudItem ends													; 60
 
 ;------------------------------CInventoryItem----------------------------------
@@ -3409,7 +3418,7 @@ CWeaponAmmo struct ; (sizeof=696, align=8)
 											byte ? ; undefined
 CWeaponAmmo ends													; 696
 
-CCustomOutfit struc ; (sizeof=728, align=8)
+CCustomOutfit struct ; (sizeof=728, align=8)
 	CInventoryItemObject <>											; 0
 	m_HitTypeProtection						svector@float_11@ <>	; 648
 	m_fPowerLoss							dword ?					; 696
@@ -3708,7 +3717,7 @@ CWeaponMagazined struct ; (sizeof=1960, align=8)
 	m_sCurFireMode						string16 <>						; 1932
 	m_iPrefferedFireMode				dword ?							; 1948
 	m_bLockType							byte ?							; 1952
-										byte ? ; undefined
+	m_bAutoReload						byte ?							; 1953	NEW	bool	блокировка автоперезарядки
 										byte ? ; undefined
 										byte ? ; undefined
 										dword ? ; undefined
@@ -3718,6 +3727,27 @@ CWeaponCustomPistol struct ; (sizeof=1960, align=8)
 	CWeaponMagazined <>
 CWeaponCustomPistol ends
 
+CWeaponPistol@@WWPMotions struct ; (sizeof=100, align=4)
+	mhud_show_empty						svector@MotionID_8@ <>
+	mhud_empty							svector@MotionID_8@ <>
+	mhud_shot_l							svector@MotionID_8@ <>
+	mhud_close							svector@MotionID_8@ <>
+	mhud_reload_empty					svector@MotionID_8@ <>
+CWeaponPistol@@WWPMotions ends
+
+CWeaponPistol struct ; (sizeof=2328, align=8)
+	CWeaponCustomPistol <>												; 0
+	sndClose							HUD_SOUND <>					; 1960
+	m_eSoundClose						dword ?							; 1980	enum ESoundTypes
+	mhud_pistol							CWeaponPistol@@WWPMotions <>	; 1984
+	mhud_pistol_r						CWeaponPistol@@WWPMotions <>	; 2084
+	wm_mhud_r							CWeaponMagazined@@SWMmotions <>	; 2184
+	m_opened							byte ?							; 2324
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+CWeaponPistol ends														; 2328
+
 CRocketLauncher struct ; (sizeof=40, align=4)
 	CRocketLauncher@vfptr				dword ?					; offset
 	m_rockets							xr_vector <>			; xr_vector<CCustomRocket *,xalloc<CCustomRocket *> > ?
@@ -3725,17 +3755,26 @@ CRocketLauncher struct ; (sizeof=40, align=4)
 	m_fLaunchSpeed						real4 ?
 CRocketLauncher ends
 
+svector@short_64@ struct ; (sizeof=132, align=4)
+	array								word 64 dup(?)			; 0
+	count								dword ?					; 128
+svector@short_64@ ends
+
 CWeaponRPG7 struct ; (sizeof=2016, align=8)
-	CWeaponCustomPistol <>												; 0
-	CRocketLauncher <>													; 1960
-	m_sGrenadeBoneName					shared_str <>					; 2000
-	m_sHudGrenadeBoneName				shared_str <>					; 2004
-	m_sRocketSection					shared_str <>					; 2008
+	CWeaponCustomPistol <>										; 0
+	CRocketLauncher <>											; 1960
+	m_sGrenadeBoneName					shared_str <>			; 2000
+	m_sHudGrenadeBoneName				shared_str <>			; 2004
+	m_sRocketSection					shared_str <>			; 2008
+;----------------------NEW------------------------
+	m_aBonesGrenade						svector@short_64@ <>	; 2012
+	m_aHudBonesGrenade					svector@short_64@ <>	; 2144
+	m_deflection_angles					Fvector2 <>				; 2276
+	m_bCanRocketReload					byte ?					; 2284
 										byte ? ; undefined
 										byte ? ; undefined
 										byte ? ; undefined
-										byte ? ; undefined
-CWeaponRPG7 ends														; 2016
+CWeaponRPG7 ends												; 2288
 
 CWeaponMagazinedWGrenade struct ; (sizeof=2456, align=8)
 	CWeaponMagazined <>											; 
@@ -3770,6 +3809,15 @@ CWeaponMagazinedWGrenade struct ; (sizeof=2456, align=8)
 										byte ? ; undefined
 	m_DefaultCartridge2					CCartridge <>			; 
 	grenade_bone_name					shared_str <>			; 
+;---------------------NEW---------------------
+	m_bGrnLauncherShotgun				byte ?					;	// может ли ПГ стрелять пулями
+	m_bCanRocketReload					byte ?					;
+	m_bCanScopeGrnMode					byte ?					;
+	m_bAutoReload2						byte ?					;
+	m_bHasDifferentFireModes2			byte ?					;
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
 CWeaponMagazinedWGrenade ends
 
 CWeaponShotgun	struct ; (sizeof=2136, align=8)
@@ -4277,12 +4325,12 @@ CKinematics		struct ; (sizeof=180, align=4)
 	Update_Visibility					dword ?					; 152
 	UCalc_Time							dword ?					; 160
 	UCalc_Visibox						dword ?					; 164
-	visimask							qword ?					; 168	flags64
+	visimask							qword ?					; 168	Flags64
 	Update_Callback						dword ?					; 172	UpdateCallback
 	Update_Callback_Param				dword ?					; 176	void*
 CKinematics		ends											; 180
 
-CKinematicsAnimated struct ; (sizeof=17916, align=4)
+CKinematicsAnimated struct ; (sizeof=17912, align=4)
 	CKinematics <>												; 0
 	Update_LastTime						dword ?					; 180
 	blend_instances						dword ?					; 184	CBlendInstance*
@@ -4292,7 +4340,7 @@ CKinematicsAnimated struct ; (sizeof=17916, align=4)
 	blend_cycles						svector@CBlend__64@ MAX_PARTS dup(<>); 16596
 	blend_fx							svector@CBlend__64@ <>	; 17636
 	channel_factors						dword MAX_CHANNELS dup(?);17896	float
-CKinematicsAnimated ends										; 17916
+CKinematicsAnimated ends										; 17912
 
 CHWCaps@@caps_Geometry struct ; (sizeof=8, align=4)
 	_bf0								dword ?						; 
@@ -5133,7 +5181,7 @@ CLevel struct ; (sizeof=18000, align=8)
 									byte ? ; undefined
 CLevel ends													; 18000
 
-COperatorConditionAbstract?u32_bool? struc ; (sizeof=12, align=4)
+COperatorConditionAbstract?u32_bool? struct ; (sizeof=12, align=4)
 	m_condition						dword ?					; 0		u32
 	m_hash							dword ?					; 4		u32
 	m_value							byte ?					; 8		bool

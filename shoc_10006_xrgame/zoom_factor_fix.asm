@@ -74,7 +74,7 @@ align_proc
 CWeaponMagazinedWGrenade@@CurrentZoomFactor_fix proc
 	ASSUME	ecx:ptr CWeaponMagazinedWGrenade
 	mov		eax, [ecx].m_eGrenadeLauncherStatus
-	.if ((eax==2 && [ecx].m_flagsAddOnState & 2 || eax==1) && [ecx].m_bGrenadeMode)
+	.if ((eax==2 && [ecx].m_flagsAddOnState & 2 || eax==1) && [ecx].m_bGrenadeMode && ![ecx].m_bCanScopeGrnMode)
 		fld		[ecx].m_fIronSightZoomFactor
 	.else
 		mov		eax, [ecx].m_eScopeStatus

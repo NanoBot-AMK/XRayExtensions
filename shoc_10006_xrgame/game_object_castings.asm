@@ -76,6 +76,8 @@ CHECK_CLASS_CAST		CScriptGameObject@@IsWeaponPistol,			CWeaponPistol
 CHECK_CLASS_CAST		CScriptGameObject@@IsWeaponKnife,			CWeaponKnife
 CHECK_CLASS_CAST		CScriptGameObject@@IsWeaponBinoculars,		CWeaponBinoculars
 CHECK_CLASS_CAST		CScriptGameObject@@IsWeaponShotgun,			CWeaponShotgun
+CHECK_CLASS_CAST		CScriptGameObject@@IsWeaponCustomPistol,	CWeaponCustomPistol
+CHECK_CLASS_CAST		CScriptGameObject@@IsWeaponRG6,				CWeaponRG6
 CHECK_CLASS_CAST		CScriptGameObject@@IsCrow,					CAI_Crow
 CHECK_CLASS_CAST		CScriptGameObject@@IsBloodsucker,			CAI_Bloodsucker
 CHECK_CLASS_CAST		CScriptGameObject@@IsBoar,					CAI_Boar

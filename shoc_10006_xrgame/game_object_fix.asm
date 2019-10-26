@@ -340,6 +340,8 @@ PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponKnife,				"is_knife"
 PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponBinoculars,			"is_binoculars"
 PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponPistol,				"is_weapon_pistol"
 PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponShotgun,				"is_weapon_shotgun"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponRG6,					"is_weapon_rg6"
+PERFORM_EXPORT_BOOL__VOID				CScriptGameObject@@IsWeaponCustomPistol,		"is_weapon_custom_pistol"
 ; метод для высадки актора из машины
 PERFORM_EXPORT_VOID__VECTOR				CScriptGameObject@@DetachVehicle,				"detach_vehicle"
 ; разворот камеры на геймобъект
@@ -3166,15 +3168,13 @@ CScriptGameObject@@setDynamicScales endp
 ; Загрузка параметров патрона в объект CCarWeapon через CHolder
 ; задаём секцию патронов
 align_proc
-CScriptGameObject@@LoadAmmoCar proc uses esi	sect_ammo:dword
+CScriptGameObject@@LoadAmmoCar proc sect_ammo:dword
 	smart_cast	CCar, CGameObject, [ecx+4]
 	.if (eax)
 		ASSUME	eax:ptr CCar, edx:ptr CCarWeapon
 		mov		edx, [eax].m_car_weapon
 		.if (edx)
-			mov		esi, [edx].m_Ammo	; CCartridge*
-			mov		eax, sect_ammo
-			CCartridge@@Load(0)
+			CCartridge@@Load([edx].m_Ammo, sect_ammo, 0)
 			mov		eax, 1
 		.endif
 		ASSUME	eax:nothing, edx:nothing

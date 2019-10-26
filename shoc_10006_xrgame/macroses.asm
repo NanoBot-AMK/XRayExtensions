@@ -14,12 +14,14 @@ float			typedef REAL4
 double			typedef REAL8
 
 ;только дл€ выравнивани€ процедур!
+globalCountProcedures		= 0
 align_proc MACRO
 LOCAL m1,m2
 m1:	align 16
 m2:	org		m1
 	db		15 dup (0CCh)
 	org		m2
+	globalCountProcedures = globalCountProcedures + 1
 ENDM
 
 ;include macros_eval.asm
@@ -61,6 +63,15 @@ const_static_float MACRO name_param:REQ, param:VARARG
 align 4
 name_param		REAL4	param
 .code
+ENDM
+
+const_static_float$ MACRO value:VARARG
+LOCAL name_param
+.const
+align 4
+name_param		REAL4	value
+.code
+EXITM <name_param>
 ENDM
 
 static_xmm4 MACRO name_param:REQ, param:VARARG
@@ -237,6 +248,39 @@ PRINT_FLOAT MACRO fmt_txt:REQ, val:REQ
 	popa
 ENDM
 
+InverseList MACRO arglist
+LOCAL txt, arg
+	txt TEXTEQU <>
+%	FOR arg, <arglist>
+		txt CATSTR <arg, >, txt
+	ENDM
+	txt SUBSTR txt, 1, @SizeStr(%txt)-2		;; удаление последней зап€той в txt
+	EXITM <txt>
+ENDM
+
+globalCountPushBytes		= 0	;;количество байт помещЄные в стек
+printf MACRO fmt_txt:REQ, params:VARARG
+LOCAL argstr, arg
+	argstr TEXTEQU <>
+	IFNB <params>
+%		FOR arg, <params>
+			argstr CATSTR <arg, >, argstr
+		ENDM
+		argstr SUBSTR argstr, 1, @SizeStr(%argstr)-2
+	ENDIF
+	pusha
+	globalCountPushBytes = 1
+%	FOR arg, <argstr>
+		pushvar	arg
+	ENDM
+;;% echo @CatStr(%globalCountPushBytes)
+	push	const_static_str$(fmt_txt)
+	call	Msg
+	add		esp, globalCountPushBytes*4
+	popa
+	EXITM <>
+ENDM
+
 FLUSH_LOG MACRO
 	pusha
 	call	FlushLog
@@ -345,18 +389,18 @@ ENDM
 
 ;============================================================================================
 ;	ћакросы колбеков, названи€ соотвествует передаваемым параметрам
-CALLBACK__GO	MACRO	_this:REQ, type_callback:REQ, param1:REQ
+CALLBACK__GO	MACRO	this_:REQ, type_callback:REQ, param1:REQ
 	regvar	eax, param1
 	CGameObject@@lua_game_object()
 	push	eax
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO
 ENDM
 
-CALLBACK__GO_GO	MACRO	_this:REQ, type_callback:REQ, obj1:REQ, obj2:REQ
+CALLBACK__GO_GO	MACRO	this_:REQ, type_callback:REQ, obj1:REQ, obj2:REQ
 	regvar	eax, obj2
 	CGameObject@@lua_game_object()
 	push	eax
@@ -364,13 +408,13 @@ CALLBACK__GO_GO	MACRO	_this:REQ, type_callback:REQ, obj1:REQ, obj2:REQ
 	CGameObject@@lua_game_object()
 	push	eax
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_GO
 ENDM
 
-CALLBACK__GO_GO_INT_VECTOR_FLOAT MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ, vector4:REQ, param5:REQ
+CALLBACK__GO_GO_INT_VECTOR_FLOAT MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ, vector4:REQ, param5:REQ
 	pushvar	param5
 	push	vector4.z
 	push	vector4.y
@@ -383,26 +427,26 @@ CALLBACK__GO_GO_INT_VECTOR_FLOAT MACRO	_this:REQ, type_callback:REQ, param1:REQ,
 	CGameObject@@lua_game_object()
 	push	eax
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_GO_int_vector_float
 ENDM
 
-CALLBACK__GO_BOOL_U32 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ
+CALLBACK__GO_BOOL_U32 MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ
 	push	param3
 	push	param2
 	regvar	eax, param1
 	CGameObject@@lua_game_object()
 	push	eax
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_bool_u32
 ENDM
 
-CALLBACK__GO_FLOAT_VECTOR_GO_s16 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
+CALLBACK__GO_FLOAT_VECTOR_GO_s16 MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
 IF (TYPE (param5) EQ 2)
 	movzx	eax, param5
 	push	eax
@@ -425,13 +469,13 @@ ENDIF
 	push	param2
 	push	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_float_vector_GO_s16
 ENDM
 
-CALLBACK__GO_FLOAT_VECTOR_GO_u16 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
+CALLBACK__GO_FLOAT_VECTOR_GO_u16 MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
 IF (TYPE (param5) EQ 2)
 	movzx	eax, param5
 	push	eax
@@ -458,13 +502,13 @@ ENDIF
 	call	CGameObject@@lua_game_object
 	push	eax
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_float_vector_GO_u16
 ENDM
 
-CALLBACK__SGO_FLOAT_VECTOR_SGO_u16 MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
+CALLBACK__SGO_FLOAT_VECTOR_SGO_u16 MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ, vector3:REQ, param4:REQ, param5:REQ
 IF (TYPE (param5) EQ 2)
 	movzx	eax, param5
 	push	eax
@@ -487,31 +531,31 @@ ENDIF
 	push	param2
 	push	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_float_vector_GO_u16
 ENDM
 
-CALLBACK__GO_STR	MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ
+CALLBACK__GO_STR	MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ
 	push	param2
 	regvar	eax, param1
 	call	CGameObject@@lua_game_object
 	push	eax
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_str
 ENDM
 
-CALLBACK__GO_STR_STR_STR	MACRO _this:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ, param4:REQ
+CALLBACK__GO_STR_STR_STR	MACRO this_:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ, param4:REQ
 	push	param4
 	push	param3
 	push	param2
 	push	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__GO_str_str_int
@@ -520,66 +564,66 @@ ENDM
 ;CALLBACK__SGAMETASK_SGAMETASKOBJECTIVE_ETASKSTATE
 ;	call	script_callback__SGameTask_SGameTaskObjective_ETaskState
 
-CALLBACK__FLOAT_FLOAT_INT_u32	MACRO _this:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ, param4:REQ
+CALLBACK__FLOAT_FLOAT_INT_u32	MACRO this_:REQ, type_callback:REQ, param1:REQ, param2:REQ, param3:REQ, param4:REQ
 	push	param4
 	push	param3
 	push	param2
 	push	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__float_float_int_u32
 ENDM
 
-CALLBACK__FLOAT_VECTOR MACRO	_this:REQ, type_callback:REQ, param1:REQ, vector2:REQ
+CALLBACK__FLOAT_VECTOR MACRO	this_:REQ, type_callback:REQ, param1:REQ, vector2:REQ
 	push	vector2.z
 	push	vector2.y
 	push	vector2.x
 	push	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__float_vector_m1
 ENDM
 
-CALLBACK__FLOAT_VECTOR_INT MACRO	_this:REQ, type_callback:REQ, param1:REQ, vector2:REQ, param3:REQ
+CALLBACK__FLOAT_VECTOR_INT MACRO	this_:REQ, type_callback:REQ, param1:REQ, vector2:REQ, param3:REQ
 	push	param3
 	push	vector2.z
 	push	vector2.y
 	push	vector2.x
 	push	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__float_vector_int
 ENDM
 
-CALLBACK__STR_u16	MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ
+CALLBACK__STR_u16	MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ
 	push	param2
 	push	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__str_u16
 ENDM
 
-CALLBACK__INT_INT	MACRO	_this:REQ, type_callback:REQ, param1:REQ, param2:REQ
+CALLBACK__INT_INT	MACRO	this_:REQ, type_callback:REQ, param1:REQ, param2:REQ
 	pushvar	param2
 	pushvar	param1
 	push	type_callback
-	mov		ecx, _this
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__u32_u32
 ENDM
 
-CALLBACK__VOID	MACRO	_this:REQ, type_callback:REQ
-	push	type_callback
-	mov		ecx, _this
+CALLBACK__VOID	MACRO	this_:REQ, type_callback:REQ
+	pushvar	type_callback
+	regvar	ecx, this_
 	call	CGameObject__callback
 	push	eax
 	call	script_callback__void
@@ -587,7 +631,7 @@ ENDM
 ;============================================================================================
 
 mrm MACRO FirstArgument:REQ, SecondArgument:REQ
-	LOCAL itemSize
+LOCAL itemSize
 	itemSize=TYPE (FirstArgument)
 	IF itemSize EQ 1
 		mov		al, SecondArgument
@@ -618,6 +662,31 @@ ENDM
 m2m MACRO param1:req, param2:req
 	push	param2
 	pop		param1
+ENDM
+
+;рассчитано на одинаковый размер параметров!
+swap MACRO param1:req, param2:req
+LOCAL itemSize, register1, register2
+	itemSize=TYPE (param1)
+	register1	TEXTEQU <>
+	register2	TEXTEQU <>
+	IF itemSize EQ 1
+		register1	TEXTEQU <al>
+		register2	TEXTEQU <dl>
+	ELSEIF itemSize EQ 2
+		register1	TEXTEQU <ax>
+		register2	TEXTEQU <dx>
+	ELSEIF itemSize EQ 4
+		register1	TEXTEQU <eax>
+		register2	TEXTEQU <edx>
+;;	ELSEIF itemSize EQ 8
+;;		register1	TEXTEQU <rax>
+;;		register2	TEXTEQU <rdx>
+	ENDIF
+	mov		register1, param1
+	mov		register2, param2
+	mov		param2, register1
+	mov		param1, register2
 ENDM
 
 float@clamp	MACRO param, min, max
@@ -692,7 +761,9 @@ Fvector@normalize MACRO vec_this:req
 ENDM
 
 Fvector4@magnitude MACRO vec_this:req
-	movaps	xmm0, vec_this
+	IF @SearchStr(<vec_this>,<xmm0>) EQ 0
+	movups	xmm0, vec_this
+	ENDIF
 	mulps	xmm0, xmm0
 	movss	xmm1, xmm0				; xmm1.x = x
 	shufps	xmm0, xmm0, 11100101b	; 3211t		копируем 1-й элемент в 0-й элемент
@@ -732,7 +803,7 @@ Fmatrix4@transform_tiny MACRO matrix_this:req, vec_result:req, vec:req
 	movups	vec_result, xmm0
 ENDM
 
-;ICF	void	transform_dir		(Tvector &dest, const Tvector &v)	const	// preferred to use
+;ICF	void	transform_dir(Tvector &dest, const Tvector &v)	const	// preferred to use
 ;{
 ;	dest.x = v.x*this.i.x + v.y*this.j.x + v.z*this.k.x;
 ;	dest.y = v.x*this.i.y + v.y*this.j.y + v.z*this.k.y;
@@ -1346,6 +1417,13 @@ CObject@@Center MACRO this_:req, pos:req
 	EXITM <>
 ENDM
 
+CObject@@setEnabled MACRO this_:req, enabled:req
+	pushvar	enabled
+	regvar	ecx, this_
+	call	ds:CObject__setEnabled
+	EXITM <>
+ENDM
+
 ref_sound@@create MACRO S:req, fName:req, sound_type:req, game_type:req
 	pushvar	game_type
 	pushvar	sound_type
@@ -1464,6 +1542,69 @@ CPhysicsShell@@set_CallbackData MACRO this_:req, cd:req
 	mov		edx, [ecx]
 	mov		eax, [edx+90h]
 	call	eax
+	EXITM <>
+ENDM
+
+CPHShell@@SetAirResistance MACRO this_:req, linear:req, angular:req
+	pushvar	angular
+	pushvar	linear
+	regvar	ecx, this_
+	mov		edx, [ecx]
+	mov		eax, [edx+70h]
+	call	eax			;CPHShell::SetAirResistance
+	EXITM <>
+ENDM
+
+CPHShell@@GetAirResistance MACRO this_:req, pLinear:req, pAngular:req
+	pushvar	pAngular
+	pushvar	pLinear
+	regvar	ecx, this_
+	mov		edx, [ecx]
+	mov		eax, [edx+74h]
+	call	eax			;CPHShell::GetAirResistance
+	EXITM <>
+ENDM
+
+CKinematics@@LL_BoneID MACRO this_:req, name_bone:req
+	pushvar	name_bone
+	regvar	ecx, this_
+	call	ds:CKinematics__LL_BoneID
+	EXITM <ax>
+ENDM
+
+CKinematics@@LL_SetBoneVisible MACRO this_:req, bone_id:req, val:req, bRecursive:req
+	pushvar	bRecursive
+	pushvar	val
+	pushvar	bone_id
+	regvar	ecx, this_
+	call	ds:CKinematics__LL_SetBoneVisible
+	EXITM <>
+ENDM
+
+CKinematics@@dcast_PKinematics MACRO this_:req
+	regvar	ecx, this_
+	mov		eax, [ecx]
+	mov		edx, [eax+18h]
+	call	edx
+	EXITM <eax>
+ENDM
+
+CKinematics@@CalculateBones MACRO this_:req, bForceExact:=<FALSE>
+	pushvar	bForceExact
+	regvar	ecx, this_
+	mov		eax, [ecx]
+	mov		edx, [eax+40h]
+	call	edx
+	EXITM <>
+ENDM
+
+CRocketLauncher@@FireTraceRocket MACRO this_:req, P:req, D:req
+	pushvar	D
+	pushvar	P
+	regvar	ecx, this_
+	mov		eax, [ecx]
+	mov		edx, [eax+4]
+	call	edx
 	EXITM <>
 ENDM
 
@@ -1655,19 +1796,38 @@ ENDIF
 ENDM
 
 pushvar MACRO mem:req
-LOCAL _mem
+LOCAL _mem, ddd
 IF @InStr(1, <&mem>, <&>) EQ 1
 	_mem equ @SubStr(<&mem>, 2)
 	IF ((OPATTR (_mem)) AND DIRECT_ADDR)
 		push 	offset _mem
+		globalCountPushBytes = globalCountPushBytes + 1
 	ELSE
 		lea		eax, _mem
 		push	eax
+		globalCountPushBytes = globalCountPushBytes + 1
 	ENDIF
 ELSEIF @InStr(1, <&mem>, <">) EQ 1
 	push	const_static_str$(mem)
+	globalCountPushBytes = globalCountPushBytes + 1
+ELSEIF @InStr(1, <&mem>, <^>) EQ 1	;;casting float -> double
+	_mem equ @SubStr(<&mem>, 2)
+	push	_mem
+	fld		dword ptr [esp]
+	push	ecx
+	fstp	qword ptr [esp]
+	globalCountPushBytes = globalCountPushBytes + 2
 ELSE
-	push	mem
+;;	 % echo @CatStr(%OPATTR(mem))
+	IF ((OPATTR(mem)) EQ 0)
+		push	mem
+	ELSEIF (TYPE(mem) EQ 2 OR TYPE(mem) EQ 1)
+		movzx	eax, mem
+		push	eax
+	ELSE
+		push	mem
+	ENDIF
+	globalCountPushBytes = globalCountPushBytes + 1
 ENDIF
 ENDM
 
@@ -1784,6 +1944,16 @@ ENDM
 	mov		eax, ds:pSettings			; CInifile const * const pSettings
 	mov		ecx, dword ptr[eax]
 	call	ds:r_section
+	EXITM <>
+ENDM
+
+@R_FVECTOR2 MACRO tmp_vector:req, name_sect:req, name_param:req
+	pushvar	name_param
+	pushvar	name_sect
+	pushvar	tmp_vector
+	mov		eax, ds:pSettings			; CInifile const * const pSettings
+	mov		ecx, dword ptr[eax]
+	call	ds:CInifile__r_fvector2
 	EXITM <>
 ENDM
 
@@ -2492,40 +2662,20 @@ arginvoke MACRO argNo:REQ, invCount:REQ, func:REQ, args:VARARG
     ENDIF
 ENDM
 
-; uinvoke MACRO func:REQ, args:VARARG
-	; IFB <args>
-		; invoke func
-	; ELSE
-		; invoke func, args
-	; ENDIF
-	; IF @LastReturnType EQ 0
-        ; EXITM <al>
-    ; ELSEIF @LastReturnType EQ 0x40
-        ; EXITM <al>
-    ; ELSEIF @LastReturnType EQ 1
-        ; EXITM <ax>
-    ; ELSEIF @LastReturnType EQ 0x41
-        ; EXITM <ax>
-    ; ELSEIF @LastReturnType EQ 2
-        ; EXITM <eax>
-    ; ELSEIF @LastReturnType EQ 0x42
-        ; EXITM <eax>
-    ; ELSEIF @LastReturnType EQ 3
-        ; EXITM <rax>
-    ; ELSEIF @LastReturnType EQ 0x43
-        ; EXITM <rax>
-    ; ELSEIF @LastReturnType EQ 0xc3
-        ; EXITM <rax>
-    ; ELSEIF @LastReturnType EQ 6
-        ; EXITM <xmm0>
-    ; ELSEIF @LastReturnType EQ 7
-        ; EXITM <ymm0>
-    ; ELSEIF @LastReturnType EQ 8
-        ; EXITM <zmm0>
-    ; ELSEIF @LastReturnType EQ 0x22
-        ; EXITM <xmm0>
-    ; ELSEIF @LastReturnType EQ 0x23
-        ; EXITM <xmm0>
-	; ENDIF
-; ENDM
+uinvoke MACRO func:REQ, args:VARARG
+	IFB <args>
+		invoke func
+	ELSE
+		invoke func, args
+	ENDIF
+	IF (@LastReturnType EQ 0) OR (@LastReturnType EQ 0x40)
+        EXITM <al>
+    ELSEIF (@LastReturnType EQ 1) OR (@LastReturnType EQ 0x41)
+        EXITM <ax>
+    ELSEIF (@LastReturnType EQ 2) OR (@LastReturnType EQ 0x42)
+        EXITM <eax>
+    ELSEIF (@LastReturnType EQ 6) OR (@LastReturnType EQ 0x22) OR (@LastReturnType EQ 0x23)
+        EXITM <xmm0>
+	ENDIF
+ENDM
 

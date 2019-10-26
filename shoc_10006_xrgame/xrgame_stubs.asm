@@ -335,7 +335,7 @@ org 103F4CECh - shift	; 10 bytes
 return_CUICustomEdit__KeyPressed_fix_2:
 ;'жЖ'
 org 103F4CFFh - shift	; 13 bytes
-	mov     bl, [ebp].CUICustomEdit.m_bShift
+	mov		bl, [ebp].CUICustomEdit.m_bShift
 	jmp		CUICustomEdit__KeyPressed_fix_3
 	nop2
 return_CUICustomEdit__KeyPressed_fix_3:
@@ -733,7 +733,7 @@ CProjector__TurnOff: ; this = esi
 
 ;
 org 101562D5h - shift	;  bytes
-	mov     [esp+64h-48h], offset CScriptGameObject@@disable_info_portion_fix
+	mov		[esp+64h-48h], offset CScriptGameObject@@disable_info_portion_fix
 org 10146D00h - shift
 CScriptGameObject@@DisableInfoPortion:
 org 10146F80h - shift
@@ -1464,6 +1464,19 @@ org 1045871Ch - shift
 _ds@CObjectSpace__RayPick dd ?
 CObjectSpace__RayPick proc pos:dword, dir:dword, range:real4, RQ:dword, res:dword, ignor_obj:dword
 CObjectSpace__RayPick endp
+CObjectSpace@@RayPick MACRO pos:req, dir:req, range:req, RQ:req, res:req, ignor_obj:req
+	pushvar	ignor_obj
+	pushvar	res
+	pushvar	RQ
+	pushvar	range
+	pushvar	dir
+	pushvar	pos
+	mov		eax, ds:g_pGameLevel
+	mov		ecx, [eax]
+	add		ecx, CLevel.ObjectSpace
+	call	ds:_ds@CObjectSpace__RayPick
+	EXITM <eax>
+ENDM
 
 ;использование патронов на поясе
 org 10205D71h - shift	; 5 bytes
@@ -2400,7 +2413,8 @@ org 10147750h - shift
 CScriptGameObject__DropItem:
 
 org 1022A2E0h - shift
-CWeaponMagazinedWGrenade@@PerformSwitchGL:
+CWeaponMagazinedWGrenade@@PerformSwitchGL proc
+CWeaponMagazinedWGrenade@@PerformSwitchGL endp
 
 org 10458DD8h - shift
 pSettings dd ?
@@ -2450,11 +2464,31 @@ org 10458AF4h - shift
 r_section		dd ?
 
 org 10458B08h - shift
-_GetItemCount	dd ?
+_ds@_GetItemCount	dd ?
+_GetItemCount MACRO src:req, separator:=<','>
+	pushvar	separator
+	pushvar	src
+	call	ds:_ds@_GetItemCount
+	add		esp, 8
+	EXITM <eax>
+ENDM
 org 10458DF4h - shift
-_GetItem		dd ?
+_ds@_GetItem		dd ?
+_GetItem MACRO src:req, index:req, dst:req, separator:=<','>, def:=<offset null_string>, trim:=<true>
+	pushvar	trim
+	pushvar	def
+	pushvar	separator
+	pushvar	dst
+	pushvar	index
+	pushvar	src
+	call	ds:_ds@_GetItem
+	add		esp, 24
+	EXITM <>
+ENDM
 org 104C885Ah - shift
 null_string		dd ?
+org 1048D804h - shift
+aGrenade_bone	db ?	; "grenade_bone"
 ;------------------------------------------
 org 105421E0h - shift
 _AVCCustomMonster:
@@ -2510,6 +2544,8 @@ org 10556EC4h - shift
 _AVCWeaponBinoculars:
 org 10556EF4h - shift
 _AVCWeaponShotgun:
+org 10556F4Ch - shift
+_AVCWeaponBM16:
 org 10556CC8h - shift
 _AVCWeaponMagazinedWGrenade:
 org 10557248h - shift
@@ -2598,6 +2634,8 @@ org 10556DF0h - shift
 _AVCWeaponRPG7:
 org 10556F30h - shift
 _AVCWeaponRG6:
+org 10556BFCh - shift
+_AVCWeaponCustomPistol:
 ;-----??????-----
 org 105507CCh - shift
 _AVIRender_Visual:
@@ -2979,7 +3017,7 @@ org 101BB225h - shift	; 70 bytes
 	mulss	xmm2, xmm0
 	movss	[esp+30h-10h], xmm0				;R
 	movss	dword ptr [esp+30h-14h], xmm2	;target_material
-	comiss  xmm1, ds:float_m0p00001			; if (mtl->fShootFactor >= -0.00001)
+	comiss	xmm1, ds:float_m0p00001			; if (mtl->fShootFactor >= -0.00001)
 	nop3
 ;загрузим параметры.
 org 101B778Ah - shift	; 8 bytes
@@ -3112,9 +3150,11 @@ org 1024FF39h - shift	; 7 bytes
 	movzx	eax, [ebp].m_game_object_id
 ;строка 385
 org 1024FFBBh - shift	; 10 bytes
-	mov		eax, [ebp].m_game_object
+;	mov		eax, [ebp].m_game_object
+;	nop2
+	jmp		CExplosive@@CumulativeJet_fix
+return_CExplosive@@CumulativeJet_fix:
 	test	eax, eax
-	nop2
 	jz		loc_1024FFD9
 	nop
 org 1024FFD9h - shift
@@ -3293,8 +3333,16 @@ org 10481F64h - shift
 virtual_prototype__void__luabind@@object_luabind@@functor@bool@_luabind@@functor@void@:
 ;===================================================================================
 org 1021F3F0h - shift	; ---===NanoBot===---
-CCartridge@@Load proc LocalAmmoType:dword
-CCartridge@@Load endp
+CCartridge__Load:
+CCartridge@@Load MACRO this_:req, sect:req, LocalAmmoType:req
+	push	esi
+	pushvar	LocalAmmoType
+	regvar	eax, sect
+	regvar	esi, this_
+	call	CCartridge__Load
+	pop		esi
+	EXITM <>
+ENDM
 org 1021F360h - shift
 CCartridge@@CCartridge proc
 CCartridge@@CCartridge endp
@@ -3921,7 +3969,7 @@ org 1047CF00h - shift
 aLocation_on_pa	dd ?		; "location_on_path"
 ;for register__bool__pvector_float
 org 10156CE3h - shift	; 5 bytes
-	push    offset aInside
+	push	offset aInside
 org 10159653h - shift	; 5 bytes
 	push	[esp+5Ch+arg_4]
 	nop
@@ -3954,9 +4002,9 @@ org 10157333h - shift	; 5 bytes
 	nop
 ;for register__float__int
 org 1014B661h - shift	; 14 bytes
-	mov     [esp+88h-74h], offset CScriptGameObject@@GetCurrentOutfitProtection
-	push    edx
-	push    offset aGet_current__0
+	mov		[esp+88h-74h], offset CScriptGameObject@@GetCurrentOutfitProtection
+	push	edx
+	push	offset aGet_current__0
 org 1014DF0Fh - shift	; 5 bytes
 	push	[esp+58h+arg_0]
 	nop
@@ -4043,12 +4091,14 @@ ph_world		dd ?	;CPHWorld*
 org 10229080h - shift
 Func@TransferenceAndThrowVelToThrowDir:	; proc C throw_vel:real4, gravity_accel:real4
 TransferenceAndThrowVelToThrowDir MACRO transference:req, throw_vel:req, gravity_accel:req, throw_dir:req
+	push	edi
 	pushvar	gravity_accel
 	pushvar	throw_vel
 	regvar	edi, throw_dir
 	regvar	eax, transference
 	call	Func@TransferenceAndThrowVelToThrowDir
 	add		esp, 8
+	pop		edi
 	EXITM	<al>
 ENDM
 ;------------------------------------------------------------------
@@ -4090,8 +4140,6 @@ loc_1022DBD0:
 		call	CCustomRocket@@OpenParachute
 	.endif
 	jmp		CExplosiveRocket@@UpdateCL
-	;pop		esi
-	;retn
 org 1022D140h - shift
 CCustomRocket@@ObjectContactCallback: ;;; do_colide:ptr byte, bo1:byte, cc:ptr , material_1:ptr , material_2:ptr 
 org 10224EF0h - shift
@@ -4116,11 +4164,23 @@ org 1048F248h - shift	; 4 bytes
 ;CExplosiveRocket::OnEvent
 org 1022EA6Dh - shift	; 5 bytes
 	jmp		CExplosiveRocket@@OnEvent@ext
-;
+;Задать силу сопротивления воздуха, линейную и угловую.
+org 1022CD75h - shift	; 25 bytes
+	mov		ecx, esi
+	nop7
+	call	CCustomRocket@@SetParamsAirResistance
+	nop4
+	nop7
 ;------------------------------------------------------------------
 ;------------------------------------------------------------------
 ;Переделка гранатомётов CWeaponRG6, CWeaponMagazinedWGrenade, CWeaponRPG7
-;Теперь запускается ракете происходит из метода CWeapon::FireTrace
+;Теперь запуск ракеты происходит из метода CWeapon::FireTrace
+org 1008DBB0h - shift
+OnServer proc (byte)
+OnServer endp
+org 101A3300h - shift
+OnClient proc (byte)
+OnClient endp
 org 1021F090h - shift
 CWeapon@@FireTrace proc P:ptr Fvector, D:ptr Fvector
 CWeapon@@FireTrace endp
@@ -4133,6 +4193,9 @@ CWeaponMagazined@@UnloadMagazine endp
 org 102381A0h - shift
 CWeaponRG6@@AddCartridge proc cnt:dword
 CWeaponRG6@@AddCartridge endp
+org 1021ACF0h - shift
+CWeapon@@LoadFireParams proc sect:ptr byte, prefix:ptr byte
+CWeapon@@LoadFireParams endp
 org 1021AF50h - shift
 CWeapon@@net_Spawn proc DC:ptr CSE_Abstract
 CWeapon@@net_Spawn endp
@@ -4144,10 +4207,55 @@ org 10226AF0h - shift
 CWeaponMagazined@@state_Fire:
 org 1021CB40h - shift
 CWeapon@@SwitchState:
+org 1021B6E0h - shift
+CWeapon@@OnH_A_Chield:
+org 10225B70h - shift
+CWeaponMagazined@@TryReload:
+org 10227000h - shift
+CWeaponMagazined@@switch2_Fire:
+org 10225AF0h - shift
+CWeaponMagazined@@FireEnd:
+org 10228960h - shift
+CWeaponMagazined@@SetQueueSize proc size_:dword
+CWeaponMagazined@@SetQueueSize endp
+;-------------------
 org 1048D824h - shift
 aFake_grenade_n		dd ?	; "fake_grenade_name"
 org 10492634h - shift
 aRocket_class		dd ?	; "rocket_class"
+org 1048A5FCh - shift
+aRpm				dd ?	; "rpm"
+org 1048A630h - shift
+aFire_distance		dd ?	; "fire_distance"
+org 1048AAD0h - shift
+aGrenade_laun_0		dd ?	; "grenade_launcher_name"
+org 1048E984h - shift
+aForce_explode_		dd ?	; "force_explode_time"
+org 1048A8CCh - shift
+aCam_max_angle		dd ?	; "cam_max_angle"
+org 1048A8DCh - shift
+aCam_relax_speed	dd ?	; "cam_relax_speed"
+org 1048A900h - shift
+aCam_max_angle_		dd ?	; "cam_max_angle_horz"
+org 1048A914h - shift
+aCam_step_angle		dd ?	; "cam_step_angle_horz"
+org 1048A928h - shift
+aCam_dispertion		dd ?	; "cam_dispertion_frac"
+org 1048A9A0h - shift
+aFire_dispers_1		dd ?	; "fire_dispersion_condition_factor"
+org 1048A9C4h - shift
+aMisfire_probab		dd ?	; "misfire_probability"
+org 1048A9D8h - shift
+aMisfire_condit		dd ?	; "misfire_condition_k"
+org 1048A9ECh - shift
+aCondition_shot		dd ?	; "condition_shot_dec"
+org 10488BF4h - shift
+aInv_weight			dd ?	; "inv_weight"
+org 1045CCBCh - shift
+aBox_size			dd ?	; "box_size"
+org 104D2458h - shift
+g_fDeg2rad			dd ?	;=0.017453292 = PI/180.f
+const_static_str		aBlock_auto_aim_rg, "block_auto_aim_rg"
 org 1022EEF0h - shift
 CRocketLauncher@@SpawnRocket proc rocket_section:ptr, parent_rocket_launcher:ptr 
 CRocketLauncher@@SpawnRocket endp
@@ -4170,7 +4278,7 @@ CRocketLauncher@@DetachRocket MACRO rocket_id:req, this_:req, bLaunch:req
 	EXITM <>
 ENDM
 org 1022F2A0h - shift
-Func@CRocketLauncher@@LaunchRocket: 	;(CRocketLauncher *this@<eax>, Fmatrix *xform, Fvector *vel)
+Func@CRocketLauncher@@LaunchRocket:		;(CRocketLauncher *this@<eax>, Fmatrix *xform, Fvector *vel)
 CRocketLauncher@@LaunchRocket MACRO this_:req, xform:req, vel:req
 	pushvar	vel
 	pushvar	xform
@@ -4193,40 +4301,390 @@ CRocketLauncher@@dropCurrentRocket MACRO this_:req	;INLINE
 	.endif
 	EXITM <>
 ENDM
-;переделаем метод CWeaponRG6::FireStart в CWeaponRG6::StartRocket
-org 10237C30h - shift
-CWeaponRG6@@StartRocket proc	;было CWeaponRG6@@FireStart:
-CWeaponRG6@@StartRocket endp
-org 10237C46h - shift	; 48 bytes
-	jmp		@F
-	db		15 dup (90h)
-@@:
-	mov     eax, [ebp-2E8h]
-	test    eax, eax
-	jz      loc_1023818C
-	mov     ecx, [ebp-2E4h]
-	sub     ecx, eax
-	sar     ecx, 2
-	jz      loc_1023818C
-org 1023818Ch - shift
-loc_1023818C:
-;переделаем метод CWeaponMagazinedWGrenade::SwitchState в CWeaponMagazinedWGrenade::StartRocket
-org 1022A8E0h - shift
-CWeaponMagazinedWGrenade@@StartRocket proc S:dword	;было CWeaponMagazinedWGrenade@@SwitchState:
-CWeaponMagazinedWGrenade@@StartRocket endp
-org 1022A8F8h - shift	; 42 bytes
-	mov		[esp+0Ch], edi
-	jmp		@F
-	db		36 dup (90h)
-@@:
-;переделаем метод CWeaponRPG7::switch2_Fire в CWeaponRPG7::StartRocket
-org 10232420h - shift
-CWeaponRPG7@@StartRocket proc	;было CWeaponRPG7@@switch2_Fire:
-CWeaponRPG7@@StartRocket endp
-org 10232438h - shift	; 32 bytes
-	jmp		@F
-	db		30 dup (90h)
-@@:
+;инлайн функция, использовать только в условных блоках .if, .while и т.д.
+IsGrenadeLauncherAttached MACRO this_wpn:req
+	mov		eax, this_wpn.m_eGrenadeLauncherStatus
+	EXITM <((eax==eAddonAttachable && this_wpn.m_flagsAddOnState & eWeaponAddonGrenadeLauncher) || eax==eAddonPermanent)>
+ENDM
+org 1003E0E0h - shift
+Fvector__generate_orthonormal_basis:	;(Fvector *dir@<ebx>, Fvector *up@<edi>, Fvector *right@<esi>)
+Fvector@@generate_orthonormal_basis MACRO dir:req, up:req, right:req
+	push	esi
+	push	edi
+	push	ebx
+	regvar	esi, dir
+	regvar	edi, up
+	regvar	ebx, right
+	call	Fvector__generate_orthonormal_basis
+	pop		ebx
+	pop		edi
+	pop		esi
+	EXITM <>
+ENDM
+CExplosiveRocket@@RealGravity		PROTO (real4)
+;Т.к. метод CWeaponRPG7::switch2_Fire() удалён, на его место помещаем методы StartRocket, DeleteRockets, SpawnRockets
+org 10232420h - shift	; 1072 bytes
+	db		1072 dup (0CCh)	
+org 10232420h - shift	; 1072 bytes
+;void	CRocketLauncher::StartRocket(const Fvector& P, const Fvector& D, bool )
+CRocketLauncher@@StartRocket proc uses esi edi ebx pos_start:ptr Fvector, dir_start:ptr Fvector, is_aim:byte
+local gravity:real4, gravi_min:real4, HasPick:dword, p1:Fvector4, d:Fvector4, launch_matrix:Fmatrix4
+local Transference:Fvector4, res[2]:Fvector, RQ:collide__rq_result, P:NET_Packet
+	mov		esi, ecx
+	ASSUME	esi:ptr CRocketLauncher, edi:ptr CExplosiveRocket, ebx:ptr CObject
+	;CExplosiveRocket*	pGrenade = smart_cast<CExplosiveRocket*>(getCurrentRocket());
+	CRocketLauncher@@getCurrentRocket(esi)
+	smart_cast	CExplosiveRocket, CCustomRocket, eax
+	.if (eax)
+		mov		edi, eax	;pGrenade
+		mov		edx, pos_start
+		Fvector_set		p1, [edx].Fvector
+		and		p1.w, 0
+		mov		edx, dir_start
+		Fvector_set		d, [edx].Fvector
+		and		d.w, 0
+		Fmatrix4@identity (launch_matrix)
+		Fvector_set		launch_matrix.k, d
+		Fvector@@generate_orthonormal_basis(&launch_matrix.k, &launch_matrix.j, &launch_matrix.i)
+		Fvector_set		launch_matrix.c_, p1
+		;CGameObject*	obj = smart_cast<CGameObject*>(this);
+		smart_cast	CGameObject, CRocketLauncher, esi
+		mov		ebx, eax
+		;CObject*		parent = obj->H_Parent();
+		.if (is_aim)	;//
+			CObject@@setEnabled([ebx].Parent, FALSE)
+			CObject@@setEnabled(ebx, FALSE)
+			;BOOL HasPick = Level().ObjectSpace.RayPick(p1, d, 500.0f, collide::rqtBoth, RQ, obj);
+			mov		HasPick, CObjectSpace@@RayPick(&p1, &d, 500.0, 3, &RQ, ebx)
+			CObject@@setEnabled(ebx, TRUE)
+			CObject@@setEnabled([ebx].Parent, TRUE)
+			movflt	gravi_min, 0.001
+			;//метод RealGravity возвращает реальную гравитацию с учётом работы двигателя при определёном условии.
+			mov		ecx, edi
+			movss	gravity, CExplosiveRocket@@RealGravity()	;gravity = pGrenade->RealGravity();
+			movss	xmm0, gravi_min
+			.if (HasPick && xmm0<gravity)
+				;Transference.mul(d, RQ.range);
+				movups	xmm0, d
+				movss	xmm1, RQ.range
+				shufps	xmm1, xmm1, 0
+				mulps	xmm0, xmm1
+				movups	Transference, xmm0
+;				printf("Transference[%.5f, %.5f, %.5f] range=%.3f", ^Transference.x, ^Transference.y, ^Transference.z, ^RQ.range)
+				.if (TransferenceAndThrowVelToThrowDir(&Transference, [esi].m_fLaunchSpeed, gravity, &res))
+					Fvector_set	d, res[0]
+				.endif
+			.endif
+		.endif
+		;d.mul(m_fLaunchSpeed);
+		movups	xmm0, d
+		movss	xmm1, [esi].m_fLaunchSpeed
+		shufps	xmm1, xmm1, 0
+		mulps	xmm0, xmm1
+		movups	d, xmm0
+		CRocketLauncher@@LaunchRocket(esi, &launch_matrix, &d)
+		;pGrenade->SetInitiator(parent->ID());
+		mov		edx, [ebx].Parent
+		mrm		[edi].m_iCurrentParentID, [edx].CObject.ID
+		.if (OnServer())
+			;u_EventGen(P, GE_LAUNCH_ROCKET, obj->ID());
+			CGameObject@@u_EventGen(&P, GE_LAUNCH_ROCKET, [ebx].ID)
+			;P.w_u16(pGrenade->ID());
+			mov		edx, P.B.count
+			mrm		word ptr P.B.data[edx], [edi].ID
+			add		P.B.count, 2
+			;u_EventSend(P);
+			CGameObject@@u_EventSend(&P)
+		.endif
+		;dropCurrentRocket();
+		mov		eax, [esi].m_rockets._Myfirst
+		.if (eax && eax!=[esi].m_rockets._Mylast)
+			sub		[esi].m_rockets._Mylast, 4
+		.endif
+	.endif
+	ASSUME	esi:nothing, edi:nothing, ebx:nothing
+	ret
+CRocketLauncher@@StartRocket endp
+
+;void			CRocketLauncher::DeleteRockets()
+;{
+;	xr_vector<CCustomRocket>::const_iterator	I = m_rockets.begin();
+;	xr_vector<CCustomRocket>::const_iterator	E = m_rockets.end();
+;	for( ; I != E; ++I)
+;		CCustomRocket*	rocket = *I;
+;		if(rocket->Local())
+;			rocket->DestroyObject();
+;	}
+;	m_rockets.();
+;}
+align_proc
+CRocketLauncher@@DeleteRockets proc uses esi edi ebx
+	mov		esi, ecx
+	ASSUME	esi:ptr CRocketLauncher
+	mov		edi, [esi].m_rockets._Myfirst	;I = m_rockets.begin();
+	mov		ebx, [esi].m_rockets._Mylast
+	.for (:edi!=ebx: edi+=4)
+		mov		ecx, [edi]
+		.if ([ecx].CCustomRocket.Props.flags & net_Local)	;rocket->Local()
+			;rocket->DestroyObject();
+			mov     edx, [ecx]
+			mov     eax, [edx+0E8h]
+			call	eax
+		.endif
+	.endfor
+	mrm		[esi].m_rockets._Mylast, [esi].m_rockets._Myfirst	;
+	ASSUME	esi:nothing
+	ret
+CRocketLauncher@@DeleteRockets endp
+
+;void			CRocketLauncher::SpawnRockets(xr_vector<CCartridge>& magazine)
+;{
+;	CGameObject*	obj = smart_cast<CGameObject*>(this);
+;	xr_vector<CCartridge>::const_iterator	I = magazine.begin();
+;	xr_vector<CCartridge>::const_iterator	E = magazine.end();
+;	for( ; I != E; ++I){
+;		LPCSTR	sect = (*I).m_ammoSect.c_str();
+;		if(pSettings->line_exist(sect, "fake_grenade_name"))
+;			sect = pSettings->r_string(sect, "fake_grenade_name");
+;		else{
+;			CWeaponRPG7* rpg = smart_cast<CWeaponRPG7*>(this);
+;			if(!rpg) continue;
+;			sect = rpg->m_sRocketSection.c_str();	//оригинальный RPG7
+;		}
+;		SpawnRocket(sect, obj);
+;	}
+;}
+align_proc
+CRocketLauncher@@SpawnRockets proc uses esi edi ebx magazine:ptr xr_vector
+local E:dword
+;ecx	this CRocketLauncher*
+	smart_cast	CGameObject, CRocketLauncher, ecx
+	mov		esi, eax
+	mov		edx, magazine
+	mov		edi, [edx].xr_vector._Myfirst	;I = magazine.begin();
+	mrm		E, [edx].xr_vector._Mylast		;E = magazine.end();
+	.for (:edi!=E: edi += size CCartridge)
+		mov		ebx, [edi].CCartridge.m_ammoSect.p_
+		.if (@LINE_EXIST(&[ebx].str_value.value, &aFake_grenade_n))		;"fake_grenade_name"
+			mov		edx, @R_STRING(&[ebx].str_value.value, &aFake_grenade_n)
+		.else
+			smart_cast	CWeaponRPG7, CGameObject, esi
+			.continue .if (!eax)
+			mov		ecx, [eax].CWeaponRPG7.m_sRocketSection.p_	;оригинальный RPG7
+			lea		edx, [ecx].str_value.value
+		.endif
+		CRocketLauncher@@SpawnRocket(edx, esi)
+	.endfor
+	ret
+CRocketLauncher@@SpawnRockets endp
+;=================================================================================
+
+;Переделка класса CWeaponMagazinedWGrenade
+;убираем метод void	 CWeaponMagazinedWGrenade::state_Fire(float dt)
+CRocketLauncher@@SpawnRockets				PROTO magazine:ptr xr_vector
+CRocketLauncher@@DeleteRockets				PROTO
+CWeaponMagazinedWGrenade@@UnloadMagazine	PROTO spawn_ammo:byte
+CWeaponMagazinedWGrenade@@LoadFireParams	PROTO sect:ptr byte, prefixptr:ptr byte
+org 1022A220h - shift
+CWeaponMagazinedWGrenade@@SwitchMode proc
+CWeaponMagazinedWGrenade@@SwitchMode endp
+org 1021DFB0h - shift
+CWeapon@@Weight proc
+CWeapon@@Weight endp
+org 10226F60h - shift
+CWeaponMagazined__OnAnimationEnd:
+CWeaponMagazined@@OnAnimationEnd MACRO this_:req, state:req
+	pushvar	state
+	regvar	ecx, this_
+	call	CWeaponMagazined__OnAnimationEnd
+	EXITM <>
+ENDM
+;уберём виртуальный метод CWeaponMagazinedWGrenade::state_Fire
+org 1048DA34h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@state_Fire
+org 10490754h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@state_Fire
+org 104938BCh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@state_Fire
+;уберём виртуальный метод CWeaponMagazinedWGrenade::SwitchState
+org 1048DD4Ch - shift	; 4 bytes
+	dd offset CWeapon@@SwitchState		;CWeaponMagazinedWGrenade
+org 10490A6Ch - shift	; 4 bytes
+	dd offset CWeapon@@SwitchState		;CWeaponGroza
+org 10493BD4h - shift	; 4 bytes
+	dd offset CWeapon@@SwitchState		;CWeaponAK74
+;-----------------------------
+;больше места для CWeaponGroza
+org 10230E74h - shift	; 5 bytes
+	push	sizeof CWeaponMagazinedWGrenade
+org 10297256h - shift	; 5 bytes
+	push	sizeof CWeaponMagazinedWGrenade
+;больше места для CWeaponAK74
+org 10233294h - shift	; 5 bytes
+	push	sizeof CWeaponMagazinedWGrenade
+org 10296996h - shift	; 5 bytes
+	push	sizeof CWeaponMagazinedWGrenade
+;больше места для CWeaponMagazinedWGrenade
+org 10296856h - shift	; 5 bytes
+	push	sizeof CWeaponMagazinedWGrenade
+;-----------------------------
+;расширение конструктора
+org 102296EEh - shift	; 5 bytes
+	jmp		CWeaponMagazinedWGrenade@@CWeaponMagazinedWGrenade_fix
+;CWeaponMagazinedWGrenade::Load
+org 10229E74h - shift	; 25 bytes
+	jmp		CWeaponMagazinedWGrenade@@Load_fix
+	db		20 dup (0CCh)
+org 1021E1C0h - shift
+CCartridge__push_back:
+CCartridge@@push_back MACRO this_:req, val:req
+	regvar	eax, val
+	regvar	ecx, this_
+	call	CCartridge__push_back
+	EXITM <>
+ENDM
+;BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
+org 10229F11h - shift	; 456 bytes
+	db		456 dup (0CCh)
+org 10229F11h - shift	; 456 bytes
+;edi	this	CWeaponMagazinedWGrenade*
+;esi	m_DefaultCartridge2	CCartridge*
+	ASSUME	edi:ptr CWeaponMagazinedWGrenade
+	xor		ebp, ebp	;rockets_empty = m_rockets.empty();//!getRocketCount()	//ракетница пуста?
+	mov		eax, [edi].m_rockets._Myfirst
+	.if (!eax || eax==[edi].m_rockets._Mylast)
+		inc		ebp		;Да
+	.endif
+	.if ([edx].game_cl_GameState.m_type != 1)	;if(GameID() != GAME_SINGLE)
+		.if (![edi].m_bGrenadeMode && IsGrenadeLauncherAttached([edi]) && ebp)
+			CCartridge@@push_back(esi, &[edi].m_magazine2)
+		.endif
+	.endif
+	;bool b_if_grenade_mode	= (m_bGrenadeMode && iAmmoElapsed && !getRocketCount());
+	;bool b_if_simple_mode	= (!m_bGrenadeMode && !m_magazine2.empty() && !getRocketCount());
+	;if(b_if_grenade_mode || b_if_simple_mode)
+	mov		eax, [edi].m_magazine2._Myfirst
+	.if (ebp && (([edi].m_bGrenadeMode && [edi].iAmmoElapsed) || (![edi].m_bGrenadeMode && eax && eax!=[edi].m_magazine2._Mylast)))
+		push	ebx
+		mov		bl, [edi].m_bGrenadeMode	;bool	curr_mode = m_bGrenadeMode;
+		.if (!bl)							;// если в основном режиме, то перегодим на ПГ.
+			mov		eax, edi
+			CWeaponMagazinedWGrenade@@PerformSwitchGL()	;SwitchMode()	;
+		.endif
+		;// заряжаем ПГ ракетами. Ракеты соотвествуют патронам из m_magazine.
+		lea		ecx, [edi].CRocketLauncher@vfptr
+		CRocketLauncher@@SpawnRockets(&[edi].m_magazine)
+		.if (!bl)							;// если текущий режим основной то, переключаем на основной
+			mov		eax, edi
+			CWeaponMagazinedWGrenade@@PerformSwitchGL()	;SwitchMode()	;
+		.endif
+		pop		ebx
+	.endif
+	;перезапустим параметры для подствольного девайса.
+	.if ([edi].m_bGrenadeMode && [edi].m_bGrnLauncherShotgun)
+		mov		edx, [edi].NameSection.p_	;LPCSTR	sect = cNameSect().c_str();
+		mov		edx, @R_STRING(&[edx].str_value.value, &aGrenade_laun_0)	;"grenade_launcher_name"
+		mov		ecx, edi
+		CWeaponMagazinedWGrenade@@LoadFireParams(edx, &null_string)
+	.endif
+	mov		eax, [esp+14h-8];l_res
+	pop		edi
+	pop		esi
+	pop		ebp
+	add		esp, 8
+	retn	4
+;void  CWeaponMagazinedWGrenade::PerformSwitchGL()
+org 1022A2E6h - shift	; 45 bytes
+	sub		esp, 4Ch+4	;добавим места для this
+	push	ebx
+	push	esi
+	push	edi
+	mov		edi, eax
+	;m_bGrenadeMode		= !m_bGrenadeMode;
+	xor		[edi].m_bGrenadeMode, 1
+	mov		[ebp-4], edi	;this //хак чтобы сохранить this, т.к. ниже он там затерается!
+	nop3
+	swap	[edi].iMagazineSize2, [edi].iMagazineSize	;;24 bytes
+org 1022A5B9h - shift	; 7 bytes
+	jmp		CWeaponMagazinedWGrenade@@PerformSwitchGL_fix
+	nop2
+;void CWeaponMagazinedWGrenade::UnloadMagazine(bool spawn_ammo)
+org 1048DA40h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@UnloadMagazine		;CWeaponMagazinedWGrenade
+org 10490760h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@UnloadMagazine		;CWeaponGroza
+org 104938C8h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@UnloadMagazine		;CWeaponAK74
+;CWeaponMagazinedWGrenade::ReloadMagazine
+org 1022AEA9h - shift	; 138 bytes
+	db		138 dup (0CCh)
+org 1022AEA9h - shift	; 138 bytes
+	;// перезарядка подствольного гранатомета  (c) NanoBot
+	.if ([edi].m_bGrenadeMode && [edi].m_bCanRocketReload)
+		mov		[edi].m_bCanRocketReload, false
+		lea		ecx, [edi].CRocketLauncher@vfptr
+		CRocketLauncher@@DeleteRockets()
+		lea		ecx, [edi].CRocketLauncher@vfptr
+		CRocketLauncher@@SpawnRockets(&[edi].m_magazine)
+	.endif
+	pop		edi
+	pop		ecx
+	retn
+	ASSUME	edi:nothing
+;CWeaponMagazinedWGrenade::OnAnimationEnd
+org 1022AFBBh - shift	; 24 bytes
+	mov		[esi-CWeaponMagazinedWGrenade.CHudItem@vfptr].CWeaponMagazinedWGrenade.m_bCanRocketReload, 1
+	jnz		short loc_1022AFC6
+		mov		eax, [esi]
+		mov		edx, [eax+28h]
+		push	0
+		call	edx
+loc_1022AFC6:
+	CWeaponMagazined@@OnAnimationEnd(esi, edi)
+	pop		edi
+	pop		esi
+	retn	4
+;Переопределим метод OnH_A_Chield в классе CWeaponMagazinedWGrenade
+org 1048DB04h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@OnH_A_Chield
+org 10490824h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@OnH_A_Chield
+org 1049398Ch - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@OnH_A_Chield
+;учёт веса патронов во втором стволе
+org 1048D8ECh - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@Weight
+org 1049060Ch - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@Weight		;CWeaponGroza
+org 10493774h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@Weight		;CWeaponAK74
+;фикс бага при отсоединении ПГ
+;CWeaponMagazinedWGrenade::Detach
+org 1022B2CCh - shift	; 16 bytes
+	jnz		return_CWeaponMagazinedWGrenade@@Detach_fix
+		jmp		CWeaponMagazinedWGrenade@@Detach_fix
+return_CWeaponMagazinedWGrenade@@Detach_fix:
+	push	true
+	mov		ecx, edi
+	call	CWeaponMagazinedWGrenade@@UnloadMagazine
+;void CWeaponMagazinedWGrenade::save(NET_Packet &output_packet)
+org 1022BBB6h - shift	; 16 bytes
+	add		[esi].NET_Packet.B.count, 4
+	jmp		CWeaponMagazinedWGrenade@@save_fix
+	nop4
+org 1022BBE1h - shift	; 16 bytes
+	add		[esi].NET_Packet.B.count, 4
+	jmp		CWeaponMagazinedWGrenade@@save_fix
+	nop4
+;void CWeaponMagazinedWGrenade::load(IReader &input_packet)
+org 1022BC54h - shift	; 6 bytes
+	jmp		CWeaponMagazinedWGrenade@@load_fix
+	nop
+return_CWeaponMagazinedWGrenade@@load_fix:
+
+;---------------------------------------------------------------------
+;---------------------------------------------------------------------
+;Переделка класса CWeaponRG6
 ;переопределим виртуальный метод CWeapon::net_Spawn для CWeaponShotgun
 org 10495BB8h - shift	; 4 bytes
 	dd offset CWeaponShotgun@@net_Spawn		;было CWeapon::net_Spawn
@@ -4242,73 +4700,92 @@ org 102381C2h - shift	; 11 bytes
 	jmp		CWeaponRG6@@AddCartridge_chank
 	nop3
 return_CWeaponRG6@@AddCartridge_chank:
-;
-org 10237ECAh - shift	; 26 bytes
-	cmp		[ebp-CWeapon.CShootingObject@vfptr].CWeaponMagazined.m_bBlockAutoAimRG, 0
-	jnz		loc_10237FE0
-	nop7
-	nop6
-org 10237FE0h - shift
-loc_10237FE0:
-CRocketLauncher@@SpawnRockets		PROTO magazine:ptr xr_vector
 ;доработка CWeaponRG6::net_Spawn
 org 10237B2Ch - shift	; 211 bytes
 	db		211 dup (0CCh)
 org 10237B2Ch - shift	; 211 bytes
 ;edi	this	CWeapon*
 ;ebx	l_res	BOOL
-	ASSUME	edi:ptr CWeapon, ecx:ptr CRocketLauncher
+	ASSUME	edi:ptr CWeaponMagazined, ecx:ptr CRocketLauncher
 	call	CWeaponShotgun@@net_Spawn
 	mov		ebx, eax
 	;if (iAmmoElapsed>0 && getRocketCount()==0)
 	.if (ebx && [edi].iAmmoElapsed>0)
-		lea		ecx, [edi-size CRocketLauncher]	;CRocketLauncher*
+		lea		ecx, [edi-size(CRocketLauncher)]	;CRocketLauncher*
 		mov		eax, [ecx].m_rockets._Myfirst
 		.if (eax==NULL || [ecx].m_rockets._Mylast==eax)
 			;зарядим ракеты которые соотвествуют патронам в m_magazine
 			CRocketLauncher@@SpawnRockets(&[edi].m_magazine)
 		.endif
 	.endif
+	push	esi
+	push	ebx
+	mov		esi, offset aBlock_auto_aim_rg	;"block_auto_aim_rg"
+	mov		[edi].m_bBlockAutoAimRG, false
+	mov		ebx, [edi].NameSection.p_
+	.if (@LINE_EXIST(&[ebx].str_value.value, esi))
+		mov		[edi].m_bBlockAutoAimRG, @R_BOOL(&[ebx].str_value.value, esi)
+	.endif
+	pop		eax	;l_res
+	pop		esi
 	ASSUME	edi:nothing, ecx:nothing
 	pop		edi
-	mov		eax, ebx
 	pop		ebx
 	add		esp, 8
 	retn	4
-;Перехват метода CWeapon::FireTrace(const Fvector& P, const Fvector& D)
-org 10226D7Eh - shift	; 5 bytes
-	call	CWeapon@@FireTrace@update
-org 10226D92h - shift	; 5 bytes
-	call	CWeapon@@FireTrace@update
-org 10236ADEh - shift	; 5 bytes
-	call	CWeapon@@FireTrace@update
-org 10236AEDh - shift	; 5 bytes
-	call	CWeapon@@FireTrace@update
 ;уберём виртуальный метод CWeaponRG6::FireStart
 org 10496BF4h - shift	; 4 bytes
 	dd offset CWeaponMagazined@@FireStart	;
-;уберём виртуальный метод CWeaponRPG7::switch2_Fire
-org 104927FCh - shift	; 4 bytes
-	dd offset CWeaponCustomPistol@@switch2_Fire
-;уберём виртуальный метод CWeaponMagazinedWGrenade::SwitchState в классе CWeaponMagazinedWGrenade
-org 1048DD4Ch - shift	; 4 bytes
-	dd offset CWeapon@@SwitchState		;было CWeaponMagazinedWGrenade::SwitchState
-;уберём виртуальный метод CWeaponMagazinedWGrenade@@SwitchState в классе CWeaponGroza
-org 10490A6Ch - shift	; 4 bytes
-	dd offset CWeapon@@SwitchState		;было CWeaponMagazinedWGrenade::SwitchState
-;уберём виртуальный метод CWeaponMagazinedWGrenade@@SwitchState в классе CWeaponAK74
-org 10493BD4h - shift	; 4 bytes
-	dd offset CWeapon@@SwitchState		;было CWeaponMagazinedWGrenade::SwitchState
+;------------------------------------------------------------------
+;Перехват метода CWeapon::FireTrace(const Fvector& P, const Fvector& D)
+org 10226D7Eh - shift	; 5 bytes
+	call	CWeapon@@FireTrace_fix
+org 10226D92h - shift	; 5 bytes
+	call	CWeapon@@FireTrace_fix
+org 10236ADEh - shift	; 5 bytes
+	call	CWeapon@@FireTrace_fix
+org 10236AEDh - shift	; 5 bytes
+	call	CWeapon@@FireTrace_fix
+;В классе CRocketLauncher добавляем виртуальный метод FireTraceRocket(Fvector4& P, Fvector4& D)
+;Всего есть 5 классов которые содержат CRocketLauncher:
+;CWeaponMagazinedWGrenade, CWeaponGroza, CWeaponAK74, CWeaponRPG7, CWeaponRG6
+;И некоторые другие, но мы там ничего добавлять не будем.
+;Чтобы освободить место, надо передвинуть некоторые данные.
+org 1048DE28h - shift	; 7 bytes
+aCscope			db "CScope", 0
+org 10490B48h - shift	; 6 bytes
+aCrgd5			db "CRGD5", 0
+org 10493CB0h - shift	; 13 bytes
+aCweaponlr300	db "CWeaponLR300", 0
+org 10492C10h - shift	; 16 bytes
+aCweaponrpg7	db "CWeaponRPG7", 0
+aCf1			db "CF1", 0
+;поменяем ссылки.
+org 1022C114h - shift	; 5 bytes
+	push	offset aCscope			; "CScope"
+org 10231068h - shift	; 5 bytes
+	push	offset aCrgd5			; "CRGD5"
+org 10233468h - shift	; 5 bytes
+	push	offset aCweaponlr300	; "CWeaponLR300"
+org 10232993h - shift	; 5 bytes
+	push	offset aCweaponrpg7		; "CWeaponRPG7"
+org 10232BD8h - shift	; 5 bytes
+	push	offset aCf1				; "CF1"
+;дополняем метод в виртуальные таблицы
+org 1048DE24h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@FireTraceRocket		;;CWeaponMagazinedWGrenade
+org 10490B44h - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@FireTraceRocket		;;CWeaponGroza
+org 10493CACh - shift	; 4 bytes
+	dd offset CWeaponMagazinedWGrenade@@FireTraceRocket		;;CWeaponAK74
+org 10492C0Ch - shift	; 4 bytes
+	dd offset CWeaponRPG7@@FireTraceRocket					;;CWeaponRPG7
+org 1049667Ch - shift	; 4 bytes
+	dd offset CWeaponRG6@@FireTraceRocket					;;CWeaponRG6
 ;------------------------------------------------------------------
 ;------------------------------------------------------------------
 ;Пиротехника
 ;
-org 1008DBB0h - shift
-OnServer proc (byte)
-OnServer endp
-org 101A3300h - shift
-OnClient proc (byte)
-OnClient endp
 org 10458A7Ch - shift
 CObject__Center		dd ?	;void __thiscall CObject::Center(Fvector& )const
 org 104590C4h - shift
@@ -4333,21 +4810,6 @@ dGeomGetData endp
 org 104512A2h - shift
 dGeomTransformGetGeom proc C geom:dword
 dGeomTransformGetGeom endp
-org 1003E0E0h - shift
-Fvector__generate_orthonormal_basis:	;(Fvector *dir@<ebx>, Fvector *up@<edi>, Fvector *right@<esi>)
-Fvector@@generate_orthonormal_basis MACRO dir:req, up:req, right:req
-	push	esi
-	push	edi
-	push	ebx
-	regvar	esi, dir
-	regvar	edi, up
-	regvar	ebx, right
-	call	Fvector__generate_orthonormal_basis
-	pop		ebx
-	pop		edi
-	pop		esi
-	EXITM <>
-ENDM
 org 10018440h - shift
 Fvector@@setHP:
 org 1007E640h - shift
@@ -4520,7 +4982,393 @@ return_CObjectFactory@@register_classes_ext:
 ;расширение пространства имён CPhysicsShell, скриптовый класс physics_shell
 org 1037096Eh - shift
 register_shell__void__Fvector:
+org 1036FFFDh - shift
+register_shell__void__float_float_float:
+;оптимизация регистрации скриптовых методов пространства имён physics_shell
+org 104BF274h - shift
+aApply_force	dd ?	; "apply_force"
+org 1036F882h - shift	; 14 bytes
+	nop7
+	push	0
+	push	offset aApply_force
+org 103700BFh - shift	; 5 bytes
+	nop2
+	push	[ebp+12];arg_4
 org 1036FA52h - shift	; 5 bytes
 	jmp		script_register@@physics_shell_fix
 return_script_register@@physics_shell_fix:
 ;--------------------------------------------------------
+;Пули и ракеты вылетают из дула.
+org 10118EF0h - shift
+CWeapon@@get_LastFP proc (dword)
+CWeapon@@get_LastFP endp
+org 10118F20h - shift
+CWeapon@@get_LastFD proc (dword)
+CWeapon@@get_LastFD endp
+org 10218700h - shift
+CWeapon@@get_LastFP2 proc (dword)
+CWeapon@@get_LastFP2 endp
+org 101D607Eh - shift	; 6 bytes
+	jz		CActor@@g_fireParams_fix
+;--------------------------------------------------------
+;Переделка класса  CWeaponRPG7
+org 10296F36h - shift	; 5 bytes
+	push	sizeof(CWeaponRPG7)
+org 10232A75h - shift	; 5 bytes
+	push	sizeof(CWeaponRPG7)
+org 102321DEh - shift	; 13 bytes
+	mov		[esi].CWeaponRPG7.m_sRocketSection.p_, eax
+	jmp		CWeaponRPG7@@Load_ext
+	db		2 dup (0CCh)
+;Многозарядный гранатомёт, Многотипозарядный гранатомёт.
+CWeaponRPG7@@UpdateMissileVisibility_fun	PROTO pWeaponVisual:dword, pHudVisual:dword, vis_hud:dword, vis_weap:dword
+;void	CWeaponRPG7::UpdateMissileVisibility()
+org 10232265h - shift	; 121 bytes
+	db		121 dup (0CCh)	;затрём функцию
+org 10232265h - shift	; 121 bytes
+;edi	pHudVisual		CKinematics*
+;esi	pWeaponVisual	CKinematics*
+	movzx	eax, byte ptr [esp+14h-2];vis_hud
+	movzx	edx, byte ptr [esp+14h-1];vis_weap
+	mov		ecx, [esp+14h+4];this
+	CWeaponRPG7@@UpdateMissileVisibility_fun(esi, edi, eax, edx)
+	mov		ecx, esi
+	call	ds:CKinematics__CalculateBones_Invalidate
+	mov		edx, [esi]
+	mov		eax, [edx+40h]
+	push	0
+	mov		ecx, esi
+	call	eax			; pWeaponVisual->CalculateBones();
+;---------------------
+	pop		edi
+	pop		esi
+	pop		ebp
+	pop		ebx
+	pop		ecx
+	retn	4
+;BOOL	CWeaponRPG7::net_Spawn(CSE_Abstract *DC)
+org 102322F6h - shift	; 95 bytes
+	db		95 dup (0CCh)	;затрём функцию
+org 102322F6h - shift	; 95 bytes
+	ASSUME	esi:ptr CWeaponRPG7, ecx:ptr CRocketLauncher
+	.if ([esi].iAmmoElapsed)
+		mov		eax, [esi].m_rockets._Myfirst
+		.if (eax==NULL || [esi].m_rockets._Mylast==eax);(m_rockets.empty())
+			lea		ecx, [esi].CRocketLauncher@vfptr	;-size(CRocketLauncher)CRocketLauncher*
+			CRocketLauncher@@SpawnRockets(&[esi].m_magazine)
+		.endif
+	.endif
+	mov		eax, edi
+	pop		edi
+	pop		esi
+	retn	4
+;переопределим OnAnimationEnd
+org 10492B6Ch - shift	; 4 bytes
+	dd offset CWeaponRPG7@@OnAnimationEnd
+;уберём виртуальный метод CWeaponRPG7::switch2_Fire
+org 104927FCh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10492854h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10492BB0h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;-------------
+;void	CWeaponRPG7::ReloadMagazine()
+org 102323A9h - shift	; 73 bytes
+	db		73 dup (0CCh)	;затрём функцию
+org 102323A9h - shift	; 73 bytes
+	.if ([esi].iAmmoElapsed && [esi].m_bCanRocketReload)
+		mov		[esi].m_bCanRocketReload, false
+		lea		ecx, [esi].CRocketLauncher@vfptr
+		CRocketLauncher@@DeleteRockets()
+		lea		ecx, [esi].CRocketLauncher@vfptr
+		CRocketLauncher@@SpawnRockets(&[esi].m_magazine)
+	.endif
+	ASSUME	esi:nothing, ecx:nothing
+	pop		esi
+	pop		ecx
+	retn
+;--------------------------------------------------------
+;Всё оружие(CWeaponMagazined) может стрелять очередями.
+WEAPON_ININITE_QUEUE		= dword ptr -1
+;int	CWeaponMagazined::GetCurrentFireMode()
+org 10225200h - shift	; 32 bytes
+	db		32 dup (0CCh)
+org 10225200h - shift	; 32 bytes
+CWeaponMagazined@@GetCurrentFireMode proc 
+	;return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1;
+	ASSUME	ecx:ptr CWeaponMagazined
+	mov		eax, 1
+	.if ([ecx].m_bHasDifferentFireModes)
+		mov		eax, [ecx].m_iCurFireMode
+		mov		edx, [ecx].m_aFireModes._Myfirst
+		mov		eax, [edx+eax*4]
+	.endif
+	ASSUME	ecx:nothing
+	ret
+CWeaponMagazined@@GetCurrentFireMode endp
+;CWeaponMagazined::Load
+org 10225A25h - shift	; 37 bytes
+	ASSUME	edi:ptr CWeaponMagazined
+	jz		short loc_10225A3B
+	add		dword ptr [ebx], -1
+loc_10225A3B:
+	jmp		CWeaponMagazined@@Load_fix
+	nop5
+loc_10225A34:
+	mov		[edi].m_bHasDifferentFireModes, false
+	mov		[edi].m_iQueueSize, 1
+	jmp		CWeaponMagazined@@Load_fix
+;void	CWeaponMagazined::OnH_A_Chield()
+org 102288E0h - shift	; 128 bytes
+	db		128 dup (0CCh)
+org 102288E0h - shift	; 128 bytes
+CWeaponMagazined@@OnH_A_Chield proc
+	push	edi
+	mov		edi, ecx
+	mov		eax, 1	;queue_size
+	.if ([edi].m_bHasDifferentFireModes)
+		smart_cast	CActor, [edi].Parent	;;, CGameObject
+		.if (eax)
+			;queue_size = GetCurrentFireMode();
+			mov		ecx, edi
+			mov		eax, [edi]
+			mov		edx, [eax+208h]
+			call	edx
+		.else			;НПС всегда переключает на автоматический режим, если он есть, или на максимальную очередь.
+			smart_cast	CWeaponBM16, CWeaponMagazined, edi
+			TERNARY	eax, 1, WEAPON_ININITE_QUEUE	;НПС из двухстволки дуплетом не стреляет!
+		.endif
+	.endif
+	;SetQueueSize(queue_size);
+	push	eax
+	mov		ecx, edi
+	mov		eax, [edi]
+	mov		edx, [eax+1F0h]
+	call	edx
+	mov		ecx, edi
+	pop		edi
+	jmp		CWeapon@@OnH_A_Chield
+CWeaponMagazined@@OnH_A_Chield endp
+;void	CWeaponMagazined::SetQueueSize(int size)
+org 10228964h - shift	; 9 bytes
+	jmp		CWeaponMagazined@@SetQueueSize_fix
+	nop
+return_CWeaponMagazined@@SetQueueSize_fix:
+	cmp		eax, WEAPON_ININITE_QUEUE
+;Всё оружие стреляет очередями, если включен параметр fire_modes, и задан размер очереди больше 1 или -1.
+;Для того, чтобы всё оружие(CWeaponMagazined) могло стрелять очередями, надо удалить класс CWeaponCustomPistol.
+;Этот класс, отличается от родителя только отличием 3 методов: switch2_Fire, GetCurrentFireMode, FireEnd.
+;Удалим эти виртуальные методы из класса CWeaponCustomPistol, переопределив их в наследник CWeaponMagazined.
+org 1048B854h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 1048B8ACh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 1048BC08h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponPistol
+org 1048BF7Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 1048BFD4h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 1048C330h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponWalther
+org 1048F4ECh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 1048F544h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 1048F8A0h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponUSP45
+org 104917CCh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10491824h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10491B80h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponSVU
+org 1049221Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10492274h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 104925D0h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponSVD
+org 1049363Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined__OnAnimationEnd
+org 104932CCh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10493324h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10493680h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponHPSA
+org 10494A04h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10494A5Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10494DB8h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponPM
+org 10494FDCh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10495034h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10495390h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponBinoculars
+org 104955C4h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 1049561Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10495978h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponShotgun
+org 10495C84h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10495CDCh - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10496048h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponFORT
+org 1049626Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 104962C4h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10496620h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponRG6
+org 10496834h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 1049688Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10496BF8h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;удаляем виртуальные методы из класса CWeaponBM16
+org 10496E7Ch - shift	; 4 bytes
+	dd offset CWeaponMagazined@@switch2_Fire
+org 10496ED4h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@GetCurrentFireMode
+org 10497240h - shift	; 4 bytes
+	dd offset CWeaponMagazined@@FireEnd
+;Удалим все ссылки на класс CWeaponCustomPistol
+org 10225220h - shift
+CWeaponMagazined@@CWeaponMagazined:
+org 102253F0h - shift
+CWeaponMagazined@@_CWeaponMagazined:
+;CWeaponPistol
+org 10220255h - shift	; 5 bytes
+	call	CWeaponMagazined@@CWeaponMagazined
+org 10220507h - shift	; 5 bytes
+	call	CWeaponMagazined@@_CWeaponMagazined
+;CWeaponSVU
+org 10231BF3h - shift	; 5 bytes
+	call	CWeaponMagazined@@CWeaponMagazined
+org 10231D2Bh - shift	; 5 bytes
+	jmp		CWeaponMagazined@@_CWeaponMagazined
+;CWeaponRPG7
+org 10231EA3h - shift	; 5 bytes
+	call	CWeaponMagazined@@CWeaponMagazined
+org 1023209Dh - shift	; 5 bytes
+	jmp		CWeaponMagazined@@_CWeaponMagazined
+;CWeaponSVD
+org 10232D53h - shift	; 5 bytes
+	call	CWeaponMagazined@@CWeaponMagazined
+org 10232E8Bh - shift	; 5 bytes
+	jmp		CWeaponMagazined@@_CWeaponMagazined
+;CWeaponBinoculars
+org 10233E93h - shift	; 5 bytes
+	call	CWeaponMagazined@@CWeaponMagazined
+org 10234078h - shift	; 5 bytes
+	jmp		CWeaponMagazined@@_CWeaponMagazined
+;CWeaponShotgun
+org 10236183h - shift	; 5 bytes
+	call	CWeaponMagazined@@CWeaponMagazined
+org 102364A4h - shift	; 5 bytes
+	call	CWeaponMagazined@@_CWeaponMagazined
+;Удаляем из таблиц RTTI наследников в классе CWeaponCustomPistol
+;Теперь CWeaponCustomPistol класс пустышка.
+org 104F63D0h - shift	; 28 bytes
+a0_CWeaponCustomPistol0		dd offset _AVCWeaponCustomPistol
+							dd 0
+							dd 0
+							dd -1
+							dd 0
+							dd 40h
+							dd offset db_CWeaponCustomPistol0
+org 104F96C4h - shift	; 28 bytes
+a28_CWeaponCustomPistol0	dd offset _AVCWeaponCustomPistol
+							dd 0
+							dd 28h
+							dd -1
+							dd 0
+							dd 40h
+							dd offset db_CWeaponCustomPistol0
+.data
+align 4
+db_CWeaponCustomPistol0		dd 0
+							dd 0
+							dd 1
+							dd offset tbl_CWeaponCustomPistol0
+tbl_CWeaponCustomPistol0	dd offset a0_CWeaponCustomPistol0
+							dd 0
+.code
+;-----------------------------------------------
+;Блокировка автоперезарядки
+;void CWeaponMagazined::FireEnd()
+org 10225B39h - shift	; 14 bytes
+;esi	this	CShootingObject*
+;edi	this	CWeaponMagazined
+	.if ([edi].m_bAutoReload) ;7+2 bytes
+		jmp		CWeaponMagazined@@FireEnd_fix
+	.endif
+	ASSUME	edi:nothing
+;void CWeaponMagazined::switch2_Empty()
+org 10227070h - shift	; 64 bytes
+	ASSUME	esi:ptr CWeaponMagazined
+	push	esi
+	mov		esi, ecx		; this
+	.if ([esi].m_bAutoReload)
+		mov		eax, [esi]
+		mov		edx, [eax+154h]
+		call	edx				;OnZoomOut();
+		call	CWeaponMagazined@@TryReload
+		mov		ecx, esi
+		.if (!al)
+			mov		eax, [esi]
+			mov		edx, [eax+1CCh]
+			pop		esi
+			jmp		edx			;CWeaponMagazined::OnEmptyClick
+		.endif
+	.endif
+	mov		eax, [ecx]
+	mov		edx, [eax+188h]
+	mov		[esi].bWorking, false
+	pop		esi
+	jmp		edx					;ClearShotEffector()
+	ASSUME	esi:nothing
+;--------------------------------------------------------
+;
+org 101B7950h - shift
+CBulletManager__AddBullet:
+;CBulletManager *this@<eax>, Fvector *position, Fvector *direction, float starting_speed, float power, float impulse, u16 sender_id, u16 sendersweapon_id, int e_hit_type, float maximum_distance, CCartridge *cartridge, bool SendHit, bool AimBullet
+CBulletManager@@AddBullet MACRO pos:req, dir:req, start_speed:req, power:req, impulse:req, sender_id:req, senderswpn_id:req, hit_type:req, max_dist:req, cartridge:req, SendHit:req, AimBullet:=<false>
+	pushvar	AimBullet
+	pushvar	SendHit
+	pushvar	cartridge
+	pushvar	max_dist
+	pushvar	hit_type
+	pushvar	senderswpn_id
+	pushvar	sender_id
+	pushvar	impulse
+	pushvar	power
+	pushvar	start_speed
+	pushvar	dir
+	pushvar	pos
+	mov		eax, ds:g_pGameLevel
+	mov		edx, [eax]
+	mov		eax, [edx].CLevel.m_pBulletManager
+	call	CBulletManager__AddBullet
+	EXITM <>
+ENDM

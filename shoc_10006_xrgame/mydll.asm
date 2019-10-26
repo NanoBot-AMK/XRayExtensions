@@ -2,6 +2,7 @@
 .XMM
 
 .model flat,  stdcall
+option casemap:none
 
 include addr.inc
 
@@ -12,7 +13,7 @@ LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD
     ret
 LibMain ENDP
 
-;;___INSTRUCTION__SSE3	equ <lalala>;;; 
+;;___INSTRUCTION__SSE3	equ <> 
 
 calc_bullet							PROTO :DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 calc_future_position				PROTO :DWORD, :DWORD, :DWORD, :DWORD, :DWORD
@@ -128,4 +129,5 @@ include vector_fix.asm
 include physics_script.asm
 include register_classes_fix.asm
 
+% echo globalCountProcedures = @CatStr(%globalCountProcedures)
 end LibMain

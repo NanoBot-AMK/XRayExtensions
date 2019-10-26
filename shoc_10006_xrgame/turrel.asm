@@ -422,15 +422,9 @@ local strFire_bone[128]:byte
 	mov		ecx, ebx
 	call	ds:r_string
 	;PRINT_UINT "fire_bones - %s", eax
-	; int count = _GetItemCount( str );
 	mov		fire_bones, eax
-	push	','
-	push	eax
-	call	ds:_GetItemCount				; _GetItemCount(char const *,char)
-	add		esp, 8
-	mov		count, eax
+	mov		count, _GetItemCount(eax)
 	mov		[edi].m_count_firebones, eax
-	;lea		eax, [eax*2+0]
 	add		eax, eax		; eax*=2;
 	xr_memory	eax
 	mov		[edi].m_firebones, eax
@@ -438,23 +432,9 @@ local strFire_bone[128]:byte
 	xor		ecx, ecx
 	mov		it, ecx
 	.while (ecx < count)
-		; _GetItem(fire_bones, it, strFire_bone);
-		push	true
-		push	offset null_string
-		push	','
-		lea		edx, strFire_bone
-		push	edx
-		push	it
-		push	fire_bones
-		call	ds:_GetItem				 ; _GetItem(char const *,int,char *,uint,char,char const *,bool)
-		add		esp, 24
-		; u16	num_bone = K->LL_BoneID(strFire_bone);
-		lea		eax, strFire_bone
-;		PRINT_UINT "name fire_bone - %s", eax
-		push	eax
-		mov		ecx, esi
-		call	ds:CKinematics__LL_BoneID
-;		movzx	eax, ax
+		_GetItem(fire_bones, it, &strFire_bone)
+		;u16	num_bone = K->LL_BoneID(strFire_bone);
+		movzx	eax, CKinematics@@LL_BoneID(esi, &strFire_bone)
 ;		PRINT_UINT "num fire_bone - %d", eax
 		; m_firebones[it] = num_bone;
 		mov		ecx, it

@@ -522,8 +522,7 @@ local radius_kugel:real4, radius:real4, dir:Fvector4, vel:Fvector4, P:NET_Packet
 		mrm		[edi].m_iCurrentParentID, [esi].m_iCurrentParentID
 		.if (OnServer())
 			;u_EventGen(P, GE_LAUNCH_ROCKET, ID());
-			movzx	edx, [esi].ID
-			CGameObject@@u_EventGen(&P, GE_LAUNCH_ROCKET, edx)
+			CGameObject@@u_EventGen(&P, GE_LAUNCH_ROCKET, [esi].ID)
 			;P.w_u16(rocket->ID());
 			mov		edx, P.B.count
 			mrm		word ptr P.B.data[edx], [edi].ID

@@ -1,6 +1,8 @@
 
 TRUE				equ 1
 FALSE				equ 0
+true				equ 1
+false				equ 0
 NULL				= dword ptr 0
 
 
@@ -455,4 +457,38 @@ mtParticles						= dword ptr (1 shl 17)
 rsCameraPos						= dword ptr (1 shl 18)
 rsR2							= dword ptr (1 shl 19)
 	;// 20-32 bit - reserved to Editor
+;};
+;enum EActorCameras {
+eacFirstEye						= 0
+eacLookAt						= 1
+eacFreeLook						= 2
+eacMaxCam						= 3
+;};
+
+;enum EWeaponStates {
+eIdle							= dword ptr 0
+eFire							= dword ptr 1
+eFire2							= dword ptr 2
+eReload							= dword ptr 3
+eShowing						= dword ptr 4
+eHiding							= dword ptr 5
+eHidden							= dword ptr 6
+eMisfire						= dword ptr 7
+eMagEmpty						= dword ptr 8
+eSwitch							= dword ptr 9
+;};
+
+;enum EHitType {
+eHitTypeBurn					= dword ptr 0
+eHitTypeShock					= dword ptr 1
+eHitTypeStrike					= dword ptr 2
+eHitTypeWound					= dword ptr 3
+eHitTypeRadiation				= dword ptr 4
+eHitTypeTelepatic				= dword ptr 5
+eHitTypeChemicalBurn			= dword ptr 6
+eHitTypeExplosion				= dword ptr 7
+eHitTypeFireWound				= dword ptr 8
+eHitTypeWound_2					= dword ptr 9		;//knife's alternative fire
+eHitTypePhysicStrike			= dword ptr 10
+eHitTypeMax						= dword ptr 11
 ;};
