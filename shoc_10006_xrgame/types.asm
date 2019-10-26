@@ -1,3 +1,8 @@
+
+TRUE				equ 1
+FALSE				equ 0
+NULL				equ 0
+
 collide__rq_result struc
 O                  dd ? ; CObject *O;
 range              dd ? ;  float range;

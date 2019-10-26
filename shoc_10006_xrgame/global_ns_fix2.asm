@@ -138,3 +138,19 @@ GetStaticRescalefactor proc
 	fld     dword ptr [g_static_rescale_correction]
 	retn
 GetStaticRescalefactor endp
+
+; Вывод стартового адреса xrGame.dll в логе
+first_start_log		db 1
+StartAdress_xrGame_log__DllMain proc
+fdwReason	= dword ptr	 8
+	.if		[first_start_log] != 0
+		mov		eax, [esp]
+		sub		eax, 00288645h
+		PRINT_UINT	"xrGame.dll Start adress: %x", eax
+		mov		[first_start_log], 0
+	.endif
+	; делаем что вырезали
+	mov		eax, [esp+4+fdwReason]
+	sub		eax, 1
+	retn
+StartAdress_xrGame_log__DllMain endp

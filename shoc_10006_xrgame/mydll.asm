@@ -4,7 +4,7 @@
 .model flat,  C
 
 include addr.inc
-_CODE segment public 'CODE' use32 ;ALIGN(0)
+_CODE segment para public 'CODE' use32
 	assume cs:_CODE
 	assume ds:_CODE
 ; заглушка для линковшика
@@ -158,6 +158,7 @@ include quicksave_fix.asm
 include relations_fix.asm
 include zoom_factor_fix.asm
 include art_activation_fix.asm
+include self_anim_stalker.asm
 
 _CODE ENDS
 

@@ -465,3 +465,36 @@
 
 ; фикс вылета при активации артефактов, не использующих lvid и gvid
 0x102413C0 5
+
+0x101E5177 2 ; при переходе в онлайн кондишен объекта не устанавливается в 1	CGameObject::spawn_supplies
+
+;----------------------------------------------
+;загружаем свои анимации для класса CAI_Stalker
+;;;0x10101E8E 5
+0x10101F8A 6	; load_anim_params
+0x101021AA 5	; load_state_names
+0x10102057 11	; load_weapon_names
+0x1010238E 6	; load_weapon_action_names
+0x10104287 11	; load_movement_names
+0x101044DE 6	; load_movement_action_names
+0x1010437E 6	; load_in_place_names
+0x1010227C 7	; load_head_names
+0x1010417E 6	; load_global_names
+;;;0x10101FC0 5
+0x101040A8 5  ;Load_str__torso__
+
+;;;0x10076197 9
+0x1007620B 7  ;Load_anim_num_prefix
+;;;0x100762D6 13
+0x100762C5 5  ;Load_anim_num_prefix2
+;----------
+0x10100A58 5 ; CStalkerAnimationPair__play_impl
+0x10100AB7 5 ; CStalkerAnimationPair__play_impl
+0x10100B47 7 ; CStalkerAnimationManager__play_global_impl_CHUNK
+0x10100C00 5 ; CStalkerAnimationPair__play_impl
+0x10100CAE 5 ; CStalkerAnimationPair__play_impl
+0x10100D1D 5 ; CStalkerAnimationPair__play_impl
+0x10100E06 7 ; CStalkerAnimationManager__play_legs_CHUNK
+;----------------------------------------------
+0x10288640 7 ; Вывод стартового адреса xrGame.dll в логе
+

@@ -4691,3 +4691,191 @@ org 102413CBh - shift
 back_from_art_activation_fix:
 org 1011E010h - shift
 CLevelGraph__vertex__Fvector3:
+
+;---------------------------------------
+org 1004BFD0h - shift
+CALifeSimulator__spawn_item2:
+
+org 1005BDA0h - shift
+alife_spawn_item:
+
+org 10147870h - shift
+CScriptGameObject__DropItemAndTeleport:
+
+org 10147750h - shift
+CScriptGameObject__DropItem:
+
+org 10458DD8h - shift
+pSettings dd ?
+
+org 104509AEh - shift
+__RTCastToVoid dd ?
+
+org 10451A40h - shift
+__alloca_probe dd ?
+
+org 1004FD6Dh - shift
+sub_1004FD6D dd ?
+
+org 1053C5ACh - shift
+flt__2f dd ?		; 2.0f
+
+org 10458B0Ch - shift
+section_exist dd ?
+
+org 10458E00h - shift
+line_exist dd ?
+
+org 10458DF8h - shift
+r_string dd ?
+
+org 10458CDCh - shift
+r_fvector3 dd ?
+
+org 10458DCCh - shift
+r_float dd ?
+
+org 10458D94h - shift
+r_u8 dd ?
+
+org 10458DC0h - shift
+r_u32 dd ?
+
+org 10458DB4h - shift
+r_s32 dd ?
+
+org 10458D7Ch - shift
+r_string_wb		 dd ?		; public: class shared_str __thiscall CInifile::r_string_wb
+
+org 10167890h - shift
+CScriptIniFile__r_string_wb:
+
+org 10458CE0h - shift
+r_bool			dd ?		; public: int __thiscall CInifile::r_bool(char const *, char const *)
+
+org 105421E0h - shift
+_AVCCustomMonster:
+org 105421C8h - shift
+_AVCEntity:
+org 1053951Ch - shift
+_AVCEntityAlive:
+org 10536048h - shift
+_AVCObject:
+org 10458110h - shift
+_itoa				dd ?
+;---------------------------------------
+
+; при переходе в онлайн кондишен объекта не устанавливается в 1		CGameObject::spawn_supplies
+org 101E5177h - shift	; 2 bytes
+	jmp		loc_101E5184
+org 101E5184h - shift
+loc_101E5184:
+
+;======================================================
+; загружаем свой список анимации для класса CAI_Stalker
+;======================================================
+org 10101FD0h - shift
+WEAPON_ANIMATIONS__Load:
+org 10101F8Ah - shift	; 6 bytes
+	jmp		load_anim_params
+	nop
+return_load_anim_params:
+; перехватываем загрузку
+org 101021AAh - shift	; 5 bytes
+	jmp		load_state_names
+return_load_state_names:
+org 10102057h - shift	; 11 bytes
+	jmp		load_weapon_names
+	db		6 dup (090h)
+return_load_weapon_names:
+org 1010238Eh - shift	; 6 bytes
+	jmp		load_weapon_action_names
+	nop
+return_load_weapon_action_names:
+org 10104287h - shift	; 11 bytes
+	jmp		load_movement_names
+	db		6 dup (090h)
+return_load_movement_names:
+org 101044DEh - shift	; 6 bytes
+	jmp		load_movement_action_names
+	nop
+return_load_movement_action_names:
+org 1010437Eh - shift	; 6 bytes
+	jmp		load_in_place_names
+	nop
+return_load_in_place_names:
+org 1010227Ch - shift	; 7 bytes
+	jmp		load_head_names
+	nop
+	nop
+return_load_head_names:
+org 1010417Eh - shift	; 6 bytes
+	jmp		load_global_names
+	nop
+return_load_global_names:
+org 101040A8h - shift	; 5 bytes
+	jmp		Load_str__torso__
+return_Load_str__torso__:
+org 101040B2h - shift
+return_Load_str__torso__2:
+;--------------------
+; CAniFVector::Load
+; загружаем принудительно анимацию с номером-префиксом менее указаной в min_count_prefix_num
+org 100762F0h - shift
+vector_motionID__push_back:
+org 10103D80h - shift
+CStalkerAnimationPair__play:
+org 1007620Bh - shift	; 7 bytes
+	jmp		Load_anim_num_prefix
+	nop
+	nop
+return_Load_anim_num_prefix:
+;org 10076233h - shift
+org 100762C5h - shift	; 5 bytes
+	jmp		Load_anim_num_prefix2
+return_Load_anim_num_prefix2:
+; Если анимация инвалидная(=0FFFFh), то её не играем.
+org 10100A58h - shift	; 5 bytes
+	call	CStalkerAnimationPair__play_impl
+org 10100AB7h - shift	; 5 bytes
+	call	CStalkerAnimationPair__play_impl
+org 10100B47h - shift	; 7 bytes	inline
+	jmp		CStalkerAnimationManager__play_global_impl_CHUNK
+	nop
+	nop
+return_CStalkerAnimationManager__play_global_impl_CHUNK:
+org 10100BA8h - shift
+return_inlineCStalkerAnimationPair__play__play_global_impl:
+org 10100C00h - shift	; 5 bytes
+	call	CStalkerAnimationPair__play_impl
+org 10100CAEh - shift	; 5 bytes
+	call	CStalkerAnimationPair__play_impl
+org 10100D1Dh - shift	; 5 bytes
+	call	CStalkerAnimationPair__play_impl
+org 10100E06h - shift	; 7 bytes	inline
+	jmp		CStalkerAnimationManager__play_legs_CHUNK
+	nop
+	nop
+return_CStalkerAnimationManager__play_legs_CHUNK:
+org 10100E6Eh - shift
+return_inlineCStalkerAnimationPair__play__play_legs:
+;--------------------
+org 100762BBh - shift	; 5 bytes
+	jmp		debug_print_anim2
+return_debug_print_anim2:
+org 101043C0h - shift	; 6 bytes
+	jmp		debug_print_in_place_names
+	nop
+return_debug_print_in_place_names:
+org 101022C0h - shift	; 6 bytes
+	jmp		debug_print_head_names
+	nop
+return_debug_print_head_names:
+
+;======================================================
+
+; Вывод стартового адреса xrGame.dll в логе
+org 10288640h - shift	; 7 bytes
+	call	StartAdress_xrGame_log__DllMain
+	nop
+	nop
