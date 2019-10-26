@@ -11,66 +11,17 @@ LibMain proc STDCALL instance:DWORD,reason:DWORD,unused:DWORD
     ret
 LibMain ENDP
 
+include types.asm
+include macroses.asm
+include structures.asm
 ; вставки из целевой либы
 include xrgame_stubs.asm
-
-ALIGN_8 MACRO
-	;ALIGN 8
-ENDM
-
-PRINT MACRO msg_txt:REQ
-LOCAL lab1_
-LOCAL a_msg
-	jmp     lab1_
-a_msg db msg_txt, 0
-lab1_:
-	pushad
-	push    offset a_msg
-	call    Msg
-	add     esp, 04h
-	popad
-ENDM
-
-PRINT_UINT MACRO fmt_txt:REQ, val:REQ
-LOCAL lab1_
-LOCAL a_msg
-	jmp     lab1_
-a_msg db fmt_txt, 0
-lab1_:
-	pushad
-	push    val
-	push    offset a_msg
-	call    Msg
-	add     esp, 08h
-	popad
-ENDM
-
-PRINT_FLOAT MACRO fmt_txt:REQ, val:REQ
-LOCAL lab1_
-LOCAL a_msg
-LOCAL value1
-	jmp     lab1_
-a_msg db fmt_txt, 0
-value1 dd ?
-lab1_:
-	pushad
-	mov     [value1], val
-	sub     esp, 8
-	fld     [value1]
-	fstp    QWORD ptr [esp]
-	push    offset a_msg
-	call    Msg
-	add     esp, 0Ch
-	
-	popad
-ENDM
 
 ; позиция в том месте, где в целевой DLL начинается наша секция
 org sec1_sec2_dist
 
 include macros_smart_cast.asm
 include macros_call.asm
-include types.asm
 include global_ns_fix.asm
 include level_ns_fix.asm
 include cuistatic_fix.asm

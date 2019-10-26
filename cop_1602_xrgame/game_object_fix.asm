@@ -1,7 +1,7 @@
 include game_object_reg_macro.asm
 
 ;ALIGN_8
-game_object_fix proc
+game_object_fix2 proc
 ; делаем то, что вырезали 
 	call	register__bool__void
 ; добавляем своё
@@ -95,8 +95,53 @@ game_object_fix proc
 	; Для подствольника
 	PERFORM_EXPORT_VOID__BOOL			CScriptGameObject__SetGrenadeMode,				"set_grenade_mode"
 	; идём обратно
-	jmp		back_from_game_object_fix
-game_object_fix endp
+	jmp		return_game_object_fix2
+game_object_fix2 endp
+
+
+game_object_fix1 proc
+	call	register__float__int
+	;-----------------------------------------------------------------------------------------------------
+	PERFORM_EXPORT__FLOAT___INT			CScriptGameObject@@GetGameObjectFloat,			"get_go_float"
+	PERFORM_EXPORT__VECTOR__VOID		CScriptGameObject@@DirUp,						"dir_up"		;вектор верх
+	PERFORM_EXPORT__VECTOR__VOID		CScriptGameObject@@DirRight,					"dir_right"		;вектор вправо
+	
+	;-----------------------------------------------------------------------------------------------------
+	; идём обратно
+	jmp		return_game_object_fix1
+game_object_fix1 endp
+
+;============================================================================================================
+; Доступ к членам класса для CGameObject, CActor, CCar, CCustomMonster у них у всех смещение равно CGameObject
+;============================================Чтение==========================================================
+align_proc
+CScriptGameObject@@GetGameObjectFloat proc param_offset:dword
+	mov		edx, [ecx+4]	; CGameObject
+	mov		ecx, param_offset
+	fld		dword ptr [edx+ecx]
+	ret
+CScriptGameObject@@GetGameObjectFloat endp
+;============================================================================================================
+
+align_proc
+CScriptGameObject@@DirUp proc pVec:dword
+	mov		ecx, [ecx+4]
+	mov		edx, pVec
+	ASSUME	edx:ptr Fvector, ecx:ptr Fvector
+	Fvector_set	[edx], [ecx+60h]
+	mov		eax, edx
+	ret
+CScriptGameObject@@DirUp endp
+
+align_proc
+CScriptGameObject@@DirRight proc pVec:dword
+	mov		ecx, [ecx+4]
+	mov		edx, pVec
+	Fvector_set	[edx], [ecx+50h]
+	ASSUME	edx:nothing, ecx:nothing
+	mov		eax, edx
+	ret
+CScriptGameObject@@DirRight endp
 
 ;---===Nanobot===---
 m_explosion_flags		= byte ptr 08Ch

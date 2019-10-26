@@ -318,3 +318,7 @@ kLASTACTION				= 77
 kNOTBINDED				= 78
 kFORCEDWORD				= -1
 ;}
+; enum CEffect_Rain::States {
+CEffect_Rain@stIdle           = 0
+CEffect_Rain@stWorking        = 1
+;}

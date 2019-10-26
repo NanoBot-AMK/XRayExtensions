@@ -543,9 +543,14 @@ org 100C172Eh - shift	; 2 bytes
 	nop
 	nop
 
+;
 org 101EC1D3h - shift	; 5 bytes
-	jmp		game_object_fix
-back_from_game_object_fix:
+	jmp		game_object_fix2
+return_game_object_fix2:
+;
+org 101D8A98h - shift	; 5 bytes
+	jmp		game_object_fix1
+return_game_object_fix1:
 
 org 101D3D20h - shift
 register__bool__void:
@@ -563,6 +568,10 @@ org 101D41D0h - shift
 register__void__str_bool:
 org 101D4500h - shift
 register__bool__str:
+org 101D5040h - shift
+register__float__int:
+org 101D6D20h - shift
+register__vector__void:
 
 ; for game_object_castings.asm
 org 1061842Ch - shift

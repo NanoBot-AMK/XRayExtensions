@@ -118,3 +118,25 @@ StartAdress_xrGame_log__DllMain proc
 	sub		eax, 1
 	retn
 StartAdress_xrGame_log__DllMain endp
+
+;‘икс пропадани€ звука дожд€ при загрузке уровн€.
+;if (g_pGamePersistent->pEnvironment){
+;	CEffect_Rain*	rain = g_pGamePersistent->pEnvironment->eff_Rain;
+;	if (rain)
+;		rain->state = CEffect_Rain::stIdle;
+;}
+align_proc
+SoundRain_fix proc
+	mov		edx, ds:g_pGamePersistent
+	mov		eax, [edx]
+	ASSUME	eax:ptr IGame_Persistent, ecx:ptr CEnvironment, edx:ptr CEffect_Rain
+	mov		ecx, [eax].pEnvironment
+	.if (ecx)
+		mov		edx, [ecx].eff_Rain
+		.if (edx)
+			and		[edx].state, CEffect_Rain@stIdle
+		.endif
+	.endif
+	ASSUME	eax:nothing, ecx:nothing, edx:nothing
+	jmp		return_SoundRain_fix
+SoundRain_fix endp

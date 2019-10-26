@@ -97,16 +97,16 @@
 ;EXTENDED TUNING OF MAIN_VIRTUAL_SIZE FOR LAMPS
 ;=====================================
 ; но могут возникнуть глюки с резким переходом свет-тень от ламп, и резкие грани у п€тен света/от фонар€ (примечание by Macron)
-1002E787h 5 ; jmp light__light_fix
-1002FD3Dh 17 ; jmp light__export_fix
-100337C0h 188 ; jmp CLight_Compute_XFORM_and_VIS__compute_xf_spot_fix
+;1002E787h 5 ; jmp light__light_fix
+;1002FD3Dh 17 ; jmp light__export_fix
+;100337C0h 188 ; jmp CLight_Compute_XFORM_and_VIS__compute_xf_spot_fix
 
 
-0x10004BB6 5 ; 
-0x1002FD32 5 ; 
-0x100300D0 5 ; 
-0x100301BA 5 ; 
-0x1000ABB1 5 ; jmp      loc_1000AEB3
+;0x10004BB6 5 ; 
+;0x1002FD32 5 ; 
+;0x100300D0 5 ; 
+;0x100301BA 5 ; 
+;0x1000ABB1 5 ; jmp      loc_1000AEB3
 
 ;=====================================
 ;==============ЅЋ”ƒћј– »==============

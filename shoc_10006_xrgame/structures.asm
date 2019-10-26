@@ -4705,6 +4705,205 @@ CUICellItem struct ; (sizeof=392, align=4)
 									byte ? ; undefined
 CUICellItem ends											; 392
 
+pureAppStart struct ; (sizeof=4, align=4)
+	pureAppStart@vfptr				dword ?					; offset
+pureAppStart ends
+
+pureAppEnd struct ; (sizeof=4, align=4)
+	pureAppEnd@vfptr				dword ?					; offset
+pureAppEnd ends
+
+pureAppActivate struct ; (sizeof=4, align=4)
+	pureAppActivate@vfptr			dword ?					; offset
+pureAppActivate ends
+
+pureAppDeactivate struct ; (sizeof=4, align=4)
+	pureAppDeactivate@vfptr			dword ?					; offset
+pureAppDeactivate ends
+
+IGame_ObjectPool struct ; (sizeof=20, align=4)
+	IGame_ObjectPool@vfptr			dword ?					; offset
+	m_PrefetchObjects				xr_vector <>			; xr_vector<CObject *,xalloc<CObject *> > ?
+IGame_ObjectPool ends
+
+IGame_Persistent@@params union ; (sizeof=1028, align=4)
+	struct
+		m_game_or_spawn				byte 256 dup(?)
+		m_game_type					byte 256 dup(?)
+		m_alife						byte 256 dup(?)
+		m_new_or_load				byte 256 dup(?)
+		m_e_game_type				dword ?
+	ends
+	m_params						byte 1024 dup(?)
+IGame_Persistent@@params ends
+
+xr_set struct ; (sizeof=4, align=4)
+	_Myhead							dword ?					; offset
+	_Mysize							dword ?
+	gapC							byte 4 dup(?)
+xr_set ends
+
+IGame_Persistent struct ; (sizeof=1136, align=8)
+	DLL_Pure <>													; 0
+	pureAppStart <>												; 16
+	pureAppEnd <>												; 20
+	pureAppActivate <>											; 24
+	pureAppDeactivate <>										; 28
+	pureFrame <>												; 32
+	m_game_params					IGame_Persistent@@params <>	; 36
+	ps_active						xr_set <>					; 1064	xr_set<CPS_Instance*,std::less<CPS_Instance*>,xalloc<CPS_Instance*>>?
+	ps_destroy						xr_vector <>				; 1076	xr_vector<CPS_Instance *,xalloc<CPS_Instance *> > ?
+	ps_needtoplay					xr_vector <>				;	xr_vector<CPS_Instance *,xalloc<CPS_Instance *> > ?
+	ObjectPool						IGame_ObjectPool <>			;
+	m_pMainMenu						dword ?						; 1128	IMainMenu*
+	pEnvironment					dword ?						; 1132	CEnvironment*
+IGame_Persistent ends											; 1136
+
+CPropertyBase struct ; (sizeof=4, align=4)
+	CPropertyBase@vfptr				dword ?						; offset
+CPropertyBase	ends
+
+CBlender_DESC struct ; (sizeof=176, align=8)
+	CLS								qword ?						; 0
+	cName							byte 128 dup(?)				; 8
+	cComputer						byte 32 dup(?)				; 136
+	cTime							dword ?						; 168
+	version							word ?						; 172
+									byte ? ; undefined
+									byte ? ; undefined
+CBlender_DESC ends												; 176
+
+xrP_Integer struct ; (sizeof=12, align=4)
+	value			dword ?
+	min				dword ?
+	max				dword ?
+xrP_Integer ends
+
+xrP_BOOL struct ; (sizeof=4, align=4)
+	value			dword ?
+xrP_BOOL ends
+
+IBlender struct ; (sizeof=324, align=4)
+	CPropertyBase <>											; 0
+	description						CBlender_DESC <>			; 4
+	oPriority						xrP_Integer <>				; 180
+	oStrictSorting					xrP_BOOL <>					; 192
+	oT_Name							byte 64 dup(?)				; 196
+	oT_xform						byte 64 dup(?)				; 260
+IBlender ends													; 324
+
+CBlender_skybox struct ; (sizeof=324, align=4)
+	IBlender <>
+CBlender_skybox ends
+
+CEnvDescriptor struct ; (sizeof=184, align=4)
+	exec_time						dword ?						; 0
+	exec_time_loaded				dword ?						; 4
+	sky_texture_name				shared_str <>				; 8
+	sky_texture_env_name			shared_str <>				; 12
+	clouds_texture_name				shared_str <>				; 16
+	sky_texture						resptr_core <>				; 20	resptr_core<CTexture,resptrcode_texture> ?
+	sky_texture_env					resptr_core <>				; 24	resptr_core<CTexture,resptrcode_texture> ?
+	clouds_texture					resptr_core <>				; 28	resptr_core<CTexture,resptrcode_texture> ?
+	clouds_color					Fvector4 <>					; 32
+	sky_color						Fvector <>					; 48
+	sky_rotation					real4 ?						; 60
+	far_plane						real4 ?						; 64
+	fog_color						Fvector <>					; 68
+	fog_density						dword ?						; 80
+	fog_distance					dword ?						; 84
+	rain_density					dword ?						; 88
+	rain_color						Fvector <>					; 92
+	bolt_period						dword ?						; 104
+	bolt_duration					dword ?						; 108
+	wind_velocity					dword ?						; 112
+	wind_direction					dword ?						; 116
+	ambient							Fvector <>					; 120
+	hemi_color						Fvector4 <>					; 132
+	sun_color						Fvector <>					; 148
+	sun_dir							Fvector <>					; 160
+	lens_flare_id					dword ?						; 172
+	tb_id							dword ?						; 176
+	env_ambient						dword ?						; 180	offset
+CEnvDescriptor ends												; 184
+
+CEnvDescriptorMixer struct ; (sizeof=280, align=4)
+	CEnvDescriptor <>											; 0
+	sky_r_textures					STextureList <>				; 184
+	sky_r_textures_env				STextureList <>				; 212
+	clouds_r_textures				STextureList <>				; 240
+	weight							dword ?						; 268
+	fog_near						dword ?						; 272
+	fog_far							dword ?						; 276
+CEnvDescriptorMixer ends										; 280
+
+CEnvironment struct ; (sizeof=788, align=4)
+	CloudsVerts						xr_vector <>			; 0		xr_vector<_vector3<float>,xalloc<_vector3<float> > > ?
+	CloudsIndices					xr_vector <>			; 16	xr_vector<unsigned short,xalloc<unsigned short> > ?
+	m_b_skybox						CBlender_skybox <>		; 32
+	PerlinNoise1D					dword ?					; 356	CPerlinNoise1D*
+	fGameTime						real4 ?					; 360
+	wind_strength_factor			real4 ?					; 364
+	wind_gust_factor				real4 ?					; 368
+	CurrentEnv						CEnvDescriptorMixer <>	; 372
+	Current							dword 2 dup(?)			; 652	offset
+	bWFX							byte ?					; 660
+									byte ? ; undefined
+									byte ? ; undefined
+									byte ? ; undefined
+	wfx_time						real4 ?					; 664
+	WFX_end_desc					dword 2 dup(?)			; 668	offset
+	CurrentWeather					dword ?					; 676	offset
+	CurrentWeatherName				shared_str <>			; 680
+	CurrentCycleName				shared_str <>			; 684
+	WeatherCycles					xr_map <>				; 688	xr_map<shared_str,xr_vector<CEnvDescriptor *,xalloc<CEnvDescriptor *> >,CEnvironment::str_pred,xalloc<std::pair<shared_str,xr_vector<CEnvDescriptor *,xalloc<CEnvDescriptor *> > > > > ?
+	WeatherFXs						xr_map <>				; 700	xr_map<shared_str,xr_vector<CEnvDescriptor *,xalloc<CEnvDescriptor *> >,CEnvironment::str_pred,xalloc<std::pair<shared_str,xr_vector<CEnvDescriptor *,xalloc<CEnvDescriptor *> > > > > ?
+	Modifiers						xr_vector <>			; 712	xr_vector<CEnvModifier,xalloc<CEnvModifier> > ?
+	Ambients						xr_vector <>			; 728	xr_vector<CEnvAmbient *,xalloc<CEnvAmbient *> > ?
+	sh_2sky							resptr_core <>			; 744	resptr_core<Shader,resptrcode_shader> ?	
+	sh_2geom						resptr_core <>			; 748	resptr_core<SGeometry,resptrcode_geom> ?
+	clouds_sh						resptr_core <>			; 752	resptr_core<Shader,resptrcode_shader> ?
+	clouds_geom						resptr_core <>			; 756	resptr_core<SGeometry,resptrcode_geom> ?
+	eff_Rain						dword ?					; 760	CEffect_Rain*
+	eff_LensFlare					dword ?					; 764	CLensFlare*
+	eff_Thunderbolt					dword ?					; 768	CEffect_Thunderbolt*
+	fTimeFactor						real4 ?					; 772
+	tonemap							resptr_core <>			; 776	resptr_core<CTexture,resptrcode_texture> ?
+	tsky0							resptr_core <>			; 780	resptr_core<CTexture,resptrcode_texture> ?
+	tsky1							resptr_core <>			; 784	resptr_core<CTexture,resptrcode_texture> ?
+CEnvironment ends											; 788
+
+CEffect_Rain@@Item struct ; (sizeof=52, align=4)
+	P								Fvector <>				; 0
+	Phit							Fvector <>				; 12
+	D								Fvector <>				; 24
+	fSpeed							real4 ?					; 36
+	dwTime_Life						dword ?					; 40
+	dwTime_Hit						dword ?					; 44
+	uv_set							dword ?					; 48
+CEffect_Rain@@Item ends										; 52
+
+CEffect_Rain@@Particle struct ; (sizeof=92, align=4)
+	next							dword ?					; 0		CEffect_Rain@@Particle*
+	prev							dword ?					; 4		CEffect_Rain@@Particle*
+	mXForm							Fmatrix <>				; 8
+	bounds							Fsphere <>				; 72
+	time							dword ?					; 88
+CEffect_Rain@@Particle ends									; 92
+
+CEffect_Rain struct ; (sizeof=64, align=4)
+	SH_Rain							resptr_core <>			; 0		resptr_core<Shader,resptrcode_shader> ?
+	hGeom_Rain						resptr_core <>			; 4		resptr_core<SGeometry,resptrcode_geom> ?
+	DM_Drop							dword ?					; 8		IRender_DetailModel*
+	hGeom_Drops						resptr_core <>			; 12	resptr_core<SGeometry,resptrcode_geom> ?
+	items							xr_vector <>			; 16	xr_vector<CEffect_Rain::Item,xalloc<CEffect_Rain::Item> > ?
+	state							dword ?					; 32	enum CEffect_Rain::States
+	particle_pool					xr_vector <>			; 36	xr_vector<CEffect_Rain::Particle,xalloc<CEffect_Rain::Particle> > ?
+	particle_active					dword ?					; 52	CEffect_Rain@@Particle*
+	particle_idle					dword ?					; 56	CEffect_Rain@@Particle*
+	snd_Ambient						ref_sound <>			; 60
+CEffect_Rain ends											; 64
+
 _action struct ; (sizeof=12, align=4)
 	action_name						dword ?					; offset
 	id								dword ?					; enum EGameActions

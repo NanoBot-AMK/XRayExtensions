@@ -5825,3 +5825,9 @@ org 1013C175h - shift	; 5 bytes
 	jmp		vector_script_fix
 return_vector_script_fix:
 ;----------------------------------------------------------------
+;‘икс пропадани€ звука дожд€ при загрузке уровн€.
+org 101A793Ch - shift	; 15 bytes
+	jmp		SoundRain_fix
+	db		10 dup (90h)
+return_SoundRain_fix:
+;----------------------------------------------------------------

@@ -357,9 +357,12 @@ static_str		fun_name, fun_name_str
 ENDM
 
 static_int		g_ogse_lib_hinst, 0
-g_CEffectorZoomInertion__Process dd ?
-g_CCameraManager__Update3 dd ?	
-g_CCar__cam_Update dd ?
+static_int		g_CEffectorZoomInertion__Process, ?
+static_int		g_CCameraManager__Update3, ?	
+static_int		g_CCar__cam_Update, ?
+;g_CEffectorZoomInertion__Process dd ?
+;g_CCameraManager__Update3 dd ?	
+;g_CCar__cam_Update dd ?
 
 align_proc
 init_external_libs proc
