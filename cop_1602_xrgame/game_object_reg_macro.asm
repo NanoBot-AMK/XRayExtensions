@@ -210,3 +210,25 @@ lab1:
 	mov		[esp+64h-038h], offset fun_to_export
 	call	register__bool__go
 ENDM
+
+PERFORM_EXPORT__VOID__GO_STRING_VECTOR_FLOAT MACRO fun_to_export:REQ, fun_name_str:REQ
+LOCAL lab1
+LOCAL fun_name
+	jmp		lab1
+fun_name db fun_name_str, 0
+lab1:
+	mov		byte ptr [esp+50h+04h], bl
+	mov		ecx, [esp+50h+04h]
+	push	ecx
+	mov		byte ptr [esp+54h-030h], bl
+	mov		edx, [esp+54h-030h]
+	push	edx
+	lea		ecx, [esp+58h+04h]
+	push	ecx
+	lea		edx, [esp+5Ch-038h]
+	push	edx
+	push	offset fun_name
+	mov		ecx, eax
+	mov		[esp+64h-038h], offset fun_to_export
+	call	register__void__go_str_pvector_float
+ENDM

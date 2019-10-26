@@ -84,6 +84,7 @@ include weapon_fix.asm
 include game_object_fix.asm
 include game_object_castings.asm
 include explosive_fix.asm
+include detector_fix.asm
 _CODE ENDS
 
 end LibMain

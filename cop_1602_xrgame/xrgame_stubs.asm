@@ -649,6 +649,8 @@ org 10348450h - shift
 smart_cast_CWeaponMagazined:
 org 103483C0h - shift
 smart_cast_IKinematics:
+org 103486A0h - shift
+smart_cast_CInventoryItem:
 
 org 10512D10h - shift
 IGame_Level__CurrentEntity dd ?
@@ -941,6 +943,11 @@ org 106373E8h - shift
 off_106373E8:
 org 1063E6A8h - shift
 off_1063E6A8:
+org 10637B58h - shift
+off_10637B58:
+
+org 1051224Ch - shift
+memmove		dd ?
 
 ;org 102D9703h - shift	; 5 bytes
 ;	push	offset aGrenadeAny
@@ -979,6 +986,8 @@ org 101D3ED0h - shift
 register__void__bool:
 org 101D5EB0h - shift
 register__bool__go:
+org 101D4E00h - shift
+register__void__go_str_pvector_float:
 
 ; Блокировка пуска ракет для класса CWeaponRPG7
 org 102D9948h - shift	; 5 bytes
@@ -989,3 +998,30 @@ org 102D9658h - shift	; 6 bytes
 	jmp		Callback_UpdateMissileVisibility
 	nop
 back_from__Callback_UpdateMissileVisibility:
+
+;
+;org 102F07C0h - shift	; 3 bytes
+;	retn	8
+
+org 102F07C0h - shift
+CUIArtefactDetectorElite__RegisterItemToDraw:
+org 102FB430h - shift
+HUD_SOUND_COLLECTION__LoadSound:
+org 10512814h - shift
+str_container__g_pStringContainer	dd ?
+org 10512810h - shift
+str_container__dock		dd ?
+org 1056C2B4h - shift
+aElite		dd ?
+
+; Скриптовый детектор
+org 102EC7F1h - shift	; 6 bytes
+	jmp		CEliteDetectorLoadParam
+	nop
+back_from__CEliteDetectorLoadParam:
+org 102F0BC8h - shift	; 6 bytes
+	jmp		CEliteDetectorUpdateAfScriptExt
+	nop
+back_from__CEliteDetectorUpdateAfScriptExt:
+org 102EF315h - shift	; 5 bytes
+	jmp		CEliteDetector__ui_xml_tag_ext

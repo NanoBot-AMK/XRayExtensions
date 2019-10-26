@@ -167,6 +167,7 @@ MAKE_CASTING2 CScriptGameObject__CWeaponBinoculars, 	off_106376D8		; заменил
 MAKE_CASTING2 CScriptGameObject__CWeaponShotgun,		off_10637720		; заменил
 MAKE_CASTING2 CScriptGameObject__CWeaponAutoShotgun,	off_10637748		; добавил
 MAKE_CASTING2 CScriptGameObject__CAI_Crow,				off_1063E6A8		; добавил
+;MAKE_CASTING2 CScriptGameObject__CCustomDetector,		off_10619C3C		; добавил
 
 MAKE_CASTING3 CScriptGameObject__CWeaponGL,				off_10636A7C		; заменил
 MAKE_CASTING3 CScriptGameObject__CMedkit,				off_10637578		; заменил
@@ -240,6 +241,7 @@ MAKE_CHECK_FUN CScriptGameObject__IsWeaponRPG7			, CScriptGameObject__CWeaponRPG
 MAKE_CHECK_FUN CScriptGameObject__IsWeaponRG6			, CScriptGameObject__CWeaponRG6
 MAKE_CHECK_FUN CScriptGameObject__IsRocketLauncher		, CScriptGameObject__CRocketLauncher
 MAKE_CHECK_FUN CScriptGameObject__IsCrow				, CScriptGameObject__CAI_Crow
+;MAKE_CHECK_FUN CScriptGameObject__IsCustomDetector		, CScriptGameObject__CCustomDetector
 
 ;	CEatableItem* CInventoryItem::cast_eatable_item();	108
 ;	CWeapon* CInventoryItem::cast_weapon();		  112

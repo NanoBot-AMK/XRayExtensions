@@ -85,6 +85,10 @@ game_object_fix proc
 	PERFORM_EXPORT_BOOL__STRING			CScriptGameObject__GetHUDObjectBoneVisible,		"get_hud_obj_bone_visible"
 	PERFORM_EXPORT_VOID__BOOL			CScriptGameObject__BlockedRocket,				"blocked_rocket_rpg"
 	PERFORM_EXPORT_BOOL__GO				CScriptGameObject__DirectVisibility,			"direct_visibility"
+	; ƒл€ биорадара на классе CEliteDetector
+	PERFORM_EXPORT_BOOL__VOID						CScriptGameObject__DetectorClear,		"detector_clear"
+	PERFORM_EXPORT__VOID__GO_STRING_VECTOR_FLOAT	CScriptGameObject__DetectorDrawObject,	"detector_draw_object"
+	
 	; идЄм обратно
 	jmp		back_from_game_object_fix
 game_object_fix endp
@@ -927,4 +931,133 @@ exit_fail:
 	pop		esi
 	retn	4
 CScriptGameObject__DirectVisibility endp
+	
+CScriptGameObject__DetectorClear proc
+	push	esi
+	push	edi
+	push	ebx
+;------------------------------
+	mov		eax, [ecx+4]
+	test	eax, eax
+	jz		exit_fail
+	push	eax
+	call	smart_cast_CInventoryItem
+	add		esp, 4
+	test	eax, eax
+	jz		exit_fail
+	; smart_cast_CEliteDetector
+	push	0
+	push	offset off_10637B58
+	push	offset off_1061842C
+	push	0
+	push	eax
+	call	__RTDynamicCast
+	add		esp, 14h
+	test	eax, eax
+	jz		exit_fail
+		mov		edi, eax
+		cmp		byte ptr [edi+m_bScriptMode], 0
+		jz		exit_fail
+			mov		esi, [edi+m_items_to_draw]
+			mov		ecx, [esi+120]
+			mov		eax, [esi+116]
+			add		esi, 74h
+			cmp		eax, ecx
+			jz		exit1
+			mov		ebx, ecx
+			sub		ebx, ecx
+			jz		exit2
+			push	ebx				; size_t
+			push	ecx				; void *
+			push	eax				; void *
+			call	ds:memmove
+			add		esp, 0Ch
+			add		eax, ebx
+exit2:
+		mov		[esi+4], eax
+exit1:
+		mov		eax, 1
+exit_fail:
+;------------------------------
+	pop		ebx
+	pop		edi
+	pop		esi
+	retn
+CScriptGameObject__DetectorClear endp
 
+CScriptGameObject__DetectorDrawObject proc
+NameSection					= dword ptr	0ACh	;404
+Position					= dword ptr	80h
+ID							= dword ptr	0A4h
+;-----
+obj							= dword ptr 8
+palette						= dword ptr 12
+pos							= dword ptr 16
+num							= dword ptr 20
+; локальные переменные
+size_variables				= dword ptr	4	; размер пол€ локальных переменных
+palette_idx					= dword ptr	0	; shared_str*	sizeof 4 bytes
+;--------------------------------------
+; свободны - eax, ecx, edx
+	push	ebp
+	mov		ebp, esp
+	and		esp, 0FFFFFFF8h
+	sub		esp, size_variables
+	push	esi
+	push	edi
+	push	ebx
+;------------------------------
+	mov		eax, [ecx+4]
+	test	eax, eax
+	jz		exit_fail
+	push	eax
+	call	smart_cast_CInventoryItem
+	add		esp, 4
+	test	eax, eax
+	jz		exit_fail
+	; smart_cast_CEliteDetector
+	push	0
+	push	offset off_10637B58
+	push	offset off_1061842C
+	push	0
+	push	eax
+	call	__RTDynamicCast
+	add		esp, 14h
+	test	eax, eax
+	jz		exit_fail
+	mov		esi, eax
+	cmp		byte ptr [esi+m_bScriptMode], 0
+	jz		exit_fail
+	mov		eax, [ebp+obj]
+	test	eax, eax
+	jz		exit_fail
+	mov		eax, [eax+4]
+	test	eax, eax
+	jz		exit_fail
+		mov		ebx, eax
+		mov		edx, [ebp+palette]
+;		PRINT_UINT "DetectorDrawObject palette - %s", edx
+		mov		ecx, ds:str_container__g_pStringContainer		; str_container * g_pStringContainer
+		mov		ecx, [ecx]
+		push	edx
+		call	ds:str_container__dock							; str_container::dock(char const *)
+		test	eax, eax
+		jz		exit_fail
+		add		dword ptr [eax], 1
+		lea		ecx, [esp+12+palette_idx]
+		push	ecx					; const shared_str& palette_idx
+		mov		[esp+16+palette_idx], eax
+		lea		eax, [ebx+Position]
+		push	eax					; const Fvector& p
+		mov     ecx, [esi+m_items_to_draw]
+		call	CUIArtefactDetectorElite__RegisterItemToDraw
+exit_fail:
+;------------------------------
+	pop		ebx
+	pop		edi
+	pop		esi
+	add		esp, size_variables
+	mov		esp, ebp
+	pop		ebp
+	retn	16
+CScriptGameObject__DetectorDrawObject endp
