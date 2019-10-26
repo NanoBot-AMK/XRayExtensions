@@ -1,260 +1,198 @@
-MAKE_CASTING1 MACRO casting_fun_name:REQ, vcall_offset:REQ
-LOCAL exit_fail
-ALIGN_8
-casting_fun_name proc near
-	mov     ecx, [ecx+4]
-	mov     eax, ecx
-	test    eax, eax
-	jz      short exit_fail
-	mov     eax, [eax]
-	mov     eax, [eax+vcall_offset]
-	call    eax
-exit_fail:
-	retn
-casting_fun_name endp
-ENDM
-
-a_casting_error db "casting no script object", 0
-print_error_msg proc
-	pusha
-	push    offset a_casting_error
-	call    Msg
-	pop eax
-	popa
-	retn
-print_error_msg endp
-
-; приведение типа через RTTI
-MAKE_CASTING2 MACRO casting_fun_name:REQ, proc_offset:REQ
-LOCAL lab1
-LOCAL exit
-ALIGN_8
-casting_fun_name proc near
-;	push esi
-;	push edi
-;	push ecx
-	
-;	mov    esi, ecx
-;	mov     edi, [esi+4]
-;	test    edi, edi
-;	jz      short lab2
-;	call    CGameObject__lua_game_object
-;lab2:
-;	mov     eax, [esi+4]
-	mov     eax, [ecx+4]
-	test    eax, eax
-	jnz     short lab1
-	;
-	call print_error_msg
-	;
-	jmp     short exit
-lab1:
-	push    0               ; a5
-	push    offset proc_offset ; a4
-	push    offset ??_R0?AVCGameObject@@@8 ; a3
-	push    0               ; a2
-	push    eax             ; a1
-	call    __RTDynamicCast
-	add     esp, 14h
-exit:
-	;pop ecx
-	;pop edi
-	;pop esi
-	ret
-casting_fun_name endp
-ENDM
-
-; приведение типа дл€ инвентарных предметов через промежуточное приведение к CInventoryItem
-; с последующим приведением через RTTI
-MAKE_CASTING3 MACRO casting_fun_name:REQ, proc_offset:REQ
-LOCAL exit_fail
-ALIGN_8
-casting_fun_name proc near
-	call CScriptGameObject__CInventoryItem
-	test    eax, eax
-	jz      exit_fail
-	; это CInventoryItem
-	push    0             ; a5
-	push    offset proc_offset ; это надо передавать в качестве параметра макроса
-	push    offset off_10538CDC ; это у всех таких функций одинаковое
-	push    0             ; a2
-	push    eax             ; a1
-	call    __RTDynamicCast
-	add     esp, 14h
-exit_fail:
-	retn
-casting_fun_name endp
-ENDM
-
-; странное приведение типа через два последовательных приведени€
-; встречаетс€ редко
-MAKE_CASTING4 MACRO casting_fun_name:REQ, proc_offset1:REQ, proc_offset2:REQ
-LOCAL exit
-ALIGN_8
-casting_fun_name proc
-	mov     ecx, [ecx+4]
-	;PRINT_UINT "obj=%x", ecx
-	test    ecx, ecx
-	mov     eax, ecx
-	jz      short exit
-	mov     eax, [ecx]
-	mov     eax, [eax+proc_offset1]
-	call    eax
-	;PRINT_UINT "1st=%x", eax
-	;
-	test    eax, eax
-	jz      short exit
-	mov     edx, [eax]
-	mov     ecx, eax
-	mov     eax, [edx+proc_offset2]
-	call    eax
-	;PRINT_UINT "2nd=%x", eax
-exit:
-	retn
-casting_fun_name endp
-ENDM
-
-MAKE_CHECK_FUN MACRO check_fun_name:REQ, cast_fun_name:REQ
-LOCAL return_false
-ALIGN_8
-check_fun_name proc near
-	call   cast_fun_name
-	test   eax, eax
-	jz     return_false
-	mov    eax, 1
-return_false:
-	retn
-check_fun_name endp
-ENDM
-
-                                                              ; CAttachmentOwner* CGameObject::cast_attachment_owner(); 
-MAKE_CASTING1 CScriptGameObject__CInventoryOwner,      70h   ; CInventoryOwner* CGameObject::cast_inventory_owner();
-MAKE_CASTING1 CScriptGameObject__CInventoryItem,       74h   ; CInventoryItem* CGameObject::cast_inventory_item();
-                                                      ; 78h   ; CEntity* CGameObject::cast_entity(); 
-MAKE_CASTING1 CScriptGameObject__CEntityAlive,         7Ch   ; CEntityAlive* CGameObject::cast_entity_alive();
-MAKE_CASTING1 CScriptGameObject__CActor,               80h   ; CActor* CGameObject::cast_actor();
-                                                      ; 84h   ; CGameObject* CGameObject::cast_game_object();
-MAKE_CASTING1 CScriptGameObject__CCustomZone,         088h   ; CCustomZone* CGameObject::cast_custom_zone();
-MAKE_CASTING1 CScriptGameObject__IsPhysicsShellHolder, 08Ch   ; CPhysicsShellHolder* CGameObject::cast_physics_shell_holder(); 
-													  ; 90h   ; IInputReceiver* CGameObject::cast_input_receiver();
-													  ; 94h   ; CParticlesPlayer* CGameObject::cast_particles_player(); 
-MAKE_CASTING1 CScriptGameObject__CArtefact,            98h   ; CArtefact* CGameObject::cast_artefact(); 
-MAKE_CASTING1 CScriptGameObject__CCustomMonster,       9Ch   ; CCustomMonster* CGameObject::cast_custom_monster(); 
-MAKE_CASTING1 CScriptGameObject__CStalker,            0A0h   ; CAI_Stalker* CGameObject::cast_stalker(); 
-                                                      ;0A4h   ; CScriptEntity* CGameObject::cast_script_entity(); 
-MAKE_CASTING1 CScriptGameObject__CWeapon,             0A8h   ; CWeapon* CGameObject::cast_weapon(); 
-MAKE_CASTING1 CScriptGameObject__CExplosive,          0ACh   ; CExplosive* CGameObject::cast_explosive(); 
-MAKE_CASTING1 CScriptGameObject__CSpaceRestrictor,    0B0h   ; CSpaceRestrictor* CGameObject::cast_restrictor(); 
-;MAKE_CASTING1 CScriptGameObject__CAttachableItem,     0B4h   ; CAttachableItem* CGameObject::cast_attachable_item(); 
-MAKE_CASTING1 CScriptGameObject__CHolder,             0B8h   ; CHolderCustom* CGameObject::cast_holder_custom(); 
-MAKE_CASTING1 CScriptGameObject__CBaseMonster,        0BCh   ; CBaseMonster* CGameObject::cast_base_monster(); 
-
-;MAKE_CASTING1 CScriptGameObject__CEatableItem, 114h  ; <== not working yet
-
-
-MAKE_CASTING2 CScriptGameObject__CInventoryBox, off_1054F0B0
-MAKE_CASTING2 CScriptGameObject__CScriptZone, off_1054F064
-MAKE_CASTING2 CScriptGameObject__CProjector, off_1054F5E8
-MAKE_CASTING2 CScriptGameObject__CTrader, off_1054D518
-MAKE_CASTING2 CScriptGameObject__CCar, ??_R0?AVCCar@@@8
-MAKE_CASTING2 CScriptGameObject__CHelicopter, off_1054F02C
-MAKE_CASTING2 CScriptGameObject__CTorch, off_10538CFC
-MAKE_CASTING2 CScriptGameObject__CHangingLamp, off_1054F048
-MAKE_CASTING2 CScriptGameObject__CWeaponPistol, off_10556C20
-MAKE_CASTING2 CScriptGameObject__CWeaponKnife, off_10556D50
-MAKE_CASTING2 CScriptGameObject__CWeaponBinoculars, off_10556EC4
-MAKE_CASTING2 CScriptGameObject__CWeaponShotgun, off_10556EF4
-
-MAKE_CASTING3 CScriptGameObject__CWeaponGL, off_10556CC8
-MAKE_CASTING3 CScriptGameObject__CMedkit, off_10557248
-MAKE_CASTING3 CScriptGameObject__CAntirad, off_10557214
-MAKE_CASTING3 CScriptGameObject__COutfit, off_1054F094
-MAKE_CASTING3 CScriptGameObject__CScope, off_10556C58
-MAKE_CASTING3 CScriptGameObject__CSilencer, off_10556C70
-MAKE_CASTING3 CScriptGameObject__CGrenadeLauncher, off_10556C88
-MAKE_CASTING3 CScriptGameObject__CFoodItem, off_1055578C
-MAKE_CASTING3 CScriptGameObject__CGrenade, off_105557A4
-MAKE_CASTING3 CScriptGameObject__CBottleItem, off_1055722C
-
-MAKE_CASTING4 CScriptGameObject__CWeaponMagazined, 0A8h, 130h
-MAKE_CASTING4 CScriptGameObject__CEatableItem,  74h, 114h  ; 
-MAKE_CASTING4 CScriptGameObject__CMissile,      74h, 120h  ;	CMissile* CInventoryItem::cast_missile();
-MAKE_CASTING4 CScriptGameObject__CHudItem,      74h, 124h  ;	CHudItem* CInventoryItem::cast_hud_item();
-MAKE_CASTING4 CScriptGameObject__CAmmo,         74h, 128h  ;	CWeaponAmmo* CInventoryItem::cast_weapon_ammo();
-; additional wrappers for checking functions, just convert return value to plain one if nonzero
-MAKE_CHECK_FUN CScriptGameObject__IsInventoryBox	   , CScriptGameObject__CInventoryBox
-MAKE_CHECK_FUN CScriptGameObject__IsInventoryOwner	   , CScriptGameObject__CInventoryOwner
-MAKE_CHECK_FUN CScriptGameObject__IsInventoryItem	   , CScriptGameObject__CInventoryItem
-MAKE_CHECK_FUN CScriptGameObject__IsEntityAlive		   , CScriptGameObject__CEntityAlive
-MAKE_CHECK_FUN CScriptGameObject__IsActor			   , CScriptGameObject__CActor
-MAKE_CHECK_FUN CScriptGameObject__IsCustomZone		   , CScriptGameObject__CCustomZone
-MAKE_CHECK_FUN CScriptGameObject__IssPhysicsShellHolder, CScriptGameObject__IsPhysicsShellHolder
-
-MAKE_CHECK_FUN CScriptGameObject__IsArtefact		   , CScriptGameObject__CArtefact
-MAKE_CHECK_FUN CScriptGameObject__IsCustomMonster	   , CScriptGameObject__CCustomMonster
-MAKE_CHECK_FUN CScriptGameObject__IsStalker			   , CScriptGameObject__CStalker
-MAKE_CHECK_FUN CScriptGameObject__IsWeapon			   , CScriptGameObject__CWeapon
-
-MAKE_CHECK_FUN CScriptGameObject__IsExplosive		   , CScriptGameObject__CExplosive
-MAKE_CHECK_FUN CScriptGameObject__IsSpaceRestrictor	   , CScriptGameObject__CSpaceRestrictor
-
-MAKE_CHECK_FUN CScriptGameObject__IsHolder			   , CScriptGameObject__CHolder
-
-MAKE_CHECK_FUN CScriptGameObject__IsBaseMonster		   , CScriptGameObject__CBaseMonster
+;=======================================================================================================
+;						ѕроверка типов объектов.
+; ѕроверить объект можно двум€ способами, виртуальными методами класса CGameObject и через smart_cast,
+; последний способ даЄт возможность проверить любой game_object, а первый работает более быстро,
+; но количество классов ограничено.
+; ѕри использовании метода smart_cast надо убедитс€, что вход€щий класс соответствует указанному объекту.
+; вернЄт указатель на указанный класс, если он присутствует в указанном классе, или ноль, если его нет.
 ;
-MAKE_CHECK_FUN CScriptGameObject__IsScriptZone		   , CScriptGameObject__CScriptZone
-MAKE_CHECK_FUN CScriptGameObject__IsProjector		   , CScriptGameObject__CProjector
-MAKE_CHECK_FUN CScriptGameObject__IsTrader			   , CScriptGameObject__CTrader
-MAKE_CHECK_FUN CScriptGameObject__IsCar				   , CScriptGameObject__CCar
-MAKE_CHECK_FUN CScriptGameObject__IsHelicopter         , CScriptGameObject__CHelicopter
-MAKE_CHECK_FUN CScriptGameObject__IsWeaponGL		   , CScriptGameObject__CWeaponGL
-MAKE_CHECK_FUN CScriptGameObject__IsMedkit			   , CScriptGameObject__CMedkit
-MAKE_CHECK_FUN CScriptGameObject__IsAntirad			   , CScriptGameObject__CAntirad
-MAKE_CHECK_FUN CScriptGameObject__IsOutfit			   , CScriptGameObject__COutfit
-MAKE_CHECK_FUN CScriptGameObject__IsScope			   , CScriptGameObject__CScope
-MAKE_CHECK_FUN CScriptGameObject__IsSilencer		   , CScriptGameObject__CSilencer
-MAKE_CHECK_FUN CScriptGameObject__IsGrenadeLauncher	   , CScriptGameObject__CGrenadeLauncher
-MAKE_CHECK_FUN CScriptGameObject__IsFoodItem		   , CScriptGameObject__CFoodItem
-MAKE_CHECK_FUN CScriptGameObject__IsWeaponMagazined	   , CScriptGameObject__CWeaponMagazined
-MAKE_CHECK_FUN CScriptGameObject__IsEatableItem 	   , CScriptGameObject__CEatableItem
-MAKE_CHECK_FUN CScriptGameObject__IsMissile			   , CScriptGameObject__CMissile
-MAKE_CHECK_FUN CScriptGameObject__IsHudItem			   , CScriptGameObject__CHudItem
-MAKE_CHECK_FUN CScriptGameObject__IsAmmo			   , CScriptGameObject__CAmmo
-MAKE_CHECK_FUN CScriptGameObject__IsGrenade            , CScriptGameObject__CGrenade
-MAKE_CHECK_FUN CScriptGameObject__IsBottleItem         , CScriptGameObject__CBottleItem
+; –ефакторинг ЌаноЅот
+;=======================================================================================================
 
-MAKE_CHECK_FUN CScriptGameObject__IsTorch		   		, CScriptGameObject__CTorch
-MAKE_CHECK_FUN CScriptGameObject__IsHangingLamp		   , CScriptGameObject__CHangingLamp
-MAKE_CHECK_FUN CScriptGameObject__IsWeaponPistol	   , CScriptGameObject__CWeaponPistol
-MAKE_CHECK_FUN CScriptGameObject__IsWeaponKnife		   , CScriptGameObject__CWeaponKnife
-MAKE_CHECK_FUN CScriptGameObject__IsWeaponBinoculars   , CScriptGameObject__CWeaponBinoculars
-MAKE_CHECK_FUN CScriptGameObject__IsWeaponShotgun	   , CScriptGameObject__CWeaponShotgun
+; приведение типа через виртуальные методы 
+MAKE_VIRTUAL_CAST MACRO casting_fun_name:REQ, vcall_offset:REQ
+align_proc
+casting_fun_name proc
+	mov		ecx, [ecx+4]	; Object()	// CGameObject*	не имеет смысл провер€ть на NULL, проверка есть внутри lua
+	mov		eax, [ecx]
+	mov		edx, [eax+vcall_offset]
+	call	edx
+	retn
+casting_fun_name endp
+ENDM
 
-;	CEatableItem* CInventoryItem::cast_eatable_item();  108
-;	CWeapon* CInventoryItem::cast_weapon();       112
-;	CFoodItem* CInventoryItem::cast_food_item();  116
+; приведение типа через smart_cast
+MAKE_SMART_CAST MACRO casting_fun_name:REQ, name_class_AV:REQ
+align_proc
+casting_fun_name proc
+	mov		eax, [ecx+4]
+	smart_cast	name_class_AV, _AVCGameObject, eax
+	retn
+casting_fun_name endp
+ENDM
 
+MAKE_CHECK_VIRTUAL MACRO casting_fun_name:REQ, vcall_offset:REQ
+align_proc
+casting_fun_name proc
+	mov		ecx, [ecx+4]
+	mov		eax, [ecx]
+	mov		edx, [eax+vcall_offset]
+	call	edx
+	;преобразовать в булеву
+	test	eax, eax
+	setnz	al
+	retn
+casting_fun_name endp
+ENDM
 
-ALIGN_8
-CScriptGameObject__GetGameObject proc near
-	mov     eax, [ecx+4]
+MAKE_CHECK_CAST MACRO casting_fun_name:REQ, name_class_AV:REQ
+align_proc
+casting_fun_name proc
+	mov		eax, [ecx+4]
+	smart_cast	name_class_AV, _AVCGameObject, eax
+	;преобразовать в булеву
+	test	eax, eax
+	setnz	al
+	retn
+casting_fun_name endp
+ENDM
+
+;//functions used for avoiding most of the smart_cast
+;“аблица виртуальных методов дл€ приведени€ типов.
+virtual_cast_attachment_owner				= dword ptr 108		; CAttachmentOwner*
+virtual_cast_inventory_owner				= dword ptr 112		; CInventoryOwner*
+virtual_cast_inventory_item					= dword ptr 116		; CInventoryItem*
+virtual_cast_entity							= dword ptr 120		; CEntity*
+virtual_cast_entity_alive					= dword ptr 124		; CEntityAlive*
+virtual_cast_actor							= dword ptr 128		; CActor*
+virtual_cast_game_object					= dword ptr 132		; CGameObject*
+virtual_cast_custom_zone					= dword ptr 136		; CCustomZone*
+virtual_cast_physics_shell_holder			= dword ptr 140		; CPhysicsShellHolder*
+virtual_cast_input_receiver					= dword ptr 144		; IInputReceiver*
+virtual_cast_particles_player				= dword ptr 148		; CParticlesPlayer*
+virtual_cast_artefact						= dword ptr 152		; CArtefact*
+virtual_cast_custom_monster					= dword ptr 156		; CCustomMonster*
+virtual_cast_stalker						= dword ptr 160		; CAI_Stalker*
+virtual_cast_script_entity					= dword ptr 164		; CScriptEntity*
+virtual_cast_weapon							= dword ptr 168		; CWeapon*
+virtual_cast_explosive						= dword ptr 172		; CExplosive*
+virtual_cast_restrictor						= dword ptr 176		; CSpaceRestrictor*
+virtual_cast_attachable_item				= dword ptr 180		; CAttachableItem*
+virtual_cast_holder_custom					= dword ptr 184		; CHolderCustom*
+virtual_cast_base_monster					= dword ptr 188		; CBaseMonster*
+
+;------------------приведени€ типа виртуальными методами-------------------------------------------
+MAKE_VIRTUAL_CAST	CScriptGameObject__CAttachmentOwner,		virtual_cast_attachment_owner
+MAKE_VIRTUAL_CAST	CScriptGameObject__CInventoryOwner,			virtual_cast_inventory_owner
+MAKE_VIRTUAL_CAST	CScriptGameObject__CInventoryItem,			virtual_cast_inventory_item
+MAKE_VIRTUAL_CAST	CScriptGameObject__CEntity,					virtual_cast_entity
+MAKE_VIRTUAL_CAST	CScriptGameObject__CEntityAlive,			virtual_cast_entity_alive
+MAKE_VIRTUAL_CAST	CScriptGameObject__CActor,					virtual_cast_actor
+MAKE_VIRTUAL_CAST	CScriptGameObject__CGameObject,				virtual_cast_game_object
+MAKE_VIRTUAL_CAST	CScriptGameObject__CCustomZone,				virtual_cast_custom_zone
+MAKE_VIRTUAL_CAST	CScriptGameObject__CPhysicsShellHolder,		virtual_cast_physics_shell_holder
+MAKE_VIRTUAL_CAST	CScriptGameObject__IInputReceiver,			virtual_cast_input_receiver
+MAKE_VIRTUAL_CAST	CScriptGameObject__CParticlesPlayer,		virtual_cast_particles_player
+MAKE_VIRTUAL_CAST	CScriptGameObject__CArtefact,				virtual_cast_artefact
+MAKE_VIRTUAL_CAST	CScriptGameObject__CCustomMonster,			virtual_cast_custom_monster
+MAKE_VIRTUAL_CAST	CScriptGameObject__CStalker,				virtual_cast_stalker
+MAKE_VIRTUAL_CAST	CScriptGameObject__CScriptEntity,			virtual_cast_script_entity
+MAKE_VIRTUAL_CAST	CScriptGameObject__CWeapon,					virtual_cast_weapon
+MAKE_VIRTUAL_CAST	CScriptGameObject__CExplosive,				virtual_cast_explosive
+MAKE_VIRTUAL_CAST	CScriptGameObject__CSpaceRestrictor,		virtual_cast_restrictor
+MAKE_VIRTUAL_CAST	CScriptGameObject__CAttachableItem,			virtual_cast_attachable_item
+MAKE_VIRTUAL_CAST	CScriptGameObject__CHolder,					virtual_cast_holder_custom
+MAKE_VIRTUAL_CAST	CScriptGameObject__CBaseMonster,			virtual_cast_base_monster
+;------------------------проверка типа виртуальными методами----------------------------------------
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsInventoryOwner,		virtual_cast_inventory_owner
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsInventoryItem,			virtual_cast_inventory_item
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsEntityAlive,			virtual_cast_entity_alive
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsActor,					virtual_cast_actor
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsCustomZone,			virtual_cast_custom_zone
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsPhysicsShellHolder,	virtual_cast_physics_shell_holder
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsArtefact,				virtual_cast_artefact
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsCustomMonster,			virtual_cast_custom_monster
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsStalker,				virtual_cast_stalker
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsWeapon,				virtual_cast_weapon
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsExplosive,				virtual_cast_explosive
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsSpaceRestrictor,		virtual_cast_restrictor
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsAttachableItem,		virtual_cast_attachable_item
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsHolder,				virtual_cast_holder_custom
+MAKE_CHECK_VIRTUAL	CScriptGameObject__IsBaseMonster,			virtual_cast_base_monster
+;-----------------------------приведени€ типа smart_cast--------------------------------------------
+MAKE_SMART_CAST		CScriptGameObject__CInventoryBox,			_AVCInventoryBox
+MAKE_SMART_CAST		CScriptGameObject__CScriptZone,				_AVCScriptZone
+MAKE_SMART_CAST		CScriptGameObject__CProjector,				_AVCProjector
+MAKE_SMART_CAST		CScriptGameObject__CTrader,					_AVCAI_CTrader
+MAKE_SMART_CAST		CScriptGameObject__CCar,					_AVCCar
+MAKE_SMART_CAST		CScriptGameObject__CHelicopter,				_AVCHelicopter
+MAKE_SMART_CAST		CScriptGameObject__CTorch,					_AVCTorch
+MAKE_SMART_CAST		CScriptGameObject__CHangingLamp,			_AVCHangingLamp
+MAKE_SMART_CAST		CScriptGameObject__CWeaponPistol,			_AVCWeaponPistol
+MAKE_SMART_CAST		CScriptGameObject__CWeaponKnife,			_AVCWeaponKnife
+MAKE_SMART_CAST		CScriptGameObject__CWeaponBinoculars,		_AVCWeaponBinoculars
+MAKE_SMART_CAST		CScriptGameObject__CWeaponShotgun,			_AVCWeaponShotgun
+MAKE_SMART_CAST		CScriptGameObject__CWeaponGL,				_AVCWeaponMagazinedWGrenade
+MAKE_SMART_CAST		CScriptGameObject__CMedkit,					_AVCMedkit
+MAKE_SMART_CAST		CScriptGameObject__CAntirad,				_AVCAntirad
+MAKE_SMART_CAST		CScriptGameObject__COutfit,					_AVCCustomOutfit
+MAKE_SMART_CAST		CScriptGameObject__CScope,					_AVCScope
+MAKE_SMART_CAST		CScriptGameObject__CSilencer,				_AVCSilencer
+MAKE_SMART_CAST		CScriptGameObject__CGrenadeLauncher,		_AVCGrenadeLauncher
+MAKE_SMART_CAST		CScriptGameObject__CFoodItem,				_AVCFoodItem
+MAKE_SMART_CAST		CScriptGameObject__CGrenade,				_AVCGrenade
+MAKE_SMART_CAST		CScriptGameObject__CBottleItem,				_AVCBottleItem
+MAKE_SMART_CAST 	CScriptGameObject__CWeaponMagazined, 		_AVCWeaponMagazined
+MAKE_SMART_CAST 	CScriptGameObject__CEatableItem,			_AVCEatableItem
+MAKE_SMART_CAST 	CScriptGameObject__CMissile,				_AVCMissile
+MAKE_SMART_CAST 	CScriptGameObject__CHudItem,				_AVCHudItem
+MAKE_SMART_CAST 	CScriptGameObject__CAmmo,					_AVCWeaponAmmo
+
+;-----------------------------проверка типа smart_cast----------------------------------------------
+MAKE_CHECK_CAST		CScriptGameObject__IsInventoryBox,			_AVCInventoryBox
+MAKE_CHECK_CAST		CScriptGameObject__IsScriptZone,			_AVCScriptZone
+MAKE_CHECK_CAST		CScriptGameObject__IsProjector,				_AVCProjector
+MAKE_CHECK_CAST		CScriptGameObject__IsTrader,				_AVCAI_CTrader
+MAKE_CHECK_CAST		CScriptGameObject__IsCar,					_AVCCar
+MAKE_CHECK_CAST		CScriptGameObject__IsHelicopter,			_AVCHelicopter
+MAKE_CHECK_CAST		CScriptGameObject__IsWeaponGL,				_AVCWeaponMagazinedWGrenade
+MAKE_CHECK_CAST		CScriptGameObject__IsMedkit,				_AVCMedkit
+MAKE_CHECK_CAST		CScriptGameObject__IsAntirad,				_AVCAntirad
+MAKE_CHECK_CAST		CScriptGameObject__IsOutfit,				_AVCCustomOutfit
+MAKE_CHECK_CAST		CScriptGameObject__IsScope,					_AVCScope
+MAKE_CHECK_CAST		CScriptGameObject__IsSilencer,				_AVCSilencer
+MAKE_CHECK_CAST		CScriptGameObject__IsGrenadeLauncher,		_AVCGrenadeLauncher
+MAKE_CHECK_CAST		CScriptGameObject__IsFoodItem,				_AVCFoodItem
+MAKE_CHECK_CAST		CScriptGameObject__IsWeaponMagazined,		_AVCWeaponMagazined
+MAKE_CHECK_CAST		CScriptGameObject__IsEatableItem,			_AVCEatableItem
+MAKE_CHECK_CAST		CScriptGameObject__IsMissile,				_AVCMissile
+MAKE_CHECK_CAST		CScriptGameObject__IsHudItem,				_AVCHudItem
+MAKE_CHECK_CAST		CScriptGameObject__IsAmmo,					_AVCWeaponAmmo
+MAKE_CHECK_CAST		CScriptGameObject__IsGrenade,				_AVCGrenade
+MAKE_CHECK_CAST		CScriptGameObject__IsBottleItem,			_AVCBottleItem
+MAKE_CHECK_CAST		CScriptGameObject__IsTorch,					_AVCTorch
+MAKE_CHECK_CAST		CScriptGameObject__IsHangingLamp,			_AVCHangingLamp
+MAKE_CHECK_CAST		CScriptGameObject__IsWeaponPistol,			_AVCWeaponPistol
+MAKE_CHECK_CAST		CScriptGameObject__IsWeaponKnife,			_AVCWeaponKnife
+MAKE_CHECK_CAST		CScriptGameObject__IsWeaponBinoculars,		_AVCWeaponBinoculars
+MAKE_CHECK_CAST		CScriptGameObject__IsWeaponShotgun,			_AVCWeaponShotgun
+
+;---------------------------------------------------------------------------------------------------
+
+align_proc
+CScriptGameObject__GetGameObject proc
+	mov		eax, [ecx+4]
 	retn
 CScriptGameObject__GetGameObject endp
 
 
-ALIGN_8
+align_proc
 CScriptGameObject__GetCarShift proc
-	push    esi
-	mov     esi, ecx
-	push    edi
-	
-	call    CScriptGameObject__CCar
-	
-	mov     esi, [esi+4]
-	sub     eax, esi
-
-	pop     edi
-	pop     esi
+	push	esi
+	mov		esi, [ecx+4]
+	call	CScriptGameObject__CCar
+	sub		eax, esi
+	pop		esi
 	retn
 CScriptGameObject__GetCarShift endp
 

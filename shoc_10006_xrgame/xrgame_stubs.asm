@@ -3874,12 +3874,10 @@ off_10538CFC dd ?
 org 104D27F8h - shift ; 0.01745329300562541
 dbl_104D27F8 dq ?
 
-org 102485D4h - shift ; CTorch__Switch_Callback
+org 102485D4h - shift	; 6 bytes
 	jmp		CTorch__Switch_Callback
 	nop
-
-org 102485DAh - shift
-CTorch__Switch_Callback_Back:
+return_CTorch__Switch_Callback:
 
 org 1045862Ch - shift ; ?LALib@@3VELightAnimLibrary@@A
 off_1045862C dd ?
@@ -3887,22 +3885,36 @@ off_1045862C dd ?
 org 10458630h - shift ; ?FindItem@ELightAnimLibrary@@QAEPAVCLAItem@@PBD@Z
 off_10458630 dd ?
 
+;------------------------------------------------------
+org 10458A00h - shift
+g_dedicated_server		dd ?	; bool 
 
-;Аномалии.
-org 1054E930h - shift ; .?AVCCustomZone@@
-off_1054E930 dd ?
-
-org 10258840h - shift
-	jmp CCustomZone__PlayHitParticles ;(CCustomZone *this<ebx>, CGameObject *pObject<eax>)
-	
-org 10258845h - shift
-CCustomZone__PlayHitParticles_Back:
-
-org 10258CD1h - shift
-	jmp CCustomZone__hit_callback
-
-org 10258CD6h - shift
-CCustomZone__hit_callback_back:
+;колбек на хит объекта в аномалии.	(c) NanoBot
+org 103AA120h - shift
+SHit__Write_Packet:
+org 1008F690h - shift
+SPHImpact__push_back:
+org 101AC970h - shift
+CLevel@@spawn_item proc this_:dword, section_:dword, level_vertex_id:dword, parent_id:dword, return_item:dword
+CLevel@@spawn_item endp
+org 1025A0A1h - shift	; 5 bytes
+	jmp		CCustomZone__CreateHit_callback
+return_CCustomZone__CreateHit_callback:
+;колбек на вход в зону аномалии
+org 10258057h - shift	; 8 bytes
+	jmp		CCustomZone__enter_Zone_callback
+	db		3 dup (090h)
+return_CCustomZone__enter_Zone_callback:
+;колбек на выход из зоны аномалии
+org 102581AFh - shift	; 8 bytes
+	jmp		CCustomZone__exit_Zone_callback
+	db		3 dup (090h)
+return_CCustomZone__exit_Zone_callback:
+;Колбек на разрушения объекта в аномалии
+org 1008EC24h - shift	; 5 bytes
+	jmp		CTeleWhirlwindObject__destroy_object_callback
+return_CTeleWhirlwindObject__destroy_object_callback:
+;------------------------------------------------------
 
 ; Duplicate story id fix
 org 1006CA0Ah - shift
@@ -3951,11 +3963,9 @@ CScriptGameObject__get_hanging_lamp:
 org 1001AD80h - shift
 CMovementManager__set_level_dest_vertex:
 
-org 1014369Fh - shift
-	jmp		CMovementManager__set_level_dest_vertex_callback
-
-org 101436A4h - shift
-CMovementManager__set_level_dest_vertex_callback_back:
+org 1014369Fh - shift	; 5 bytes
+	jmp		CScriptGameObject__set_dest_level_vertex_id_callback
+return_CScriptGameObject__set_dest_level_vertex_id_callback:
 
 org 1011E490h - shift
 	CLevelGraph__vertex_id:
@@ -4260,6 +4270,8 @@ org 101BB9B7h - shift
 ; =========================================================================================
 ; ======================================= END =============================================
 ; =========================================================================================
+org 104584D0h - shift
+IInputReceiver__IR_GetKeyState		dd ?
 
 ; Разработчики видно сделали опечатку и нужная команда не попала в блок условия. Real Wolf.
 org 1008F753h - shift
@@ -4268,18 +4280,18 @@ org 1008F72Dh - shift
 	jz short loc_fix
 
 ; Коллбеки для машины
-org 101DF1D5h - shift
+org 101DF1D5h - shift	; 5 bytes
 	jmp		CActor__attach_Vehicle_callback
-org 101DF1DAh - shift
 CActor__attach_Vehicle_callback_back:
 
-org 101DF2AAh - shift
+org 101DF2B5h - shift	; 6 bytes
 	jmp		CActor__detach_Vehicle_callback
-org 101DF2AFh - shift
+	nop
 CActor__detach_Vehicle_callback_back:
 
-org 101DF506h - shift
+org 101DF4E8h - shift	; 5 bytes
 	jmp		CActor__use_Vehicle_callback
+return_CActor__use_Vehicle_callback:
 org 101DF50Ch - shift
 CActor__use_Vehicle_callback_skip:
 org 101DF534h - shift
@@ -4729,6 +4741,17 @@ org 105557DCh - shift
 _AVCHudItem:
 org 10556BE0h - shift
 _AVCWeaponAmmo:
+org 10557448h - shift
+_AVCMincer:
+org 10557460h - shift
+_AVCMosquitoBald:
+org 1055747Ch - shift
+_AVCSmartZone:
+org 10557498h - shift
+_AVCTeamBaseZone:
+org 1054E930h - shift
+_AVCCustomZone:
+
 
 ;------------------------------------------
 org 10458110h - shift
@@ -4891,6 +4914,16 @@ org 1015BD10h - shift
 sub_1015BD10:
 org 101598F0h - shift
 register__void__float_float:
+org 101584F0h - shift
+register__bool__u32:
+org 1015CAF0h - shift
+sub_1015CAF0:
+org 1015EA30h - shift
+sub_1015EA30:
+org 1015CB50h - shift
+sub_1015CB50:
+org 1015CBF0h - shift
+sub_1015CBF0:
 
 ;===================================================================================
 ;Рефакторинг функции колбеков нажатий клавиш.
@@ -5410,10 +5443,10 @@ org 10269120h - shift	; 578 bytes
 	mov     ecx, [edi].m_owner
 	add		ecx, CCar.XFORM_	;m_owner->XFORM()
 	ASSUME	ecx:ptr Fmatrix4, esi:ptr Fmatrix4, eax:ptr CBoneInstance, edx:ptr Fvector
-	Fmatrix4_mul_43	[ecx], [esi], [eax].mTransform
+	Fmatrix4@mul_43			[ecx], [esi], [eax].mTransform
 	;Owner()->XFORM().transform_tiny(XFORM().c, m_offset_driver_place);
 	lea		edx, [edi].m_offset_driver_place
-	transform_tiny	[ecx], [ecx].c_, [edx]
+	Fmatrix4@transform_tiny	[ecx], [ecx].c_, [edx]
 	ASSUME	ecx:nothing, eax:nothing, esi:nothing, edx:nothing
 	;фикс перекрутки камеры актора в CCar. Теперь башню танка можно крутить сколько угодно, если limit_x_rot = -181, 181.
 	;active_camera.yaw = angle_normalize_signed(active_camera.yaw);
@@ -5468,6 +5501,15 @@ CCarWeapon__UpdateFire_return:
 	ASSUME	esi:nothing
 	pop		esi
 	retn
+;гильзы у турели, БТРов.
+org 10217F70h - shift
+CShootingObject@@OnShellDrop proc play_pos:dword, parent_vel:dword
+CShootingObject@@OnShellDrop endp
+org 10459968h - shift
+zero_vel:
+org 1027A12Bh - shift	; 6 bytes	
+	jmp		CCarWeapon__OnShot_ext
+	db		0CCh
 ;----------------------------------------------------------------------------------------------------
 org 104586D4h - shift
 CObject__processing_deactivate	dd ?
@@ -5528,4 +5570,35 @@ org 101198F6h - shift	; 6 bytes
 	jmp		CAI_Stalker__update_best_item_info_fix
 	nop
 return_CAI_Stalker__update_best_item_info_fix:
-;============================================================
+;===================================================================================
+org 1000C2C0h - shift
+CRandom__randI:
+org 10458DDCh - shift
+Random			dd ?	; class CRandom 
+;Спавн артефактов скриптом
+org 101E54F0h - shift
+CGameObject__u_EventGen:
+org 101E5580h - shift
+CGameObject__u_EventSend:
+;конструктор
+org 102562BDh - shift	; 13 bytes
+	ASSUME	esi:ptr CCustomZone
+	mov		[esi].m_bAllowScriptSpawnArtefact, bl
+	ASSUME	esi:nothing
+	mov		eax, esi
+	pop		ebx
+	add		esp, 8
+	retn
+org 102597DCh - shift	; 6 bytes
+	jmp		CCustomZone@@ScriptSpawnArtefact
+	nop
+return_CCustomZone@@ScriptSpawnArtefact:
+org 10259C46h - shift	; 6 bytes
+	jmp		CCustomZone@@TeleportArtefact
+	nop
+return_CCustomZone@@TeleportArtefact:
+org 10259D11h - shift	; 6 bytes
+	jmp		CCustomZone@@NormalizeDir
+	nop
+return_CCustomZone@@NormalizeDir:
+;===================================================================================

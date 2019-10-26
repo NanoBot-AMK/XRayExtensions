@@ -95,4 +95,35 @@ CCar__attach_Actor_ext proc
 	retn	4
 CCar__attach_Actor_ext endp
 
-
+;гильзы у турели, БТРов.
+align_proc
+CCarWeapon__OnShot_ext proc
+local shell_mat:Fmatrix4
+;esi - this		CCarWeapon*
+	ASSUME	esi:ptr CCarWeapon, edi:ptr CCar
+	mov		edi, [esi].m_object
+	;CKinematics* K	= smart_cast<CKinematics*>(Visual());
+	mov		ecx, [edi].Visual_
+	mov		eax, [ecx]
+	mov		edx, [eax+18h]
+	call	edx
+	;CBoneInstance& instance = K->LL_GetTransform(m_fire_bone);
+	movzx	edx, [esi].m_fire_bone
+	lea     ecx, [edx+edx*4]
+	shl     ecx, 5	; =m_fire_bone*160	// sizeof CBoneInstance = 160
+	add		ecx, [eax+bone_instances]	; CBoneInstance
+	ASSUME	ecx:ptr CBoneInstance
+	Fmatrix4@mul_43			shell_mat, [edi].XFORM_, [ecx].mTransform
+	Fmatrix4@transform_tiny	shell_mat, shell_mat.c_, [esi].vLoadedShellPoint
+	mov		ecx, esi
+	invoke	CShootingObject@@OnShellDrop, addr shell_mat.c_, addr zero_vel
+	ASSUME	esi:nothing, edi:nothing, ecx:nothing
+	leave
+	;return;
+	pop		edi
+	pop		esi
+	pop		ebp
+	pop		ebx
+	pop		ecx
+	retn
+CCarWeapon__OnShot_ext endp

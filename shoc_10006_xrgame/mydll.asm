@@ -32,6 +32,7 @@ org sec1_sec2_dist
 include structures.asm
 include types.asm
 include defines.asm
+include utils.asm
 include actor_input_fix.asm
 include global_ns_fix.asm
 include global_ns_fix2.asm
@@ -105,6 +106,7 @@ include art_activation_fix.asm
 include self_anim_stalker.asm
 include level_explosive.asm
 include turrel.asm
+include anomaly.asm
 
 _CODE ENDS
 

@@ -106,13 +106,13 @@ local fire_dir:Fvector4, cam_dir:Fvector4, angle_cos:dword
 		;(math.acos((v1.x*v2.x + v1.y*v2.y + v1.z*v2.z)/(math.sqrt(v1.x*v1.x + v1.y*v1.y + v1.z*v1.z)*math.sqrt(v2.x*v2.x + v2.y*v2.y + v2.z*v2.z)))*57.2957)
 		movups	xmm2, fire_dir
 		movups	xmm3, cam_dir
-		dotproduct	xmm2, xmm2
+		Fvector4@dotproduct	xmm2, xmm2
 		movss	xmm4, xmm0	; dot_fire_dir = (fire_dir.x*fire_dir.x + fire_dir.y*fire_dir.y + fire_dir.z*fire_dir.z);
-		dotproduct	xmm3, xmm3
+		Fvector4@dotproduct	xmm3, xmm3
 		mulss	xmm4, xmm0	;  = (cam_dir.x*cam_dir.x + cam_dir.y*cam_dir.y + cam_dir.z*cam_dir.z) * dot_fire_dir
 		sqrtss	xmm4, xmm4
 		; fire_dir.dotproduct(cam_dir);
-		dotproduct	xmm2, xmm3
+		Fvector4@dotproduct	xmm2, xmm3
 		;fire_dir.dotproduct(cam_dir)/sqrt(fire_dir.dotproduct(fire_dir)*cam_dir.dotproduct(cam_dir));
 		divss	xmm0, xmm4
 		movflt	angle_cos, angle_use_turrel_cos
@@ -262,10 +262,10 @@ local mat_cam_bone:Fmatrix4, P:Fvector4, Da:Fvector4
 	;mat_cam_bone.mul_43(XFORM(), instance.mTransform);
 	ASSUME	eax:ptr CBoneInstance, edx:ptr Fmatrix4, ecx:ptr Fvector
 	lea		edx, [esi].XFORM_
-	Fmatrix4_mul_43	mat_cam_bone, [edx], [eax].mTransform
+	Fmatrix4@mul_43	mat_cam_bone, [edx], [eax].mTransform
 	;mat_cam_bone.transform_tiny(P, m_camera_position);
 	lea		ecx, [esi].m_camera_position
-	transform_tiny	mat_cam_bone, P, [ecx]
+	Fmatrix4@transform_tiny	mat_cam_bone, P, [ecx]
 	ASSUME	eax:nothing, edx:nothing, ecx:nothing
 	;if (active_camera.tag==ectFirst)
 	mov		edx, [esi].active_camera
@@ -569,7 +569,7 @@ CCarWeapon__OnShotExt proc
 	;m_fire_bone_xform.mulA_43(m_object->XFORM());
 	lea		ecx, [edi].XFORM_
 	ASSUME	ecx:ptr Fmatrix4
-	Fmatrix4_mul_43	[esi].m_fire_bone_xform, [ecx], [edx].mTransform
+	Fmatrix4@mul_43	[esi].m_fire_bone_xform, [ecx], [edx].mTransform
 	ASSUME	ecx:nothing
 	mov		eax, [esi].m_fire_bone_xform.c_.x
 	mov		[esi].m_fire_pos.x, eax

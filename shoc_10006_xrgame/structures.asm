@@ -110,7 +110,7 @@ SHit struct ; (sizeof=72, align=4)
 SHit ends									; 72
 
 xr_vector struct ; (sizeof=16, align=4)
-	_Alval				dword ?				; 0 	allocator object for values			; объект{цель} программы распределения для значений
+	_Alval				dword ?				; 0		allocator object for values			; объект{цель} программы распределения для значений
 	_Myfirst			dword ?				; 4		pointer to beginning of array		; указатель на начало массива
 	_Mylast				dword ?				; 8		pointer to current end of sequence	; указатель на текущий конец последовательности
 	_Myend				dword ?				; 12	pointer to end of array				; указатель на конец массива
@@ -174,6 +174,68 @@ collide@@rq_results ends							; 16
 string16 struct
 								byte 16 dup(?)
 string16 ends
+
+NET_PacketSizeLimit				equ 8192	; макс. рамер пакета 8 килобайт
+
+NET_Buffer struct ; (sizeof=8196, align=4)
+	data						byte NET_PacketSizeLimit dup(?)	; 0
+	count						dword ?							; 8192
+NET_Buffer ends													; 8196
+
+NET_Packet struct ; (sizeof=8204, align=4)
+	B							NET_Buffer <>		; 0
+	r_pos						dword ?				; 8196
+	timeReceive					dword ?				; 8200
+NET_Packet ends										; 8204
+
+ISE_Abstract	struct ; (sizeof=8, align=4)
+	ISE_Abstract@vfptr			dword ?				; 0		offset
+	m_editor_flags				dword ?				; 4		flags32
+ISE_Abstract	ends								; 8
+
+CScriptValueContainer struct ; (sizeof=20, align=4)
+	CScriptValueContainer@vfptr	dword ?				; 0		offset
+	m_values					xr_vector <>		; 4		xr_vector<CScriptValue *,xalloc<CScriptValue *> > ?
+CScriptValueContainer ends							; 20
+
+CPureServerObject struct ; (sizeof=8, align=4)
+	IPureSerializeObject_IReader@vfptr		dword ?	; 0
+	IPureSerializeObject_IWriter@vfptr		dword ?	; 4
+CPureServerObject ends
+
+CSE_Abstract struct ; (sizeof=160, align=8)	__cppobj __declspec(align(8))  : ISE_Abstract, CPureServerObject, CScriptValueContainer
+	ISE_Abstract <>									; 0
+	CPureServerObject <>							; 8
+	CScriptValueContainer <>						; 16
+	s_name_replace				dword ?				; 36	LPSTR
+	net_Ready					dword ?				; 40	int
+	net_Processed				dword ?				; 44	int
+	m_wVersion					word ?				; 48	unsigned __int16
+	m_script_version			word ?				; 50	u16
+	RespawnTime					word ?				; 52	u16
+	ID							word ?				; 54	u16
+	ID_Parent					word ?				; 56	u16
+	ID_Phantom					word ?				; 58	u16
+	owner						dword ?				; 60	xrClientData*
+	s_name						shared_str <>		; 64
+	s_gameid					byte ?				; 68	u8
+	s_RP						byte ?				; 69	u8
+	s_flags						word ?				; 70	_flags<unsigned short>
+	children					xr_vector <>		; 72	xr_vector<unsigned short,xalloc<unsigned short> > 
+	o_Position					Fvector <>			; 88
+	o_Angle						Fvector <>			; 100
+	m_tClassID					qword ?				; 112	unsigned __int64 
+	m_script_clsid				dword ?				; 120	int 
+	m_ini_string				shared_str <>		; 124
+	m_ini_file					dword ?				; 128	CInifile *
+	m_bALifeControl				byte ?				; 132	bool 
+								byte ?	
+	m_tSpawnID					word ?				; 134	u16 
+	m_spawn_flags				dword ?				; 136	_flags<unsigned int> 
+	client_data					xr_vector <>		; 140	xr_vector<unsigned char,xalloc<unsigned char> > 
+								dword ?	; 156
+CSE_Abstract ends									; 160
+
 
 CHolderCustom struct	; 12 sizeof
 	CHolderCustom@vfptr			dword ?				; 0
@@ -441,7 +503,7 @@ CTracer struct ; (sizeof=24, align=4)
 CTracer ends											; 24
 
 CBulletManager struct ; (sizeof=200, align=4)
-	CBulletManager@vfptr						dword ?					; 0	offset
+	CBulletManager@vfptr		dword ?					; 0	offset
 	rq_storage					collide@@rq_results <>	; 4		
 	rq_spatial					xr_vector <>			; 20	xr_vector<ISpatial *,xalloc<ISpatial *>
 	m_rq_results				collide@@rq_results <>	; 36	
@@ -564,6 +626,14 @@ SStatSectionData struct ; (sizeof=28, align=4)
 	data								xr_vector <>	; 12
 SStatSectionData ends									; 28
 
+CAI_ObjectLocation struct ; (sizeof=12, align=4)
+	vfptr								dword ?			; 0
+	m_level_vertex_id					dword ?			; 4		u32
+	m_game_vertex_id					word ?			; 8		GameGraph::_GRAPH_ID
+										byte ? ; undefined
+										byte ? ; undefined
+CAI_ObjectLocation ends
+
 ;===================================================================================
 ;==============================	  CGameObject  =====================================
 ;===================================================================================
@@ -632,6 +702,15 @@ ICollidable	 struct ; (sizeof=8, align=4)
 	ends
 ICollidable	 ends	; 8
 
+bEnabled				= byte ptr (1 shl 0);
+bVisible				= byte ptr (1 shl 1);
+bDestroy				= byte ptr (1 shl 2);
+net_Local				= byte ptr (1 shl 3);
+net_Ready				= byte ptr (1 shl 4);
+net_SV_Update			= byte ptr (1 shl 5);
+crow					= byte ptr (1 shl 6);
+bPreDestroy				= byte ptr (1 shl 7);
+
 CObject struct ; (sizeof=260, align=8)
 	DLL_Pure <>											; 0
 	ISpatial <>											; 16
@@ -672,7 +751,7 @@ CScriptBinder struct ; (sizeof=8, align=4)
 CScriptBinder ends										; 8
 
 svector_void___stdcall_CKinematics_6 struct
-	array						dword 6 dup(?)			; 316 offset
+	array						dword 6 dup(?)			; 316	offset
 	count						dword ?					; 240
 svector_void___stdcall_CKinematics_6 ends
 
@@ -683,21 +762,21 @@ CGameObject struct ; (sizeof=360, align=4)
 	m_spawned					byte ?					; 280
 	m_server_flags				dword ?					; 284	Flags32
 	align	4
-	m_ai_location				dword ?					; 288 offset
+	m_ai_location				dword ?					; 288	CAI_ObjectLocation*
 	m_story_id					dword ?					; 292
-	m_anim_mov_ctrl				dword ?					; 296 offset
+	m_anim_mov_ctrl				dword ?					; 296	animation_movement_controller*
 	m_bObjectRemoved			byte ?					; 300
 	align	4
-	m_ini_file					dword ?					; 304 offset
+	m_ini_file					dword ?					; 304	CInifile*
 	m_bCrPr_Activated			byte ?					; 308
 	m_flCallbackKey				byte ?					; 309	flags8	NEW!!!	флаги на включения колбеков
 	align	4
 	m_dwCrPr_ActivationStep		dword ?					; 312
 	m_visual_callback	svector_void___stdcall_CKinematics_6 <>
-	m_lua_game_object			dword ?					; 344 offset
+	m_lua_game_object			dword ?					; 344	mutable CScriptGameObject*
 	m_script_clsid				dword ?					; 348
 	m_spawn_time				dword ?					; 352
-	m_callbacks					dword ?					; 356 offset
+	m_callbacks					dword ?					; 356	CALLBACK_MAP*
 CGameObject ends										; 360 
 
 pure_relcase	struct ; (sizeof=8, align=4)
@@ -914,11 +993,14 @@ CScriptEntity	struct 4 ; (sizeof=76, align=4)
 	m_saved_sounds				xr_vector <>			; 60	xr_vector<CScriptEntity::CSavedSound,xalloc<CScriptEntity::CSavedSound> >
 CScriptEntity	ends									; 76
 
-CPHUpdateObject struct 4 ; (sizeof=16, align=4)
+CPHUpdateObject struct ; (sizeof=16, align=4)
 	CPHUpdateObject@vfptr		dword ?					; 0
 	next						dword ?					; 4	offset
 	tome						dword ?					; 8	offset
 	b_activated					byte ?					; 12
+								byte ? ; undefined
+								byte ? ; undefined
+								byte ? ; undefined
 CPHUpdateObject ends									; 16
 
 CPHDestroyableNotificate struct ; (sizeof=4, align=4)
@@ -936,7 +1018,7 @@ CPHSkeleton	struct 4 ; (sizeof=36, align=4)
 CPHSkeleton	ends										; 36
 
 CDamagableItem	struct 4 ; (sizeof=16, align=4)
-	CDamagableItem@vfptr			dword ?					; 0 offset
+	CDamagableItem@vfptr		dword ?					; 0 offset
 	m_levels_num				word ?					; 4
 	align 4
 	m_max_health				dword ?					; 8
@@ -1626,6 +1708,40 @@ CWeapon@@_firedeps struct ; (sizeof=112, align=4)
 	vLastSP									Fvector <>				; 100
 CWeapon@@_firedeps ends												; 112
 
+weapon_hud_value struct ; (sizeof=108, align=4)
+	m_animations							dword ?					; 0		CKinematicsAnimated*
+	m_fire_bone								dword ?					; 4		int
+	m_fp_offset								Fvector <>				; 8
+	m_fp2_offset							Fvector <>				; 20
+	m_sp_offset								Fvector <>				; 32
+	m_offset								Fmatrix <>				; 44
+weapon_hud_value ends												; 108
+
+shared_weapon_hud struct ; (sizeof=4, align=4)
+		p_									dword ?					; 0		weapon_hud_value*
+shared_weapon_hud ends												; 4
+
+CWeaponHUD struct ; (sizeof=116, align=4)
+	m_pParentWeapon							dword ?					; 0		CHudItem*
+	m_bHidden								byte ?					; 4
+	m_bVisible								byte ?					; 5
+	m_Transform								Fmatrix <>				; 6
+											byte ? ; undefined
+											byte ? ; undefined
+	m_shared_data							shared_weapon_hud <>	; 72
+	m_dwAnimTime							dword ?					; 76
+	m_dwAnimEndTime							dword ?					; 80
+	m_bStopAtEndAnimIsRunning				byte ?					; 84
+											byte ? ; undefined
+											byte ? ; undefined
+											byte ? ; undefined
+	m_startedAnimState						dword ?					; 88
+	m_pCallbackItem							dword ?					; 92	CHudItem*
+	m_fZoomRotateX							dword ?					; 96	float
+	m_fZoomRotateY							dword ?					; 100	float
+	m_fZoomOffset							Fvector <>				; 104
+CWeaponHUD ends														; 116
+
 CWeapon struct ; (sizeof=1572, align=8)
 	CHudItemObject <>												; 0
 	CShootingObject <>												; 712
@@ -1790,4 +1906,240 @@ CWeaponMagazined struct ; (sizeof=1960, align=8)
 										dword ? ; undefined
 CWeaponMagazined ends													; 1960
 
+resptr_core struct ; (sizeof=4, align=4)
+	p_									dword ?					; 
+resptr_core ends
 
+svector@int_5@	struct ; (sizeof=24, align=4)
+	array								dword 5 dup(?)			; 0
+	count								dword ?					; 20
+svector@int_5@	ends											; 24
+
+CSpaceRestrictor struct ; (sizeof=412, align=4)
+	CGameObject <>												; 0
+	m_spheres							xr_vector <>			; 360	xr_vector<_sphere<float>,xalloc<_sphere<float> > >
+	m_boxes								xr_vector <>			; 376	xr_vector<CSpaceRestrictor::CPlanes,xalloc<CSpaceRestrictor::CPlanes> > ?
+	m_selfbounds						Fsphere <>				; 392
+	m_actuality							byte ?					; 408
+	m_space_restrictor_type				byte ?					; 409
+										byte ? ; undefined
+										byte ? ; undefined
+CSpaceRestrictor ends											; 412
+
+CCustomZone struct ; (sizeof=876, align=4)
+	CSpaceRestrictor <>											; 0
+	Feel@@Touch <>												; 412
+	m_effector							dword ?					; 468	offset
+	m_owner_id							dword ?					; 472
+	m_ttl								dword ?					; 476
+	m_zone_flags						dword ?					; 480	_flags<unsigned int>
+	m_pLocalActor						dword ?					; 484	offset
+	m_fMaxPower							dword ?					; 488
+	m_fAttenuation						dword ?					; 492
+	m_fHitImpulseScale					dword ?					; 496
+	m_fEffectiveRadius					dword ?					; 500
+	m_eHitTypeBlowout					dword ?					; 504	enum ALife::EHitType
+	m_eZoneState						dword ?					; 508	enum CCustomZone::EZoneState
+	m_iStateTime						dword ?					; 512
+	m_iPreviousStateTime				dword ?					; 516
+	m_TimeToDisable						dword ?					; 520
+	m_TimeToEnable						dword ?					; 524
+	m_TimeShift							dword ?					; 528
+	m_StartTime							dword ?					; 532
+	m_StateTime							svector@int_5@ <>		; 536
+	m_dwAffectFrameNum					dword ?					; 560
+	m_dwDeltaTime						dword ?					; 564
+	m_dwPeriod							dword ?					; 568
+	m_bZoneActive						byte ?					; 572
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	m_dwBlowoutParticlesTime			dword ?					; 576
+	m_dwBlowoutLightTime				dword ?					; 580
+	m_dwBlowoutSoundTime				dword ?					; 584
+	m_dwBlowoutExplosionTime			dword ?					; 588
+	m_bBlowoutWindActive				byte ?					; 592	bool
+	m_bAllowScriptSpawnArtefact			byte ?					; 593	bool	//NEW включить спавн артефактов скриптом
+										byte ? ; undefined
+										byte ? ; undefined
+	m_dwBlowoutWindTimeStart			dword ?					; 596
+	m_dwBlowoutWindTimePeak				dword ?					; 600
+	m_dwBlowoutWindTimeEnd				dword ?					; 604
+	m_fBlowoutWindPowerMax				dword ?					; 608
+	m_fStoreWindPower					dword ?					; 612
+	m_iDisableHitTime					dword ?					; 616
+	m_iDisableHitTimeSmall				dword ?					; 620
+	m_iDisableIdleTime					dword ?					; 624
+	m_sIdleParticles					shared_str <>			; 628
+	m_sBlowoutParticles					shared_str <>			; 632
+	m_sAccumParticles					shared_str <>			; 636
+	m_sAwakingParticles					shared_str <>			; 640
+	m_sEntranceParticlesSmall			shared_str <>			; 644
+	m_sEntranceParticlesBig				shared_str <>			; 648
+	m_sHitParticlesSmall				shared_str <>			; 652
+	m_sHitParticlesBig					shared_str <>			; 656
+	m_sIdleObjectParticlesSmall			shared_str <>			; 660
+	m_sIdleObjectParticlesBig			shared_str <>			; 664
+	m_bIdleObjectParticlesDontStop		dword ?					; 668
+	m_idle_sound						ref_sound <>			; 672
+	m_awaking_sound						ref_sound <>			; 676
+	m_accum_sound						ref_sound <>			; 680
+	m_blowout_sound						ref_sound <>			; 684
+	m_hit_sound							ref_sound <>			; 688
+	m_entrance_sound					ref_sound <>			; 692
+	m_pIdleParticles					dword ?					; 696	offset
+	m_pIdleLight						resptr_core <>			; 700	resptr_core<IRender_Light,resptrcode_light> ?
+	m_IdleLightColor					Fcolor <>				; 704
+	m_fIdleLightRange					dword ?					; 720
+	m_fIdleLightHeight					dword ?					; 724
+	m_fIdleLightRangeDelta				dword ?					; 728
+	m_pIdleLAnim						dword ?					; 732	offset
+	m_pLight							resptr_core <>			; 736	resptr_core<IRender_Light,resptrcode_light> ?
+	m_fLightRange						dword ?					; 740
+	m_LightColor						Fcolor <>				; 744
+	m_fLightTime						dword ?					; 760
+	m_fLightTimeLeft					dword ?					; 764
+	m_fLightHeight						dword ?					; 768
+	m_ObjectInfoMap						xr_vector <>			; 772	xr_vector<SZoneObjectInfo,xalloc<SZoneObjectInfo> > ?
+	m_vPrevPos							Fvector <>				; 788
+	m_dwLastTimeMoved					dword ?					; 800
+	m_SpawnedArtefacts					xr_vector <>			; 804	xr_vector<CArtefact *,xalloc<CArtefact *> > ?
+	m_fArtefactSpawnProbability			dword ?					; 820
+	m_fThrowOutPower					dword ?					; 824
+	m_fArtefactSpawnHeight				dword ?					; 828
+	m_sArtefactSpawnParticles			shared_str <>			; 832
+	m_ArtefactBornSound					ref_sound <>			; 836
+	m_ArtefactSpawn						xr_vector <>			; 840	xr_vector<CCustomZone::ARTEFACT_SPAWN,xalloc<CCustomZone::ARTEFACT_SPAWN> > ?
+	m_fDistanceToCurEntity				dword ?					; 856
+	m_ef_anomaly_type					dword ?					; 860
+	m_ef_weapon_type					dword ?					; 864
+	m_b_always_fastmode					dword ?					; 868
+	o_fastmode							dword ?					; 872
+CCustomZone ends												; 876
+
+SPHImpact	struct ; (sizeof=26, align=2)
+	force								Fvector <>				; 0
+	point								Fvector <>				; 12
+	geom								word ?					; 24
+SPHImpact	ends												; 26
+
+CBaseGraviZone	struct ; (sizeof=916, align=4)
+	CCustomZone <>												; 0
+	m_fThrowInImpulse					dword ?					; 876
+	m_fThrowInImpulseAlive				dword ?					; 880
+	m_fThrowInAtten						dword ?					; 884
+	m_fBlowoutRadiusPercent				dword ?					; 888
+	m_fTeleHeight						dword ?					; 892
+	m_dwTimeToTele						dword ?					; 896
+	m_dwTelePause						dword ?					; 900
+	m_dwTeleTime						dword ?					; 904
+	m_sTeleParticlesBig					shared_str <>			; 908
+	m_sTeleParticlesSmall				shared_str <>			; 912
+CBaseGraviZone	ends											; 916
+
+CTelekinesis struct ; (sizeof=52, align=4)
+	CPHUpdateObject <>											; 0
+	objects								xr_vector <>			; 16	xr_vector<CTelekineticObject *,xalloc<CTelekineticObject *> >
+	m_nearest							xr_vector <>			; 32	xr_vector<CObject *,xalloc<CObject *> > ?
+	active								byte ?					; 48
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+CTelekinesis ends												; 52
+
+CTeleWhirlwind	struct ; (sizeof=96, align=4)
+	CTelekinesis <>												; 0
+	m_center							Fvector <>				; 52
+	m_keep_radius						dword ?					; 64	float
+	m_throw_power						dword ?					; 68	float
+	m_owner_object						dword ?					; 72	CGameObject*
+	m_saved_impacts						xr_vector <>			; 76	xr_vector<SPHImpact,xalloc<SPHImpact> > ?
+	m_destroying_particles				shared_str <>			; 92
+CTeleWhirlwind	ends											; 96
+
+CTelekineticObject struct ; (sizeof=56, align=4)
+	vfptr								dword ?					; 0		
+	state								dword ?					; 4		ETelekineticState
+	object								dword ?					; 8		CPhysicsShellHolder*
+	telekinesis							dword ?					; 12	CTelekinesis*
+	target_height						dword ?					; 16	float
+	time_keep_started					dword ?					; 20	u32
+	time_keep_updated					dword ?					; 24	u32
+	time_raise_started					dword ?					; 28	u32
+	time_to_keep						dword ?					; 32	u32
+	time_fire_started					dword ?					; 36	u32
+	strength							dword ?					; 40	float
+	m_rotate							byte ?					; 44	bool
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	sound_hold							ref_sound <>			; 48
+	sound_throw							ref_sound <>			; 52
+CTelekineticObject ends											; 56
+
+CTeleWhirlwindObject struct ; (sizeof=68, align=4)
+	CTelekineticObject <>										; 0
+	m_telekinesis						dword ?					; 56	CTeleWhirlwind*
+	b_destroyable						byte ?					; 60	bool
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	throw_power							dword ?					; 64	float
+CTeleWhirlwindObject ends										; 68
+
+CMincer	struct ; (sizeof=1028, align=4)
+	CBaseGraviZone <>											; 0
+	CPHDestroyableNotificator <>								; 916
+	m_telekinetics						CTeleWhirlwind <>		; 920
+	m_torn_particles					shared_str <>			; 1016
+	m_tearing_sound						ref_sound <>			; 1020
+	m_fActorBlowoutRadiusPercent		dword ?					; 1024
+CMincer	ends													; 1028
+
+CArtefact	struct ; (sizeof=952, align=8)
+	CHudItemObject <>											; 0
+	CPHUpdateObject <>											; 712
+	m_CarringBoneID						word ?					; 728
+										byte ? ; undefined
+										byte ? ; undefined
+	m_sParticlesName					shared_str <>			; 732
+	m_activationObj						dword ?					; 736	offset
+	m_bLightsEnabled					byte ?					; 740
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	m_pTrailLight						resptr_core <>			; 744	resptr_core<IRender_Light,resptrcode_light> ?
+	m_TrailLightColor					Fcolor <>				; 748
+	m_fTrailLightRange					dword ?					; 764
+	m_bCanSpawnZone						byte ?					; 768
+										byte ? ; undefined
+										byte ? ; undefined
+										byte ? ; undefined
+	m_fHealthRestoreSpeed				dword ?					; 772
+	m_fRadiationRestoreSpeed			dword ?					; 776
+	m_fSatietyRestoreSpeed				dword ?					; 780
+	m_fPowerRestoreSpeed				dword ?					; 784
+	m_fBleedingRestoreSpeed				dword ?					; 788
+	m_ArtefactHitImmunities				CHitImmunity <>			; 792
+	m_anim_idle							svector@MotionID_8@ <>	; 844
+	m_anim_idle_sprint					svector@MotionID_8@ <>	; 864
+	m_anim_hide							svector@MotionID_8@ <>	; 884
+	m_anim_show							svector@MotionID_8@ <>	; 904
+	m_anim_activate						svector@MotionID_8@ <>	; 924
+	o_render_frame						dword ?					; 944
+	o_fastmode							dword ?					; 948
+CArtefact	ends												; 952
+
+CGraviArtefact	struct ; (sizeof=960, align=8)
+	CArtefact <>												; 0
+	m_fJumpHeight						dword ?					; 952
+	m_fEnergy							dword ?					; 956
+CGraviArtefact	ends											; 960
+
+CMercuryBall	struct ; (sizeof=976, align=8)
+	CArtefact <>												; 0
+	m_timeLastUpdate					qword ?					; 952
+	m_timeToUpdate						qword ?					; 960
+	m_fImpulseMin						dword ?					; 968
+	m_fImpulseMax						dword ?					; 972
+CMercuryBall	ends											; 976

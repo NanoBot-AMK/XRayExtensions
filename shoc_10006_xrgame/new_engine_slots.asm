@@ -519,8 +519,8 @@ aDragdrop_biodetector db "dragdrop_biodetector", 0
 
 ; заставляем движок учитывать предмет из шлемового слота при подсчете хита актору
 CActor__HitArtefactsOnBelt proc
-hit_power       = dword ptr  4
-hit_type        = dword ptr  8
+;hit_power       = dword ptr  4
+;hit_type        = dword ptr  8
 	sub     esp, 8
 	movss   xmm0, ds:pick_dist
 	push    esi
@@ -534,7 +534,7 @@ hit_type        = dword ptr  8
 	movss   dword ptr [esp+0Ch], xmm0
 	jz      short check_slot
 	push    ebx
-	mov     ebx, [esp+14h+hit_type]
+	mov     ebx, [esp+14h+8];hit_type
 	push	eax
 	
 begin_iteration: 
@@ -599,7 +599,7 @@ check_slot:
 	lea     ecx, [eax+318h]
 	mov     eax, [edx+8]
 	push	ebx
-	mov     ebx, [esp+14h+hit_type]	
+	mov     ebx, [esp+14h+8];hit_type	
 	push    ebx
 	push    ecx
 	fstp    dword ptr [esp]	; hit_power (всегда 1 почему-то)
@@ -617,7 +617,7 @@ exit:
 	pop     edi
 	fsub    dword ptr [esp+8h]
 	pop     esi
-	fmul    dword ptr [esp+8+hit_power]
+	fmul    dword ptr [esp+8+4];hit_power
 	add     esp, 8
 	retn    8
 CActor__HitArtefactsOnBelt endp

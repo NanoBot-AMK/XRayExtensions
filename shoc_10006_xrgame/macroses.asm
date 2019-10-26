@@ -273,8 +273,8 @@ ENDM
 
 ;скал€рное произведени€ 3d вектора
 ;результат возвращаетс€ xmm0.0, регистры xmm0, xmm1 не сохран€ютс€
-dotproduct MACRO param1:req, param2:req
-	movaps	xmm0, param1
+Fvector4@dotproduct MACRO vec_this:req, param2:req
+	movaps	xmm0, vec_this
 	mulps	xmm0, param2
 IFDEF	___INSTRUCTION__SSE3
 	haddps	xmm0, xmm0
@@ -288,15 +288,42 @@ ELSE
 ENDIF	
 ENDM
 
+Fvector@normalize MACRO vec_this:req
+	sub		esp, 16
+	movups	xmm0, xmmword ptr vec_this
+	movups	xmmword ptr [esp], xmm0
+	xor		eax, eax
+	mov		[esp+12], eax;dword ptr 
+	movups	xmm0, xmmword ptr [esp]
+	movaps	xmm2, xmm0
+	mulps	xmm0, xmm0
+	movss	xmm1, xmm0				; xmm1.x = x
+	shufps	xmm0, xmm0, 11100101b	; 3211t		копируем 1-й элемент в 0-й элемент
+	addss	xmm1, xmm0				; xmm1 = x + y
+	shufps	xmm0, xmm0, 11100110b	; 3212t		копируем 2-й элемент в 0-й элемент
+	addss	xmm0, xmm1				; xmm0 = z + xmm1
+	sqrtss	xmm1, xmm0
+	xorps	xmm0, xmm0
+	movflt	xmm0, 1.0
+	divss	xmm0, xmm1
+	shufps	xmm0, xmm0, 11000000b
+	mulps	xmm0, xmm2
+	movups	xmmword ptr [esp], xmm0
+	mrm		vec_this.x, [esp]
+	mrm		vec_this.y, [esp+4]
+	mrm		vec_this.z, [esp+8]
+	add		esp, 16
+ENDM
+
 ;ICF	void	transform_tiny(Tvector &dest, const Tvector &v)	const // preferred to use
 ;{
 ;	dest.x = v.x*this.i.x + v.y*this.j.x + v.z*this.k.x + this.c.x;
 ;	dest.y = v.x*this.i.y + v.y*this.j.y + v.z*this.k.y + this.c.y;
 ;	dest.z = v.x*this.i.x + v.y*this.j.x + v.z*this.k.x + this.c.x;
 ;}
-;matrix_this:Fmatrix4, vec_dest:Fvector4, vec:Fvector
+;matrix_this:Fmatrix4, vec_result:Fvector4, vec:Fvector
 ;69 bytes
-transform_tiny MACRO matrix_this:req, vec_dest:req, vec:req
+Fmatrix4@transform_tiny MACRO matrix_this:req, vec_result:req, vec:req
 	xorps	xmm0, xmm0
 	xorps	xmm1, xmm1
 	movss	xmm0, vec.x
@@ -315,7 +342,7 @@ transform_tiny MACRO matrix_this:req, vec_dest:req, vec:req
 	movups	xmm3, matrix_this.c_
 	addps	xmm0, xmm1
 	addps	xmm0, xmm3
-	movups	vec_dest, xmm0
+	movups	vec_result, xmm0
 ENDM
 
 ;ICF	void	transform_dir		(Tvector &dest, const Tvector &v)	const 	// preferred to use
@@ -324,7 +351,7 @@ ENDM
 ;	dest.y = v.x*this.i.y + v.y*this.j.y + v.z*this.k.y;
 ;	dest.z = v.x*this.i.x + v.y*this.j.x + v.z*this.k.x;
 ;}
-transform_dir MACRO matrix_this:req, vec_dest:req, vec:req
+Fmatrix4@transform_dir MACRO matrix_this:req, vec_result:req, vec:req
 	xorps	xmm0, xmm0
 	xorps	xmm1, xmm1
 	movss	xmm0, vec.x
@@ -341,11 +368,11 @@ transform_dir MACRO matrix_this:req, vec_dest:req, vec:req
 	shufps	xmm0, xmm0, 11000000b	; 3000t
 	mulps	xmm0, xmm2
 	addps	xmm0, xmm1
-	movups	vec_dest, xmm0
+	movups	vec_result, xmm0
 ENDM
 	
 ;209 bytes
-Fmatrix4_mul_43 MACRO matrix_this:req, A:req, B:req
+Fmatrix4@mul_43 MACRO matrix_this:req, A:req, B:req
 	; заполн€ем регистры
 	xorps	xmm1, xmm1
 	movups	xmm4, A.i

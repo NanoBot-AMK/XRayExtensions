@@ -240,26 +240,24 @@ REGISTER_BOOL__GO MACRO register_fun_name:REQ, fun_name:REQ
 LOCAL script_function_name
 align_proc
 register_fun_name proc near
-
 var_48 = dword ptr -48h
 var_44 = dword ptr -44h
 var_3C = byte ptr -3Ch
-
 	sub     esp, 4Ch
 	push    esi
 	push    edi
-	lea     esi, [esp+54h+var_3C]
+	lea     esi, [esp+54h-3Ch]
 	mov     edi, eax
 	call    sub_1015DEF0
 	mov     eax, [edi]
 	push    eax
-	lea     esi, [esp+58h+var_48]
+	lea     esi, [esp+58h-48h]
 	call    sub_1014F020
 	mov     eax, esi
 	push    eax
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
-	mov     eax, [esp+54h+var_48]
+	mov     eax, [esp+54h-48h]
 	test    eax, eax
 	jz      short lab1
 	mov     ecx, [esp+54h+var_44]
@@ -267,17 +265,16 @@ var_3C = byte ptr -3Ch
 	push    ecx
 	call    eax
 	add     esp, 8
-
 lab1:
 	mov     edi, [edi]
 	push    edi
-	lea     esi, [esp+58h+var_48]
+	lea     esi, [esp+58h-48h]
 	call    sub_1014F450
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
+	mov     eax, [esp+54h-48h]
 	test    eax, eax
 	jz      short lab2
 	mov     ecx, [esp+54h+var_44]
@@ -285,14 +282,13 @@ lab1:
 	push    ecx
 	call    eax
 	add     esp, 8
-
 lab2:
-	lea     edx, [esp+54h+var_3C]
+	lea     edx, [esp+54h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z
-	lea     ecx, [esp+54h+var_3C]
+	lea     ecx, [esp+54h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ
 	pop     edi
 	mov     eax, ebx
@@ -330,18 +326,18 @@ var_3C          = byte ptr -3Ch
 	sub     esp, 4Ch
 	push    esi
 	push    edi
-	lea     esi, [esp+54h+var_3C]
+	lea     esi, [esp+54h-3Ch]
 	mov     edi, eax
 	call    sub_10151320
 	mov     eax, [edi]
 	push    eax
-	lea     esi, [esp+58h+var_48]
+	lea     esi, [esp+58h-48h]
 	call    sub_10151A80
 	mov     eax, esi
 	push    eax
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
+	mov     eax, [esp+54h-48h]
 	test    eax, eax
 	jz      short lab2
 	mov     ecx, [esp+54h+var_44]
@@ -353,13 +349,13 @@ var_3C          = byte ptr -3Ch
 lab2:
 	mov     edi, [edi]
 	push    edi
-	lea     esi, [esp+58h+var_48]
+	lea     esi, [esp+58h-48h]
 	call    sub_10151AE0
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
+	mov     eax, [esp+54h-48h]
 	test    eax, eax
 	jz      short lab1
 	mov     ecx, [esp+54h+var_44]
@@ -369,12 +365,12 @@ lab2:
 	add     esp, 8
 
 lab1:
-	lea     edx, [esp+54h+var_3C]
+	lea     edx, [esp+54h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h+var_3C]
+	lea     ecx, [esp+54h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
 	pop     edi
 	mov     eax, ebx
@@ -411,19 +407,19 @@ var_3C          = byte ptr -3Ch
 	sub     esp, 4Ch
 	push    esi
 	push    edi
-	lea     esi, [esp+54h+var_3C]
+	lea     esi, [esp+54h-3Ch]
 	mov     edi, eax
 	call    sub_10151320 ; +
 	mov     eax, [edi]
 	push    eax
-	lea     esi, [esp+58h+var_48]
+	lea     esi, [esp+58h-48h]
 	call    sub_10151A80 ; +
 	mov     eax, esi
 	push    eax
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	;+
 	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
-	mov     eax, [esp+54h+var_48]
+	mov     eax, [esp+54h-48h]
 	test    eax, eax
 	jz      short loc_1014E52D
 	mov     ecx, [esp+54h+var_44]
@@ -435,13 +431,13 @@ var_3C          = byte ptr -3Ch
 loc_1014E52D:
 	mov     edi, [edi]
 	push    edi
-	lea     esi, [esp+58h+var_48]
+	lea     esi, [esp+58h-48h]
 	call    sub_101513C0 ;+
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
-	mov     eax, [esp+54h+var_48]
+	mov     eax, [esp+54h-48h]
 	test    eax, eax
 	jz      short loc_1014E55A
 	mov     ecx, [esp+54h+var_44]
@@ -451,12 +447,12 @@ loc_1014E52D:
 	add     esp, 8
 
 loc_1014E55A:
-	lea     edx, [esp+54h+var_3C]
+	lea     edx, [esp+54h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+54h+var_3C]
+	lea     ecx, [esp+54h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ
 	pop     edi
 	mov     eax, ebx
@@ -494,7 +490,7 @@ var_3C          = byte ptr -3Ch
 	sub     esp, 4Ch
 	push    esi
 	push    edi
-	lea     esi, [esp+54h+var_3C]
+	lea     esi, [esp+54h-3Ch]
 	mov     edi, eax
 	call    sub_1014F820
 	mov     eax, [edi]
@@ -503,7 +499,7 @@ var_3C          = byte ptr -3Ch
 	call    sub_10150020
 	mov     eax, esi
 	push    eax
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
 	mov     eax, [esp+54h+var_48]
 	test    eax, eax
@@ -521,7 +517,7 @@ loc_1014DEDD:
 	call    sub_10150A80
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
 	mov     eax, [esp+54h+var_48]
 	test    eax, eax
@@ -533,12 +529,12 @@ loc_1014DEDD:
 	add     esp, 8
 
 loc_1014DF0A: 
-	lea     edx, [esp+54h+var_3C]
+	lea     edx, [esp+54h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+54h+var_3C]
+	lea     ecx, [esp+54h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
 	pop     edi
 	mov     eax, ebx
@@ -578,7 +574,7 @@ arg_0           = dword ptr  4
 	mov     ebp, [esp+50h+arg_0]
 	push    esi
 	push    edi
-	lea     edi, [esp+58h+var_3C]
+	lea     edi, [esp+58h-3Ch]
 	mov     ebx, eax
 	call    sub_1015EA90
 	mov     eax, [ebx]
@@ -605,7 +601,7 @@ loc_10159751:
 	call    sub_1015EC30
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+5Ch+var_3C]
+	lea     ecx, [esp+5Ch-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
 	mov     eax, [esp+58h+var_48]
 	test    eax, eax
@@ -617,12 +613,12 @@ loc_10159751:
 	add     esp, 8
 
 loc_1015977E:
-	lea     edx, [esp+58h+var_3C]
+	lea     edx, [esp+58h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
 	pop     edi
 	pop     esi
@@ -635,7 +631,7 @@ script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
 
-PERFORM_EXPORT_INT__STRING_INT MACRO registering_function:REQ, fun_to_export:REQ
+PERFORM_EXPORT_U32__STRING_INT MACRO registering_function:REQ, fun_to_export:REQ
 	mov     [esp+58h-48h], offset fun_to_export
 	xor     bl, bl
 	mov     byte ptr [esp+58h-38h], bl
@@ -648,8 +644,8 @@ PERFORM_EXPORT_INT__STRING_INT MACRO registering_function:REQ, fun_to_export:REQ
 	lea     eax, [esp+64h-48h]
 	call    registering_function
 ENDM
-
-REGISTER_INT__STRING_INT MACRO register_fun_name:REQ, fun_name:REQ
+;REGISTER_INT__STRING_INT
+REGISTER_U32__STRING_INT MACRO register_fun_name:REQ, fun_name:REQ
 LOCAL script_function_name
 align_proc
 register_fun_name proc near
@@ -665,7 +661,7 @@ arg_0           = dword ptr  4
 	mov     ebp, [esp+50h+arg_0]
 	push    esi
 	push    edi
-	lea     edi, [esp+58h+var_3C]
+	lea     edi, [esp+58h-3Ch]
 	mov     ebx, eax
 	call    sub_1015D390
 	mov     eax, [ebx]
@@ -692,7 +688,7 @@ loc_101588C1:
 	call    sub_1015D4E0
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+5Ch+var_3C]
+	lea     ecx, [esp+5Ch-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
 	mov     eax, [esp+58h+var_48]
 	test    eax, eax
@@ -703,12 +699,12 @@ loc_101588C1:
 	call    eax
 	add     esp, 8
 loc_101588EE: 
-	lea     edx, [esp+58h+var_3C]
+	lea     edx, [esp+58h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
 	pop     edi
 	pop     esi
@@ -753,7 +749,7 @@ arg_0           = dword ptr  4
 	mov     ebp, [esp+50h+arg_0]
 	push    esi
 	push    edi
-	lea     edi, [esp+58h+var_3C]
+	lea     edi, [esp+58h-3Ch]
 	mov     ebx, eax
 	call    sub_1015A230
 	mov     eax, [ebx]
@@ -780,7 +776,7 @@ loc_10157301:
 	call    sub_1015A320
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+5Ch+var_3C]
+	lea     ecx, [esp+5Ch-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z 
 	mov     eax, [esp+58h+var_48]
 	test    eax, eax
@@ -792,12 +788,12 @@ loc_10157301:
 	add     esp, 8
 
 loc_1015732E:
-	lea     edx, [esp+58h+var_3C]
+	lea     edx, [esp+58h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ 
 	pop     edi
 	pop     esi
@@ -891,15 +887,13 @@ REGISTER_VECTOR__STRING MACRO register_fun_name:REQ, fun_name:REQ
 LOCAL script_function_name
 align_proc
 register_fun_name proc near
-
 var_48          = dword ptr -48h
 var_44          = dword ptr -44h
 var_3C          = byte ptr -3Ch
-
 	sub     esp, 4Ch
 	push    esi
 	push    edi
-	lea     esi, [esp+54h+var_3C]
+	lea     esi, [esp+54h-3Ch]
 	mov     edi, eax
 	call    sub_1015C7E0
 	mov     eax, [edi]
@@ -908,7 +902,7 @@ var_3C          = byte ptr -3Ch
 	call    sub_1015C880
 	mov     eax, esi
 	push    eax
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
 	mov     eax, [esp+54h+var_48]
 	test    eax, eax
@@ -918,7 +912,6 @@ var_3C          = byte ptr -3Ch
 	push    ecx
 	call    eax
 	add     esp, 8
-
 loc_101583FD:
 	mov     edi, [edi]
 	push    edi
@@ -926,7 +919,7 @@ loc_101583FD:
 	call    sub_1015C8E0
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
 	mov     eax, [esp+54h+var_48]
 	test    eax, eax
@@ -936,14 +929,13 @@ loc_101583FD:
 	push    ecx
 	call    eax
 	add     esp, 8
-
 loc_1015842A:
-	lea     edx, [esp+54h+var_3C]
+	lea     edx, [esp+54h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebx
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h+var_3C]
+	lea     ecx, [esp+54h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
 	pop     edi
 	mov     eax, ebx
@@ -998,7 +990,7 @@ arg_4           = dword ptr  8
 	mov     ebp, [esp+4Ch+arg_4]
 	push    esi
 	push    edi
-	lea     ecx, [esp+54h+var_3C]
+	lea     ecx, [esp+54h-3Ch]
 	call    ds:??0overload_rep_base@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep_base::overload_rep_base(void)
 	xor     edi, edi
 	push    edi
@@ -1021,7 +1013,7 @@ arg_4           = dword ptr  8
 	call    sub_10150F20
 	mov     eax, esi
 	push    eax
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
 	mov     eax, [esp+54h+var_48]
 	cmp     eax, edi
@@ -1038,7 +1030,7 @@ loc_101579AF:
 	call    sub_1015B3E0
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
 	mov     eax, [esp+54h+var_48]
 	cmp     eax, edi
@@ -1050,12 +1042,12 @@ loc_101579AF:
 	add     esp, 8
 loc_101579DD:
 	mov     esi, [esp+54h+arg_0]
-	lea     edx, [esp+54h+var_3C]
+	lea     edx, [esp+54h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, esi
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+54h+var_3C]
+	lea     ecx, [esp+54h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
 	pop     edi
 	mov     eax, esi
@@ -1098,7 +1090,7 @@ arg_0           = dword ptr  4
 	mov     ebp, [esp+50h+arg_0]
 	push    esi
 	push    edi
-	lea     edi, [esp+58h+var_3C]
+	lea     edi, [esp+58h-3Ch]
 	mov     ebx, eax
 	call    sub_1014EE70
 	mov     eax, [ebx]
@@ -1125,7 +1117,7 @@ loc_1014C951:
 	call    sub_1014EFC0
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+5Ch+var_3C]
+	lea     ecx, [esp+5Ch-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
 	mov     eax, [esp+58h+var_48]
 	test    eax, eax
@@ -1137,12 +1129,12 @@ loc_1014C951:
 	add     esp, 8
 
 loc_1014C97E:
-	lea     edx, [esp+58h+var_3C]
+	lea     edx, [esp+58h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
 	pop     edi
 	pop     esi
@@ -1250,7 +1242,7 @@ arg_0           = dword ptr  4
 	mov     ebp, [esp+50h+arg_0]
 	push    esi
 	push    edi
-	lea     edi, [esp+58h+var_3C]
+	lea     edi, [esp+58h-3Ch]
 	mov     ebx, eax
 	call    sub_1015A380
 	mov     eax, [ebx]
@@ -1276,7 +1268,7 @@ loc_101573A1:
 	call    sub_1015A520
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+5Ch+var_3C]
+	lea     ecx, [esp+5Ch-3Ch]
 	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
 	mov     eax, [esp+58h+var_48]
 	test    eax, eax
@@ -1287,12 +1279,12 @@ loc_101573A1:
 	call    eax
 	add     esp, 8
 loc_101573CE:
-	lea     edx, [esp+58h+var_3C]
+	lea     edx, [esp+58h-3Ch]
 	push    edx
 	push    offset script_function_name
 	mov     ecx, ebp
 	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:??1overload_rep@detail@luabind@@QAE@XZ
 	pop     edi
 	pop     esi
@@ -1337,7 +1329,7 @@ arg_0           = dword ptr  4
 	mov     ebp, [esp+50h+arg_0]
 	push    esi
 	push    edi
-	lea     edi, [esp+58h+var_3C]
+	lea     edi, [esp+58h-3Ch]
 	mov     ebx, eax
 	call    sub_1015CC50
 	mov     eax, [ebx]
@@ -1365,7 +1357,7 @@ loc_10158651:
 	call    sub_1015CDA0
 	mov     edx, esi
 	push    edx
-	lea     ecx, [esp+5Ch+var_3C]
+	lea     ecx, [esp+5Ch-3Ch]
 	call    ds:luabind__detail__overload_rep__set_fun
 ;?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z
 ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
@@ -1378,14 +1370,14 @@ loc_10158651:
 	call    eax
 	add     esp, 8
 loc_1015867E:
-	lea     edx, [esp+58h+var_3C]
+	lea     edx, [esp+58h-3Ch]
 	push    edx
 	push    offset script_function_name ; "accessible_nearest"
 	mov     ecx, ebp
 	call    ds:luabind__detail__class_base__add_method
 ;?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z 
 	; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
-	lea     ecx, [esp+58h+var_3C]
+	lea     ecx, [esp+58h-3Ch]
 	call    ds:luabind__detail__overload_rep___overload_rep
 ;??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
 	pop     edi
@@ -1478,6 +1470,7 @@ arg_0           = dword ptr  4
 	pop     ebx
 	add     esp, 48h
 	retn    12
+align	4
 script_function_name db fun_name, 0
 register_fun_name endp
 ENDM
@@ -1512,3 +1505,215 @@ lab1:
 	mov     [esp+68h-48h], offset fun_to_export
 	call    register__void__float_float
 ENDM
+
+REGISTER_BOOL__PVECTOR MACRO register_fun_name:REQ, fun_name:REQ
+LOCAL script_function_name
+align_proc
+register_fun_name proc
+	sub     esp, 4Ch
+	push    esi
+	push    edi
+	lea     esi, [esp+54h-3Ch]
+	mov     edi, eax
+	call    sub_10151720
+	mov     eax, [edi]
+	push    eax
+	lea     esi, [esp+58h-48h]
+	call    sub_1015CAF0
+	mov     eax, esi
+	push    eax
+	lea     ecx, [esp+58h-3Ch]
+	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
+	mov     eax, [esp+54h-48h]
+	.if (eax)
+		mov     ecx, [esp+54h-44h]
+		push    1
+		push    ecx
+		call    eax
+		add     esp, 8
+	.endif
+	mov     edi, [edi]
+	push    edi
+	lea     esi, [esp+58h-48h]
+	call    sub_1015EA30
+	mov     edx, esi
+	push    edx
+	lea     ecx, [esp+58h-3Ch]
+	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
+	mov     eax, [esp+54h-48h]
+	.if (eax)
+		mov     ecx, [esp+54h-44h]
+		push    1
+		push    ecx
+		call    eax
+		add     esp, 8
+	.endif
+	lea     edx, [esp+54h-3Ch]
+	push    edx
+	push    offset script_function_name ; "accessible"
+	mov     ecx, ebx
+	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
+	lea     ecx, [esp+54h-3Ch]
+	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
+	pop     edi
+	mov     eax, ebx
+	pop     esi
+	add     esp, 4Ch
+	retn    8
+align	4
+script_function_name db fun_name, 0
+register_fun_name endp
+ENDM
+
+PERFORM_EXPORT_BOOL__PVECTOR MACRO registering_function:REQ, fun_to_export:REQ
+	mov     ecx, eax
+	mov     [esp+58h-38h], bl
+	mov     edx, [esp+58h-38h]
+	mov     [esp+58h-40h], bl
+	mov     eax, [esp+58h-40h]
+	push    edx
+	push    eax
+	lea     eax, [esp+60h-48h]
+	mov     ebx, ecx
+	mov     [esp+60h-48h], offset fun_to_export
+	call    registering_function
+ENDM
+
+REGISTER_BOOL__U32 MACRO register_fun_name:REQ, fun_name:REQ
+LOCAL script_function_name
+align_proc
+register_fun_name proc
+	sub     esp, 4Ch
+	push    esi
+	push    edi
+	lea     esi, [esp+54h-3Ch]
+	mov     edi, eax
+	call    sub_1015CB50
+	mov     eax, [edi]
+	push    eax
+	lea     esi, [esp+58h-48h]
+	call    sub_10150020
+	mov     eax, esi
+	push    eax
+	lea     ecx, [esp+58h-3Ch]
+	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
+	mov     eax, [esp+54h-48h]
+	.if (eax)
+		mov     ecx, [esp+54h-44h]
+		push    1
+		push    ecx
+		call    eax
+		add     esp, 8
+	.endif
+	mov     edi, [edi]
+	push    edi
+	lea     esi, [esp+58h-48h]
+	call    sub_1015CBF0
+	mov     edx, esi
+	push    edx
+	lea     ecx, [esp+58h-3Ch]
+	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
+	mov     eax, [esp+54h-48h]
+	.if (eax)
+		mov     ecx, [esp+54h-44h]
+		push    1
+		push    ecx
+		call    eax
+		add     esp, 8
+	.endif
+	lea     edx, [esp+54h-3Ch]
+	push    edx
+	push    offset script_function_name ; "accessible"
+	mov     ecx, ebx
+	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
+	lea     ecx, [esp+54h-3Ch]
+	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
+	pop     edi
+	mov     eax, ebx
+	pop     esi
+	add     esp, 4Ch
+	retn    8
+align	4
+script_function_name db fun_name, 0
+register_fun_name endp
+ENDM
+
+PERFORM_EXPORT_BOOL__U32 MACRO registering_function:REQ, fun_to_export:REQ
+	mov     ebx, eax
+	xor     al, al
+	mov     byte ptr [esp+58h-38h], al
+	mov     ecx, [esp+58h-38h]
+	mov     byte ptr [esp+58h-40h], al
+	mov     edx, [esp+58h-40h]
+	push    ecx
+	push    edx
+	lea     eax, [esp+60h-48h]
+	mov     [esp+60h-48h], offset fun_to_export
+	call    registering_function
+ENDM
+
+REGISTER_U32__STR_INT MACRO register_fun_name:REQ, fun_name:REQ
+LOCAL script_function_name
+align_proc
+register_fun_name proc
+	sub     esp, 48h
+	push    ebx
+	push    ebp
+	mov     ebp, [esp+50h+4];arg_0
+	push    esi
+	push    edi
+	lea     edi, [esp+58h-3Ch]
+	mov     ebx, eax
+	call    sub_1015D390
+	mov     eax, [ebx]
+	push    eax
+	lea     esi, [esp+5Ch-48h]
+	call    sub_1015D480
+	mov     eax, esi
+	push    eax
+	mov     ecx, edi
+	call    ds:?set_match_fun@overload_rep_base@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep_base::set_match_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
+	mov     eax, [esp+58h-48h]
+	.if (eax)
+		mov     ecx, [esp+58h-44h]
+		push    1
+		push    ecx
+		call    eax
+		add     esp, 8
+	.endif
+	mov     ebx, [ebx]
+	push    ebx
+	lea     esi, [esp+5Ch-48h]
+	call    sub_1015D4E0
+	mov     edx, esi
+	push    edx
+	lea     ecx, [esp+5Ch-3Ch]
+	call    ds:?set_fun@overload_rep@detail@luabind@@QAEXABV?$function1@HPAUlua_State@@V?$allocator@Vfunction_base@boost@@@std@@@boost@@@Z ; luabind::detail::overload_rep::set_fun(boost::function1<int,lua_State *,std::allocator<boost::function_base>> const &)
+	mov     eax, [esp+58h-48h]
+	.if (eax)
+		mov     ecx, [esp+58h-44h]
+		push    1
+		push    ecx
+		call    eax
+		add     esp, 8
+	.endif
+	lea     edx, [esp+58h-3Ch]
+	push    edx
+	push    offset script_function_name ; "get_task_state"
+	mov     ecx, ebp
+	call    ds:?add_method@class_base@detail@luabind@@QAEXPBDABUoverload_rep@23@@Z ; luabind::detail::class_base::add_method(char const *,luabind::detail::overload_rep const &)
+	lea     ecx, [esp+58h-3Ch]
+	call    ds:??1overload_rep@detail@luabind@@QAE@XZ ; luabind::detail::overload_rep::~overload_rep(void)
+	pop     edi
+	pop     esi
+	mov     eax, ebp
+	pop     ebp
+	pop     ebx
+	add     esp, 48h
+	retn    12
+align	4
+script_function_name db fun_name, 0
+register_fun_name endp
+ENDM
+
+; --
